@@ -2,6 +2,7 @@
 import { useAuth } from '@/contexts/AuthContext'
 import UserProfile from '@/components/common/UserProfile'
 import ButtonRouter from '@/components/common/ButtonRouter'
+import Link from 'next/link'
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
     const { user } = useAuth()
@@ -10,7 +11,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         <div className="min-h-screen flex flex-col">
             <header className="bg-blue-600 text-white p-4">
                 <div className="container mx-auto flex justify-between items-center">
-                    <h1 className="text-xl font-bold"><a href="/">IAD Eldorado - Cantina</a></h1>
+                    <Link href="/products" className='text-xl font-bold'>IAD Eldorado - Cantina</Link>
                     {!user && (
                         <div className="flex space-x-4">
                             <ButtonRouter
