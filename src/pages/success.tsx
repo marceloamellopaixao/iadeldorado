@@ -16,8 +16,6 @@ function SuccessPage() {
     const [validOrder, setValidOrder] = useState(false);
 
     useEffect(() => {
-        let unsubscribe: () => void;
-
         const verifyOrder = async () => {
             try {
 
@@ -27,7 +25,7 @@ function SuccessPage() {
                         where('orderId', '==', orderId)
                     );
 
-                    unsubscribe = onSnapshot(q, (querySnapshot) => {
+                    onSnapshot(q, (querySnapshot) => {
                         const orderData = querySnapshot.docs.map(doc => ({
                             id: doc.id,
                             ...doc.data()
@@ -47,7 +45,7 @@ function SuccessPage() {
                             where('clientWhatsApp', '==', localPhone) // Verifica o telefone do pedido
                         );
 
-                        unsubscribe = onSnapshot(q, (querySnapshot) => {
+                        onSnapshot(q, (querySnapshot) => {
                             const orderData = querySnapshot.docs.map(doc => ({
                                 id: doc.id,
                                 ...doc.data()
@@ -60,7 +58,7 @@ function SuccessPage() {
                         router.push('/products'); // Redireciona se não houver ID de pedido
                     }
                 }
-            } catch (error) {
+            } catch {
                 router.push('/products');
             } finally {
                 setLoading(false);
@@ -80,6 +78,21 @@ function SuccessPage() {
 
     if (!validOrder) {
         return null; // Redirecionamento já foi feito no useEffect
+    }
+
+    if (order.length === 0) {
+        return (
+            <div className="container mx-auto p-4 text-center">
+                <h1 className="text-2xl font-bold mb-4 text-red-500">Pedido não encontrado!</h1>
+                <p className="mb-6 text-black">Parece que seu pedido não foi encontrado. Por favor, entre em contato com o suporte.</p>
+                <button
+                    onClick={() => router.push('/products')}
+                    className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600"
+                >
+                    Voltar para Produtos
+                </button>
+            </div>
+        );
     }
 
     return (
