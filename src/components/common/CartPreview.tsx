@@ -1,6 +1,8 @@
 import { CartItem } from "@/types/order";
 import EmptyState from "./EmptyState";
 import { useRouter } from "next/router";
+import Image from "next/image";
+import closeIcon from "@/assets/icons/times-solid.svg"
 
 interface CartPreviewProps {
     items: CartItem[]; // Lista de itens do carrinho
@@ -16,7 +18,7 @@ export default function CartPreview({ items, total, onClose }: CartPreviewProps)
             <div className="bg-white w-full max-w-md h-full p-4 overflow-y-auto">
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-xl text-black font-bold">Seu Carrinho</h2>
-                    <button onClick={onClose} className="text-gray-500">X</button>
+                    <button onClick={onClose} className="text-gray-500"><Image src={closeIcon} alt="Fechar" width={18} height={18} /></button>
                 </div>
 
                 {items.length === 0 ? (
