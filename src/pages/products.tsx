@@ -3,13 +3,12 @@ import { useCart } from '@/hooks/useCart';
 import { ProductCard } from '@/components/common/ProductCard';
 import { withAuth } from '@/hooks/withAuth';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
-import { ErrorDisplay } from '@/components/common/ErrorDisplay';
 import { useProducts } from '@/hooks/useProducts';
 import CartPreview from '@/components/common/CartPreview';
 import Button from '@/components/common/ButtonRouter';
 
 function ProductsPage() {
-    const { products, loading, error } = useProducts();
+    const { products, loading } = useProducts();
     const {
         cartItems,
         addToCart,
@@ -19,13 +18,9 @@ function ProductsPage() {
     } = useCart();
 
     const [showCart, setShowCart] = useState(false);
-
+    
     if (loading) {
         return <LoadingSpinner message='Carregando produtos...' />
-    }
-
-    if (error) {
-        return <ErrorDisplay message={error} onRetry={() => window.location.reload()} />
     }
 
     return (
