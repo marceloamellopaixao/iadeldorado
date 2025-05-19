@@ -48,4 +48,6 @@ export interface Order {
     userId: string | null; // ID do usuário que fez o pedido (opcional, se o usuário estiver logado)
     createdAt: Date; // Data de criação do pedido
     updatedAt?: Date; // Data de atualização do pedido
+    lastOrderId?: string; // ID do último pedido (opcional, se o usuário estiver deslogado)
+    lastOrderPhone?: string; // Número do último pedido (opcional, se o usuário estiver deslogado)
 }
