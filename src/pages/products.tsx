@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useCart } from '@/hooks/useCart';
 import { ProductCard } from '@/components/common/ProductCard';
 import { withAuth } from '@/hooks/withAuth';
