@@ -17,7 +17,7 @@ export default function SalesReport() {
 
     useEffect(() => {
         fetchSalesData(dateRange.start, dateRange.end);
-    }, [dateRange])
+    }, [dateRange, fetchSalesData]);
 
     return (
         <div className="container mx-auto p-4 max-w-2xl rounded-lg shadow-md">
