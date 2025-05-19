@@ -16,6 +16,8 @@ function SuccessPage() {
     const [validOrder, setValidOrder] = useState(false);
 
     useEffect(() => {
+        let unsubscribe: () => void;
+
         const verifyOrder = async () => {
             try {
 
@@ -25,7 +27,7 @@ function SuccessPage() {
                         where('orderId', '==', orderId)
                     );
 
-                    onSnapshot(q, (querySnapshot) => {
+                    unsubscribe = onSnapshot(q, (querySnapshot) => {
                         const orderData = querySnapshot.docs.map(doc => ({
                             id: doc.id,
                             ...doc.data()
@@ -45,7 +47,7 @@ function SuccessPage() {
                             where('clientWhatsApp', '==', localPhone) // Verifica o telefone do pedido
                         );
 
-                        onSnapshot(q, (querySnapshot) => {
+                        unsubscribe = onSnapshot(q, (querySnapshot) => {
                             const orderData = querySnapshot.docs.map(doc => ({
                                 id: doc.id,
                                 ...doc.data()
@@ -65,7 +67,15 @@ function SuccessPage() {
             }
         };
 
+
+
         verifyOrder();
+
+        return () => {
+            if (unsubscribe) {
+                unsubscribe();
+            }
+        };
     }, [orderId, user, router]);
 
     if (loading) {
@@ -78,21 +88,6 @@ function SuccessPage() {
 
     if (!validOrder) {
         return null; // Redirecionamento já foi feito no useEffect
-    }
-
-    if (order.length === 0) {
-        return (
-            <div className="container mx-auto p-4 text-center">
-                <h1 className="text-2xl font-bold mb-4 text-red-500">Pedido não encontrado!</h1>
-                <p className="mb-6 text-black">Parece que seu pedido não foi encontrado. Por favor, entre em contato com o suporte.</p>
-                <button
-                    onClick={() => router.push('/products')}
-                    className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600"
-                >
-                    Voltar para Produtos
-                </button>
-            </div>
-        );
     }
 
     return (
@@ -115,10 +110,21 @@ function SuccessPage() {
                 <h1 className="text-2xl font-bold mb-4 text-black">Pedido Confirmado!</h1>
                 <p className="mb-6 text-black">Obrigado por sua compra. Seu pedido foi recebido e está sendo processado.</p>
 
-                {orderId && (
+                {orderId ? (
                     <div className="bg-gray-50 p-4 rounded mb-6">
                         <p className="font-medium text-black">Número do Pedido:</p>
                         <p className="text-lg text-black">#{String(orderId?.slice(0, 5)).toUpperCase()}</p>
+                    </div>
+                ) : (
+                    <div className="container mx-auto p-4 text-center">
+                        <h1 className="text-2xl font-bold mb-4 text-red-500">Pedido não encontrado!</h1>
+                        <p className="mb-6 text-red-500">Parece que seu pedido não foi encontrado. Por favor, entre em contato com o suporte.</p>
+                        <button
+                            onClick={() => router.push('/products')}
+                            className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600"
+                        >
+                            Voltar para Produtos
+                        </button>
                     </div>
                 )}
 
