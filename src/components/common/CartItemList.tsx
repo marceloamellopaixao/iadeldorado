@@ -1,20 +1,22 @@
+import { useProducts } from "@/hooks/useProducts";
 import { CartItem } from "@/types/order";
-import { Product } from "@/types/product";
-import { useEffect } from "react";
 
 interface CartItemListProps {
     items: CartItem[]; // Lista de itens do carrinho
-    productStock: any; // Estoque do produto
     onUpdateQuantity: (productId: string, quantity: number) => void; // Função chamada para atualizar a quantidade do produto no carrinho
     onRemoveFromCart: (productId: string) => void; // Função chamada ao remover o produto do carrinho
 }
 
 export default function CartItemList({
     items,
-    productStock,
     onUpdateQuantity,
     onRemoveFromCart
 }: CartItemListProps) {
+    const { products } = useProducts(); // Hook para obter os produtos disponíveis
+
+    // O estoque do produto é obtido pelo ID do produto consultando o Firestore
+    const productStock = products.find(product => product.id === items[0].id)?.stock || 0;
+
 
     return (
         <div className="space-y-4">
@@ -29,7 +31,7 @@ export default function CartItemList({
                         <div className="flex items-center border rounded">
                             <button
                                 onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
-                                className="px-3 py-1 hover:bg-gray-100"
+                                className="px-3 py-1 text-white hover:bg-gray-100 hover:text-black"
                                 disabled={item.quantity <= 1}
                             >
                                 -
@@ -38,8 +40,9 @@ export default function CartItemList({
                             <span className="px-2">{item.quantity}</span>
 
                             <button
-                                onClick={() => onUpdateQuantity(item.id, item.quantity + 1 > productStock ? productStock : item.quantity + 1)}
-                                className="px-3 py-1 hover:bg-gray-100"
+                                onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+                                disabled={item.quantity >= productStock}
+                                className="px-3 py-1 text-white hover:bg-gray-100 hover:text-black"
                             >
                                 +
                             </button>
