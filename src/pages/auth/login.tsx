@@ -29,7 +29,7 @@ function Login() {
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100">
             <div className="bg-white p-8 rounded shadow-md w-96">
-                <h1 className="text-2x1 font-bold mb-6 text-center">Login</h1>
+                <h1 className="text-2xl font-bold mb-6 text-center text-black">Login</h1>
                 {error && <p className="text-red-500 mb-4">{error}</p>}
 
                 <form onSubmit={handleLogin}>
@@ -38,7 +38,7 @@ function Login() {
                         <input
                             type="email" value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full px-3 py-2 border rounded"
+                            className="w-full text-gray-700 px-3 py-2 border-3 rounded border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             required
                         />
                     </div>
@@ -47,7 +47,7 @@ function Login() {
                         <input
                             type="password" value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="w-full px-3 py-2 border rounded"
+                            className="w-full text-gray-700 px-3 py-2 border-3 border-blue-500 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                             required
                         />
                     </div>
