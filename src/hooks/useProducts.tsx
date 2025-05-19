@@ -6,27 +6,44 @@ import { Product } from '@/types/product';
 export const useProducts = () => {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
 
+    // Busca os produtos do Firestore
     useEffect(() => {
-        const q = query(collection(db, 'products'), where('status', '==', true));
-        const unsubscribe = onSnapshot(q,
-            (snapshot) => {
-                setProducts(snapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                }) as Product));
-                setLoading(false);
-            },
-            (err) => {
-                setError('Erro ao carregar produtos');
-                console.error(err);
+        let unsubscribe: () => void;
+
+        const loadProducts = async () => {
+            setLoading(true);
+            try {
+                const q = query(collection(db, 'products'), where('status', '==', true));
+                unsubscribe = onSnapshot(q, (snapshot) => {
+                    setProducts(snapshot.docs.map(doc => ({
+                        id: doc.id,
+                        ...doc.data()
+                    }) as Product));
+                    setLoading(false);
+                });
+            } catch {
                 setLoading(false);
             }
-        );
+        }
 
-        return unsubscribe;
+        loadProducts();
+
+        return () => {
+            if (unsubscribe) {
+                unsubscribe();
+            }
+        };
     }, []);
 
-    return { products, loading, error };
+    // Simula um carregamento de dados
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setLoading(false);
+        }, 2000);
+
+        return () => clearTimeout(timer);
+    }, []);
+
+    return { products, loading };
 };
