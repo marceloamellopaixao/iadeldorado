@@ -13,13 +13,6 @@ function SellerOrdersPage() {
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState<OrderStatus | 'todos'>('todos');
 
-    // Função para calcular o total do pedido
-    const calculateTotal = (items: CartItem[]): string => {
-        return items.reduce((sum, item) => sum + (item.price * item.quantity), 0)
-                    .toFixed(2)
-                    .replace('.', ',');
-    };
-
     // Busca pedidos com filtro e em tempo real
     useEffect(() => {
         let unsubscribe: () => void;
@@ -47,7 +40,9 @@ function SellerOrdersPage() {
                         ...doc.data(),
                         createdAt: doc.data().createdAt.toDate(),
                         updatedAt: doc.data().updatedAt?.toDate(),
-                        total: Number(calculateTotal(doc.data().items)),
+                        total: doc.data().items.reduce((sum: number, item: { price: number; quantity: number; }) => sum + (item.price * item.quantity), 0)
+                            .toFixed(2)
+                            .replace('.', ','),
                     })) as Order[];
                     setOrders(ordersData);
                     setFilteredOrders(ordersData);
