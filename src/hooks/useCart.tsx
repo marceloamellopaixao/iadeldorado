@@ -84,7 +84,7 @@ export const useCart = () => {
         const existingIndex = items.findIndex(item => item.id === product.id);
 
         if (existingIndex >= 0) {
-            items[existingIndex].quantity == 1;
+            items[existingIndex].quantity = 1;
             showNotification(`${product.name} já está no carrinho!`);
         } else {
             items.push({
