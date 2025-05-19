@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { collection, getDocs, deleteDoc, doc, query, onSnapshot } from "firebase/firestore";
+import { collection, deleteDoc, doc, query, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Product } from "@/types/product";
 import LoadingSpinner from "../../common/LoadingSpinner";
