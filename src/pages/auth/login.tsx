@@ -16,7 +16,7 @@ function Login() {
         e.preventDefault();
         try {
             await signInWithEmailAndPassword(auth, email, password);
-        } catch (error) {
+        } catch {
             setError("Email ou senha inválidos!");
         }
     };
