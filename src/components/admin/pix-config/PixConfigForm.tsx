@@ -21,7 +21,12 @@ export default function PixConfigForm({ cantina }: PixConfigFormProps) {
             const docSnap = await getDoc(docRef);
 
             if (docSnap.exists()) {
-                setFormData(docSnap.data() as any);
+                setFormData(docSnap.data() as {
+                    name: string;
+                    keyType: PixType;
+                    key: string;
+                    owner: string;
+                });
             }
         };
 
