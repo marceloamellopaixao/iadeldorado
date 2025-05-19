@@ -29,7 +29,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                     {user && <UserProfile />}
                 </div>
             </header>
-            <main className="flex-grow container mx-auto p-4">{children}</main>
+            <main>{children}</main>
         </div>
     )
 }
