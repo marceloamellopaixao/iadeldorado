@@ -45,7 +45,7 @@ export default function PasswordUpdateForm() {
             // Envia e-mail de verificação
             await sendEmailVerification(user);
 
-            alert('Senha alterada! Verifique seu e-mail para confirmação.');
+            alert('Verifique seu e-mail para confirmação.');
             setCurrentPassword('');
             setNewPassword('');
             setConfirmPassword('');
