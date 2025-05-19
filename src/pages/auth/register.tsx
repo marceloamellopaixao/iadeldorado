@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { useRouter } from "next/router";
@@ -16,7 +16,7 @@ function Register() {
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            let userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 
             await setDoc(doc(db, "users", userCredential.user.uid), {
                 name,
