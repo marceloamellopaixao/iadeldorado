@@ -86,7 +86,7 @@ export default function CheckoutForm({ cartItems }: CheckoutFormProps) {
             let pixDetails = null;
             if (formData.paymentMethod === "pix") {
                 const pixDoc = await getDoc(doc(db, 'pixConfig', 'jovens'));
-                return pixDetails = pixDoc.exists() ? pixDoc.data() : null;
+                pixDetails = pixDoc.exists() ? pixDoc.data() : null;
             }
 
             // Cria o pedido no Firestore
