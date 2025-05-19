@@ -2,9 +2,8 @@ import { useState, useEffect } from 'react';
 import { CartItem } from '@/types/order';
 import { Product } from '@/types/product';
 import { db } from '@/lib/firebase';
-import { doc, getDoc, setDoc, updateDoc, arrayUnion, arrayRemove, query, collection, where, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
 import { useAuth } from '@/contexts/AuthContext';
-import { get } from 'http';
 
 export const useCart = () => {
     const { user } = useAuth();
@@ -47,7 +46,7 @@ export const useCart = () => {
                     const savedCart = localStorage.getItem('tempCart');
                     setTempCart(savedCart ? JSON.parse(savedCart) : []);
                 }
-            } catch (error) {
+            } catch {
                 return;
             } finally {
                 setLoading(false);
@@ -72,8 +71,8 @@ export const useCart = () => {
             } else {
                 localStorage.setItem('tempCart', JSON.stringify(items));
             }
-        } catch (error) {
-            console.error('Erro ao atualizar o carrinho: ', error);
+        } catch {
+            return;
         }
     };
 
@@ -86,7 +85,6 @@ export const useCart = () => {
 
         if (existingIndex >= 0) {
             items[existingIndex].quantity == 1;
-
             showNotification(`${product.name} já está no carrinho!`);
         } else {
             items.push({
@@ -96,8 +94,14 @@ export const useCart = () => {
                 quantity: 1,
             });
 
-            user ? setCartItems(items) : setTempCart(items);
+            if (user) {
+                setCartItems(items);
+            } else {
+                setTempCart(items);
+            }
+
             await updateCart(items);
+
             showNotification(`${product.name} foi adicionado ao carrinho!`);
         }
     };
@@ -105,8 +109,15 @@ export const useCart = () => {
     // Remove item do carrinho
     const removeFromCart = async (productId: string) => {
         const items = (user ? cartItems : tempCart).filter(item => item.id !== productId);
-        user ? setCartItems(items) : setTempCart(items);
+
+        if (user) {
+            setCartItems(items);
+        } else {
+            setTempCart(items);
+        }
+
         await updateCart(items);
+        showNotification('Produto removido do carrinho!');
     };
 
     // Atualiza a quantidade do item no carrinho
@@ -118,7 +129,11 @@ export const useCart = () => {
 
         if (itemIndex >= 0) {
             items[itemIndex].quantity = newQuantity;
-            user ? setCartItems(items) : setTempCart(items);
+            if (user) {
+                setCartItems(items);
+            } else {
+                setTempCart(items);
+            }
             await updateCart(items);
         }
     };
