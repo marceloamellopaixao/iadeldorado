@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 export const withAuth = (allowedRoles: string[]) => (WrappedComponent: React.ComponentType) => {
-    const Wrapper = (props: any) => {
+    const Wrapper = () => {
         const { userData, loading } = useAuth();
         const router = useRouter();
 
@@ -19,7 +19,7 @@ export const withAuth = (allowedRoles: string[]) => (WrappedComponent: React.Com
                 router.push('/auth/login?redirect=' + encodeURIComponent(router.asPath)); // Redireciona para a página inicial ou outra página de sua escolha
             }
 
-        }, [userData, loading]);
+        }, [userData, loading, router]);
 
         if (loading) {
             return <LoadingSpinner message='Verificando usuário...' />; // Exibe um loading spinner enquanto verifica o estado de autenticação
@@ -27,7 +27,7 @@ export const withAuth = (allowedRoles: string[]) => (WrappedComponent: React.Com
 
         // Se a rota não requer autenticação ou se o usuário tem permissão, renderiza o componente
         if (allowedRoles.length === 0 || (userData && allowedRoles.includes(userData.role))) {
-            return <WrappedComponent {...props} />;
+            return <WrappedComponent />;
         }
 
         // Se o usuário não tem permissão, redireciona para a página de produtos
