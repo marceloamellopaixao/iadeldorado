@@ -20,11 +20,13 @@ function SuccessPage() {
 
         const verifyOrder = async () => {
             try {
+                let q;
 
                 if (user) {
-                    const q = query(
+                    q = query(
                         collection(db, 'orders'),
-                        where('orderId', '==', orderId)
+                        where('orderId', '==', orderId),
+                        where('clientId', '==', user.uid) // Verifica o ID do cliente
                     );
 
                     unsubscribe = onSnapshot(q, (querySnapshot) => {
@@ -36,14 +38,15 @@ function SuccessPage() {
                     });
 
                     setValidOrder(true);
+
                 } else {
                     const localOrderId = localStorage.getItem('lastOrderId'); // Armazena o ID do pedido no localStorage
                     const localPhone = localStorage.getItem('lastOrderPhone'); // Armazena o telefone no localStorage
 
                     if (orderId == localOrderId) {
-                        const q = query(
+                        q = query(
                             collection(db, 'orders'),
-                            where('orderId', '==', orderId),
+                            where('orderId', '==', localOrderId),
                             where('clientWhatsApp', '==', localPhone) // Verifica o telefone do pedido
                         );
 
@@ -57,6 +60,8 @@ function SuccessPage() {
 
                         setValidOrder(true);
                     } else {
+                        setOrder([]);
+                        setValidOrder(false);
                         router.push('/products'); // Redireciona se não houver ID de pedido
                     }
                 }
@@ -66,7 +71,6 @@ function SuccessPage() {
                 setLoading(false);
             }
         };
-
 
 
         verifyOrder();
@@ -85,9 +89,20 @@ function SuccessPage() {
             </div>
         )
     }
-
+    
     if (!validOrder) {
-        return null; // Redirecionamento já foi feito no useEffect
+        return (
+            <div className="container mx-auto p-4 text-center">
+                <h1 className="text-2xl font-bold mb-4">Pedido não encontrado</h1>
+                <p className="mb-6">Parece que seu pedido não foi encontrado. Por favor, verifique o ID do pedido.</p>
+                <button
+                    onClick={() => router.push('/products')}
+                    className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600"
+                >
+                    Voltar para Produtos
+                </button>
+            </div>
+        );
     }
 
     return (
@@ -110,21 +125,10 @@ function SuccessPage() {
                 <h1 className="text-2xl font-bold mb-4 text-black">Pedido Confirmado!</h1>
                 <p className="mb-6 text-black">Obrigado por sua compra. Seu pedido foi recebido e está sendo processado.</p>
 
-                {orderId ? (
+                {orderId && (
                     <div className="bg-gray-50 p-4 rounded mb-6">
                         <p className="font-medium text-black">Número do Pedido:</p>
                         <p className="text-lg text-black">#{String(orderId?.slice(0, 5)).toUpperCase()}</p>
-                    </div>
-                ) : (
-                    <div className="container mx-auto p-4 text-center">
-                        <h1 className="text-2xl font-bold mb-4 text-red-500">Pedido não encontrado!</h1>
-                        <p className="mb-6 text-red-500">Parece que seu pedido não foi encontrado. Por favor, entre em contato com o suporte.</p>
-                        <button
-                            onClick={() => router.push('/products')}
-                            className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600"
-                        >
-                            Voltar para Produtos
-                        </button>
                     </div>
                 )}
 
