@@ -1,19 +1,24 @@
 import { useState, useEffect } from 'react';
-import { collection, query, where, getDocs, updateDoc, doc, onSnapshot, orderBy } from 'firebase/firestore';
+import { collection, query, where, updateDoc, doc, onSnapshot, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { Order, OrderStatus } from '@/types/order';
+import { CartItem, Order, OrderStatus } from '@/types/order';
 import { createWhatsAppMessage } from '@/utils/whatsapp';
 import { withAuth } from '@/hooks/withAuth'
 import LoadingSpinner from '@/components/common/LoadingSpinner';
-import { ErrorDisplay } from '@/components/common/ErrorDisplay';
 import { format } from 'date-fns';
 
 function SellerOrdersPage() {
     const [orders, setOrders] = useState<Order[]>([]);
     const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
     const [filter, setFilter] = useState<OrderStatus | 'todos'>('todos');
+
+    // Função para calcular o total do pedido
+    const calculateTotal = (items: CartItem[]): string => {
+        return items.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+                    .toFixed(2)
+                    .replace('.', ',');
+    };
 
     // Busca pedidos com filtro e em tempo real
     useEffect(() => {
@@ -42,13 +47,13 @@ function SellerOrdersPage() {
                         ...doc.data(),
                         createdAt: doc.data().createdAt.toDate(),
                         updatedAt: doc.data().updatedAt?.toDate(),
-                        total: calculateTotal(doc.data().items), // Calcula o total
+                        total: Number(calculateTotal(doc.data().items)),
                     })) as Order[];
                     setOrders(ordersData);
                     setFilteredOrders(ordersData);
                 });
 
-            } catch (error) {
+            } catch {
                 return;
             } finally {
                 setLoading(false);
@@ -58,16 +63,9 @@ function SellerOrdersPage() {
         fetchOrders();
 
         return () => {
-            if (unsubscribe) {
-                unsubscribe();
-            }
+            if (unsubscribe) unsubscribe();
         };
     }, [filter]);
-
-    // Função para calcular o total do pedido
-    const calculateTotal = (items: any[]) => {
-        return items.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2).replace('.', ',')
-    };
 
     const updateOrderStatus = async (orderId: string, newStatus: OrderStatus) => {
         try {
@@ -87,7 +85,7 @@ function SellerOrdersPage() {
                 const message = createWhatsAppMessage({
                     name: order.clientName,
                     items: order.items,
-                    total: calculateTotal(order.items),
+                    total: parseFloat(order.total.toFixed(2).replace('.', ',')),
                     paymentMethod: order.paymentMethod,
                     pixDetails: order.selectedPix
                 });
@@ -97,9 +95,8 @@ function SellerOrdersPage() {
                     '_blank'
                 );
             }
-        } catch (error) {
-            setError('Erro ao atualizar status do pedido. Tente novamente mais tarde.');
-            console.error(error);
+        } catch {
+            return;
         }
     };
 
@@ -130,6 +127,18 @@ function SellerOrdersPage() {
                     { value: 'não pago', label: 'Marcar como Não Pago', color: 'bg-gray-500 hover:bg-gray-600' }
                 );
                 break;
+            case 'pago':
+                options.push(
+                    { value: 'concluido', label: 'Concluir', color: 'bg-green-500 hover:bg-green-600' },
+                    { value: 'cancelado', label: 'Cancelar', color: 'bg-red-500 hover:bg-red-600' }
+                );
+                break;
+            case 'não pago':
+                options.push(
+                    { value: 'pago', label: 'Marcar como Pago', color: 'bg-blue-500 hover:bg-blue-600' },
+                    { value: 'cancelado', label: 'Cancelar', color: 'bg-red-500 hover:bg-red-600' }
+                );
+                break;
             case 'concluido':
                 options.push(
                     { value: 'entregue', label: 'Marcar como Entregue', color: 'bg-purple-500 hover:bg-purple-600' }
@@ -154,10 +163,6 @@ function SellerOrdersPage() {
 
     if (loading) {
         return <LoadingSpinner message='Carregando pedidos...' />
-    }
-
-    if (error) {
-        return <ErrorDisplay message={error} onRetry={() => window.location.reload()} />
     }
 
     return (
