@@ -1,5 +1,4 @@
 import { Product } from "@/types/product";
-import { useState } from "react";
 
 interface ProductCardProps {
     product: Product;  // Objeto do tipo Product que contém as informações do produto
