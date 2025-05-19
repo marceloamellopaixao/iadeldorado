@@ -12,7 +12,7 @@ export default function Button({ nameButton, color, rota }: ButtonProps) {
     const handleSubmit = async () => {
         try {
             router.push(rota);
-        } catch (error) {
+        } catch {
             return;
         }
     }
