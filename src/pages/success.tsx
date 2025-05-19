@@ -105,6 +105,8 @@ function SuccessPage() {
         );
     }
 
+    if (!order) return null;
+
     return (
         <div className="container mx-auto p-4 text-center">
             <div className="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md">
