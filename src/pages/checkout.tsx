@@ -3,11 +3,9 @@ import { withAuth } from "@/hooks/withAuth";
 import { useRouter } from "next/router";
 import CheckoutForm from "@/components/common/CheckoutForm";
 import CartItemList from "@/components/common/CartItemList";
-import { useProducts } from "@/hooks/useProducts";
 
 function CheckoutPage() {
     const { cartItems, total, updateQuantity, removeFromCart } = useCart();
-    const { products } = useProducts();
     const router = useRouter();
 
     if (cartItems.length === 0) {
@@ -31,9 +29,6 @@ function CheckoutPage() {
                 <div className="md:col-span-2">
                     <CartItemList
                         items={cartItems}
-                        productStock={products.some(
-                            product => product.id === cartItems[0].id) 
-                            ? products.find(product => product.id === cartItems[0].id)?.stock : 0}
                         onUpdateQuantity={updateQuantity}
                         onRemoveFromCart={removeFromCart}
                     />
