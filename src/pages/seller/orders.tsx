@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { collection, query, where, updateDoc, doc, onSnapshot, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { CartItem, Order, OrderStatus } from '@/types/order';
+import { Order, OrderStatus } from '@/types/order';
 import { createWhatsAppMessage } from '@/utils/whatsapp';
 import { withAuth } from '@/hooks/withAuth'
 import LoadingSpinner from '@/components/common/LoadingSpinner';
