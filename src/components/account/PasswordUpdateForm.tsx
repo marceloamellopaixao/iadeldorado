@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { EmailAuthProvider, reauthenticateWithCredential, updatePassword, sendEmailVerification } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
 import { useAuth } from '@/contexts/AuthContext';
+import { ErrorDisplay } from '../common/ErrorDisplay';
 
 export default function PasswordUpdateForm() {
     const [currentPassword, setCurrentPassword] = useState('');
@@ -49,10 +49,10 @@ export default function PasswordUpdateForm() {
             setCurrentPassword('');
             setNewPassword('');
             setConfirmPassword('');
-        } catch (error: any) {
+        } catch (error) {
             console.error('Erro ao atualizar a senha:', error);
 
-            switch (error.code) {
+            switch (error) {
                 case 'auth/wrong-password':
                     setError('Senha atual incorreta. Tente novamente.');
                     break;
@@ -63,12 +63,16 @@ export default function PasswordUpdateForm() {
                     setError('Você precisa logar novamente para atualizar a senha.');
                     break;
                 default:
-                    setError('Erro ao atualizar a senha: ' + error.message);
+                    setError('Erro ao atualizar a senha: ' + error);
             }
         } finally {
             setLoading(false);
         }
     };
+
+    if (error) {
+        return <ErrorDisplay message={error} onRetry={() => window.location.reload()} />;
+    }
 
     return (
         <form onSubmit={handleSubmit} className='space-y-4'>
