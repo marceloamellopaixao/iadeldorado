@@ -18,7 +18,9 @@ export default function CartPreview({ items, total, onClose }: CartPreviewProps)
             <div className="bg-white w-full max-w-md h-full p-4 overflow-y-auto">
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-xl text-black font-bold">Seu Carrinho</h2>
-                    <button onClick={onClose} className="text-gray-500"><Image src={closeIcon} alt="Fechar" width={18} height={18} /></button>
+                    <button onClick={onClose} className="text-gray-500 hover:cursor-pointer">
+                        <Image src={closeIcon} alt="Fechar" width={18} height={18} />
+                    </button>
                 </div>
 
                 {items.length === 0 ? (
