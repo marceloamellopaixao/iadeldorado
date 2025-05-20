@@ -15,11 +15,14 @@ export default function LogoutButton() {
     };
 
     return (
-        <button
-            onClick={handleLogout}
-            className="bg-red-500 text-white font-bold py-2 px-4 rounded hover:bg-red-800 transition duration-300 cursor-pointer"
-        >
-            Sair
-        </button>
+        <div className="w-full justify-center md:w-auto">
+            <button
+                onClick={handleLogout}
+                className="block w-full bg-red-600 text-white px-4 py-2 hover:bg-red-800 transition duration-300 md:bg-transparent md:hover:bg-red-800"
+            >
+                Sair
+            </button>
+        </div>
+
     );
 }
