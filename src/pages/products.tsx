@@ -31,6 +31,7 @@ function ProductsPage() {
                 <h1 className="text-2xl font-bold">Produtos</h1>
                 <div className='flex items-center gap-4'>
                     <Button
+                        disabled={false}
                         rota='/checkout'
                         color='bg-blue-500 text-white font-bold rounded-full h-10 w-40 hover:bg-blue-800 transition duration-300'>
                         Finalizar Pedido
