@@ -1,17 +1,20 @@
-import { useState, useEffect } from 'react';
-import { collection, query, where, updateDoc, doc, onSnapshot, orderBy } from 'firebase/firestore';
+import { useState, useEffect, useRef } from 'react';
+import { collection, query, where, updateDoc, doc, onSnapshot, orderBy, increment } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Order, OrderStatus } from '@/types/order';
 import { createWhatsAppMessage } from '@/utils/whatsapp';
 import { withAuth } from '@/hooks/withAuth'
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { format } from 'date-fns';
+import { useDropdownClose } from '@/hooks/useDropdownClose';
 
 function SellerOrdersPage() {
     const [orders, setOrders] = useState<Order[]>([]);
     const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState<OrderStatus | 'todos'>('todos');
+    const { dropdownStates, setDropdownRef, toggleDropdown } = useDropdownClose();
+
 
     // Busca pedidos com filtro e em tempo real
     useEffect(() => {
@@ -62,25 +65,47 @@ function SellerOrdersPage() {
         };
     }, [filter]);
 
+    // Atualiza o estado dos pedidos
+    useEffect(() => {
+        if (filter === 'todos') {
+            setFilteredOrders(orders);
+        } else {
+            setFilteredOrders(orders.filter((order) => order.status === filter));
+        }
+    }, [filter, orders]);
+
+    // Atualiza o status do pedido
     const updateOrderStatus = async (orderId: string, newStatus: OrderStatus) => {
         try {
             const orderRef = doc(db, 'orders', orderId);
             const order = orders.find((o) => o.id === orderId);
 
-            if (!order) {
-                throw new Error('Pedido não encontrado');
-            };
+            if (!order) throw new Error('Pedido não encontrado');
 
+            // Se o pedido for cancelado, devolver itens ao estoque
+            if (newStatus === 'cancelado') {
+                const updateStockPromises = order.items.map(async (item) => {
+                    const productRef = doc(db, 'products', item.id); // supondo que `item.id` é o mesmo do produto
+                    await updateDoc(productRef, {
+                        stock: increment(item.quantity) // adiciona a quantidade cancelada de volta
+                    });
+                });
+
+                await Promise.all(updateStockPromises);
+            }
+
+            // Atualiza status do pedido
             await updateDoc(orderRef, {
                 status: newStatus,
                 updatedAt: new Date(),
             });
 
+            // Se for concluído, enviar mensagem pelo WhatsApp
             if (newStatus === 'concluido') {
                 const message = createWhatsAppMessage({
                     name: order.clientName,
                     items: order.items,
-                    total: parseFloat(order.total.toFixed(2).replace('.', ',')),
+                    total: order.total,
                     paymentMethod: order.paymentMethod,
                     pixDetails: order.selectedPix
                 });
@@ -90,11 +115,13 @@ function SellerOrdersPage() {
                     '_blank'
                 );
             }
-        } catch {
-            return;
+
+        } catch (error) {
+            console.error('Erro ao atualizar status do pedido:', error);
         }
     };
 
+    // Função para obter as opções de status com base no status atual
     const getStatusOptions = (currentStatus: OrderStatus) => {
         const options: {
             value: OrderStatus;
@@ -144,6 +171,7 @@ function SellerOrdersPage() {
         return options;
     };
 
+    // Filtros de status
     const statusFilters: Array<OrderStatus | 'todos'> = [
         'todos',
         'pendente',
@@ -162,23 +190,43 @@ function SellerOrdersPage() {
 
     return (
         <div className="container mx-auto p-4">
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold mb-6">Pedidos</h1>
+            {/* Título sempre visível no topo */}
+            <h1 className="text-2xl font-bold sticky top-0 z-10">Pedidos</h1>
 
-                <div className='flex space-x-2'>
-                    {statusFilters.map((status) => (
+            {/* Linha com filtros e dropdown */}
+            <div className="flex flex-wrap justify-between items-center mb-6">
+                <div className='flex flex-row space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2'>
+                    <div className="flex flex-col md:flex-row md:relative">
                         <button
-                            key={status}
-                            onClick={() => setFilter(status)}
-                            className={`px-3 py-1 rounded-full text-xs sm:text-sm 
-                                ${filter === status
-                                    ? 'bg-blue-600 text-white'
-                                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-                                }`}
+                            onClick={() => toggleDropdown('status')}
+                            className="flex flex-row items-center justify-between w-full bg-blue-500 text-white font-bold px-2 py-1 rounded hover:bg-blue-800 transition duration-300 md:w-auto"
                         >
-                            {status === 'todos' ? 'Todos' : status.charAt(0).toUpperCase() + status.slice(1)}
+                            <span>Status</span>
+                            <svg className={`w-2.5 h-2.5 ms-2.5 transition-transform ${dropdownStates.status ? 'rotate-180' : ''}`} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4" />
+                            </svg>
                         </button>
-                    ))}
+
+                        {/* Dropdown */}
+                        <div ref={(el) => setDropdownRef('status', el)} className={`${dropdownStates.status ? 'block' : 'hidden'} w-full md:mt-12 md:absolute md:z-10 md:bg-blue-500 md:divide-y md:divide-gray-100 md:rounded-lg md:shadow md:w-44`}>
+                            <ul className="flex flex-col items-center space-y-2 bg-blue-500 rounded md:py-2 md:text-sm">
+                                {statusFilters.map((status) => (
+                                    <li key={status} className='mb-2 mx-2 w-auto'>
+                                        <button
+                                            onClick={() => setFilter(status)}
+                                            className={`px-3 py-1 rounded-full text-xs sm:text-sm 
+                                        ${filter === status
+                                                    ? 'bg-blue-600 text-white'
+                                                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                                                }`}
+                                        >
+                                            {status.charAt(0).toUpperCase() + status.slice(1)}
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -210,6 +258,7 @@ function SellerOrdersPage() {
                                     </p>
                                     <p>Data de Compra: {format(order.createdAt, "dd/MM/yyyy - HH:mm")}</p>
                                 </div>
+
                                 <span className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap
                                         ${order.status === 'pendente' ? 'bg-yellow-200 text-yellow-800' :
                                         order.status === 'preparando' ? 'bg-blue-200 text-blue-800' :
