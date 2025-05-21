@@ -3,10 +3,11 @@ import { useRouter } from "next/router";
 interface ButtonProps {
     color: string;
     rota: string;
+    disabled: boolean;
     children?: React.ReactNode;
 }
 
-export default function Button({ color, rota, children }: ButtonProps){
+export default function Button({ color, rota, disabled, children }: ButtonProps){
     const router = useRouter();
 
     const handleSubmit = async () => {
@@ -21,6 +22,7 @@ export default function Button({ color, rota, children }: ButtonProps){
         <button
             onClick={handleSubmit}
             className={`${color}  cursor-pointer`}
+            disabled={disabled}
         >
             {children}
         </button>
