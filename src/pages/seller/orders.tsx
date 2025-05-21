@@ -211,13 +211,13 @@ function SellerOrdersPage() {
                         <div ref={(el) => setDropdownRef('status', el)} className={`${dropdownStates.status ? 'block' : 'hidden'} w-full md:mt-12 md:absolute md:z-10 md:bg-blue-500 md:divide-y md:divide-gray-100 md:rounded-lg md:shadow md:w-44`}>
                             <ul className="flex flex-col items-center space-y-2 bg-blue-500 rounded md:py-2 md:text-sm">
                                 {statusFilters.map((status) => (
-                                    <li key={status} className='mb-2 mx-2 w-auto'>
+                                    <li key={status} className='w-full'>
                                         <button
                                             onClick={() => setFilter(status)}
-                                            className={`px-3 py-1 rounded-full text-xs sm:text-sm 
+                                            className={`px-3 py-2 w-full text-xs sm:text-sm
                                         ${filter === status
                                                     ? 'bg-blue-600 text-white'
-                                                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                                                    : 'text-black hover:border-2 hover:border-white-600 '
                                                 }`}
                                         >
                                             {status.charAt(0).toUpperCase() + status.slice(1)}
