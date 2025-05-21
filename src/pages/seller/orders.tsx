@@ -191,7 +191,7 @@ function SellerOrdersPage() {
     return (
         <div className="container mx-auto p-4">
             {/* Título sempre visível no topo */}
-            <h1 className="text-2xl font-bold sticky top-0 z-10">Pedidos</h1>
+            <h1 className="text-2xl font-bold">Pedidos</h1>
 
             {/* Linha com filtros e dropdown */}
             <div className="flex flex-wrap justify-between items-center mb-6">
