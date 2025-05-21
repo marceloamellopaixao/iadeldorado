@@ -79,6 +79,25 @@ export default function CheckoutForm({ cartItems }: CheckoutFormProps) {
         setLoading(true);
 
         try {
+            // Verificação de estoque antes de continuar
+            for (const item of cartItems) {
+                const productRef = doc(db, "products", item.id);
+                const productDoc = await getDoc(productRef);
+
+                if (!productDoc.exists()) {
+                    alert(`Produto ${item.name} não encontrado.`);
+                    setLoading(false);
+                    return;
+                }
+
+                const productData = productDoc.data();
+                if (productData.stock < item.quantity) {
+                    alert(`Produto "${item.name}" não possui estoque suficiente. Estoque: ${productData.stock}`);
+                    setLoading(false);
+                    return;
+                }
+            }
+
             // Formata o número de WhatsApp
             const formattedWhatsApp = formData.clientWhatsApp.replace(/\D/g, "");
 
@@ -202,13 +221,13 @@ export default function CheckoutForm({ cartItems }: CheckoutFormProps) {
                 <select
                     value={formData.paymentMethod}
                     onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value as PaymentType })}
-                    className="w-full p-2 border border-gray-300 rounded"
+                    className="w-full font-bold p-2 border border-gray-300 rounded"
                     required
                 >
-                    <option className="color-black" value="dinheiro">Dinheiro</option>
-                    <option value="pix">Pix</option>
-                    <option value="credito">Cartão de Crédito</option>
-                    <option value="debito">Cartão de Débito</option>
+                    <option className="text-black" value="dinheiro">💵Dinheiro</option>
+                    <option className="text-black" value="pix">💸Pix</option>
+                    <option className="text-black" value="credito">💳Cartão de Crédito</option>
+                    <option className="text-black" value="debito">💳Cartão de Débito</option>
                 </select>
 
                 {formData.paymentMethod === "pix" && (
