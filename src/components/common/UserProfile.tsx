@@ -17,6 +17,7 @@ export default function UserProfile() {
                 </p>
             </div>
             <ButtonRouter
+                disabled={false}
                 color="flex flex-row gap-2 bg-blue-500 text-white font-bold px-4 py-2 rounded hover:bg-blue-800 transition duration-300"
                 rota="/auth/profile"
             >
