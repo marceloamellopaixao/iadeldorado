@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { EmailAuthProvider, reauthenticateWithCredential, updatePassword, sendEmailVerification } from 'firebase/auth';
 import { useAuth } from '@/contexts/AuthContext';
-import { ErrorDisplay } from '../common/ErrorDisplay';
 
 export default function PasswordUpdateForm() {
     const [currentPassword, setCurrentPassword] = useState('');
@@ -71,7 +70,7 @@ export default function PasswordUpdateForm() {
     };
 
     if (error) {
-        return <ErrorDisplay message={error} onRetry={() => window.location.reload()} />;
+        return <div className="text-red-500">{error}</div>;
     }
 
     return (
