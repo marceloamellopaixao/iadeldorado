@@ -217,7 +217,7 @@ function SellerOrdersPage() {
                                             className={`px-3 py-2 w-full text-xs sm:text-sm
                                         ${filter === status
                                                     ? 'bg-blue-600 text-white'
-                                                    : 'text-black hover:border-2 hover:border-white-600 '
+                                                    : 'text-black'
                                                 }`}
                                         >
                                             {status.charAt(0).toUpperCase() + status.slice(1)}
