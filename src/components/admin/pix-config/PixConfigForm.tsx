@@ -41,30 +41,30 @@ export default function PixConfigForm({ cantina }: PixConfigFormProps) {
 
     return (
         <div className="bg-white p-4 rounded-lg shadow">
-            <h3 className="font-medium mb-4">Dados PIX</h3>
+            <h3 className="font-medium mb-4 text-black">Dados PIX</h3>
 
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="mb-4">
-                    <label className="block mb-2 font-medium">Nome da Cantina</label>
+                    <label className="block mb-2 font-medium text-black">Nome da Cantina</label>
                     <input
                         type="text"
                         value={formData.name}
                         onChange={(e) =>
                             setFormData({ ...formData, name: e.target.value })
                         }
-                        className="w-full p-2 border rounded"
+                        className="w-full p-2 border rounded text-black"
                         required
                     />
                 </div>
 
                 <div className="mb-4">
-                    <label className="block mb-2 font-medium">Tipo de Chave</label>
+                    <label className="block mb-2 font-medium text-black">Tipo de Chave</label>
                     <select
                         value={formData.keyType}
                         onChange={(e) =>
                             setFormData({ ...formData, keyType: e.target.value as PixType })
                         }
-                        className="w-full p-2 border rounded"
+                        className="w-full p-2 border rounded text-black"
                         required
                     >
                         <option value="celular">Celular</option>
@@ -76,23 +76,23 @@ export default function PixConfigForm({ cantina }: PixConfigFormProps) {
                 </div>
 
                 <div className="mb-4">
-                    <label className="block mb-2 font-medium">Chave PIX</label>
+                    <label className="block mb-2 font-medium text-black">Chave PIX</label>
                     <input
                         type="text"
                         value={formData.key}
                         onChange={(e) => setFormData({ ...formData, key: e.target.value })}
-                        className="w-full p-2 border rounded"
+                        className="w-full p-2 border rounded text-black"
                         required
                     />
                 </div>
 
                 <div>
-                    <label className="block mb-2 font-medium">Titular da Chave</label>
+                    <label className="block mb-2 font-medium text-black">Titular da Chave</label>
                     <input
                         type="text"
                         value={formData.owner}
                         onChange={(e) => setFormData({ ...formData, owner: e.target.value })}
-                        className="w-full p-2 border rounded"
+                        className="w-full p-2 border rounded text-black"
                         required
                     />
                 </div>
