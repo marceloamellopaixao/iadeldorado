@@ -18,25 +18,15 @@ import relatorioIcon from '@/assets/icons/calendar-solid.svg'
 import configIcon from '@/assets/icons/sliders-solid.svg'
 import productIcon from '@/assets/icons/product-icon.svg'
 import listProductIcon from '@/assets/icons/list-products-icon.svg'
+import { useDropdownClose } from "@/hooks/useDropdownClose";
 
 export default function Header() {
     const { user, userData } = useAuth()
     const [isMenuOpen, setIsMenuOpen] = useState(false)
-    const [dropdownStates, setDropdownStates] = useState({
-        products: false,
-        users: false,
-        config: false
-    })
+    const { dropdownStates, setDropdownRef, toggleDropdown } = useDropdownClose();
 
     const toggleMenu = () => {
         setIsMenuOpen(!isMenuOpen)
-    }
-
-    const toggleDropdown = (dropdownName: keyof typeof dropdownStates) => {
-        setDropdownStates(prev => ({
-            ...prev,
-            [dropdownName]: !prev[dropdownName]
-        }))
     }
 
     const handleLogout = async () => {
@@ -92,13 +82,12 @@ export default function Header() {
                                             </button>
 
                                             {/* Dropdown Menu */}
-                                            <div className={`${dropdownStates.products ? 'block' : 'hidden'} w-full md:mt-12 md:absolute md:z-10 md:bg-blue-500 md:divide-y md:divide-gray-100 md:rounded-lg md:shadow md:w-44`}>
+                                            <div ref={(el) => setDropdownRef('products', el)} className={`${dropdownStates.products ? 'block' : 'hidden'} w-full md:mt-12 md:absolute md:z-10 md:bg-blue-500 md:divide-y md:divide-gray-100 md:rounded-lg md:shadow md:w-44`}>
                                                 <ul className="space-y-1 bg-blue-500 md:py-2 md:text-sm">
                                                     <li>
                                                         <Link
                                                             href="/products"
                                                             className="block w-full bg-blue-600 text-white px-4 py-2 hover:bg-blue-700 transition duration-300 md:bg-transparent md:hover:bg-blue-800"
-                                                            onClick={() => setDropdownStates({ ...dropdownStates, products: false })}
                                                         >
                                                             <div className="flex items-center gap-2">
                                                                 <Image src={productIcon} alt="User Icon" width={20} height={20} />
@@ -110,7 +99,6 @@ export default function Header() {
                                                         <Link
                                                             href="/admin/products"
                                                             className="block w-full bg-blue-600 text-white px-4 py-2 hover:bg-blue-700 transition duration-300 md:bg-transparent md:hover:bg-blue-800"
-                                                            onClick={() => setDropdownStates({ ...dropdownStates, products: false })}
                                                         >
                                                             <div className="flex items-center gap-2">
                                                                 <Image src={listProductIcon} alt="User Icon" width={20} height={20} />
@@ -137,25 +125,34 @@ export default function Header() {
                                             </button>
 
                                             {/* Dropdown Menu */}
-                                            <div className={`${dropdownStates.users ? 'block' : 'hidden'} w-full md:mt-12 md:absolute md:z-10 md:bg-blue-500 md:divide-y md:divide-gray-100 md:rounded-lg md:shadow md:w-44`}>
+                                            <div ref={(el) => setDropdownRef('users', el)} className={`${dropdownStates.users ? 'block' : 'hidden'} w-full md:mt-12 md:absolute md:z-10 md:bg-blue-500 md:divide-y md:divide-gray-100 md:rounded-lg md:shadow md:w-44`}>
                                                 <ul className="space-y-1 bg-blue-500 md:py-2 md:text-sm">
                                                     <li>
-                                                        <Link
+                                                        {/* <Link
                                                             href="/admin/users"
                                                             className="block w-full bg-blue-600 text-white px-2 py-2 hover:bg-blue-700 transition duration-300 md:bg-transparent md:hover:bg-blue-800"
-                                                            onClick={() => setDropdownStates({ ...dropdownStates, users: false })}
+                                                            // onClick={() => { alert("🚧Página em Construção🚧") }}
                                                         >
                                                             <div className="flex items-center gap-2">
                                                                 <Image src={userIcon} alt="User Icon" width={20} height={20} />
                                                                 <span className="whitespace-nowrap">Gerenciar Usuários</span>
                                                             </div>
-                                                        </Link>
+                                                        </Link> */}
+
+                                                        <button
+                                                            className="block w-full bg-blue-600 text-white px-2 py-2 hover:bg-blue-700 transition duration-300 md:bg-transparent md:hover:bg-blue-800 hover:cursor-pointer"
+                                                            onClick={() => { alert("🚧Página em Construção🚧") }}
+                                                        >
+                                                            <div className="flex items-center gap-2">
+                                                                <Image src={userIcon} alt="User Icon" width={20} height={20} />
+                                                                <span className="whitespace-nowrap">Gerenciar Usuários</span>
+                                                            </div>
+                                                        </button>
                                                     </li>
                                                     <li>
                                                         <Link
                                                             href="/auth/profile"
                                                             className="block w-full bg-blue-600 text-white px-2 py-2 hover:bg-blue-700 transition duration-300 md:bg-transparent md:hover:bg-blue-800"
-                                                            onClick={() => setDropdownStates({ ...dropdownStates, users: false })}
                                                         >
                                                             <div className="flex items-center gap-2">
                                                                 <Image src={userIcon} alt="User Icon" width={20} height={20} />
@@ -186,15 +183,12 @@ export default function Header() {
                                             </button>
 
                                             {/* Dropdown Menu */}
-                                            <div
-                                                className={`${dropdownStates.config ? 'block' : 'hidden'} w-full mt-1 md:absolute md:mt-12 md:z-10 md:bg-blue-500 md:divide-y md:divide-gray-100 md:rounded-lg md:shadow md:w-44`}
-                                            >
+                                            <div ref={(el) => setDropdownRef('config', el)} className={`${dropdownStates.config ? 'block' : 'hidden'} w-full mt-1 md:absolute md:mt-12 md:z-10 md:bg-blue-500 md:divide-y md:divide-gray-100 md:rounded-lg md:shadow md:w-44`}>
                                                 <ul className="space-y-1 bg-blue-500 md:py-2 md:text-sm">
                                                     <li>
                                                         <Link
                                                             href="/admin/pix-config"
                                                             className="block w-full bg-blue-600 text-white px-2 py-2 hover:bg-blue-700 transition duration-300 md:bg-transparent md:hover:bg-blue-800"
-                                                            onClick={() => setDropdownStates({ ...dropdownStates, config: false })}
                                                         >
                                                             <div className="flex items-center gap-2">
                                                                 <Image src={pixIcon} alt="PIX Icon" width={20} height={20} />
@@ -206,7 +200,6 @@ export default function Header() {
                                                         <Link
                                                             href="/admin/reports"
                                                             className="block w-full bg-blue-600 text-white px-2 py-2 hover:bg-blue-700 transition duration-300 md:bg-transparent md:hover:bg-blue-800"
-                                                            onClick={() => setDropdownStates({ ...dropdownStates, config: false })}
                                                         >
                                                             <div className="flex items-center gap-2">
                                                                 <Image src={relatorioIcon} alt="Relatório Icon" width={20} height={20} />
@@ -224,6 +217,7 @@ export default function Header() {
                                         <ButtonRouter
                                             color="flex flex-row gap-2 bg-blue-500 text-white font-bold px-4 py-3 rounded hover:bg-blue-800 transition duration-300 w-full justify-center md:w-auto md:justify-start whitespace-nowrap"
                                             rota="/seller/orders"
+                                            disabled={false}
                                         >
                                             Pedidos
                                         </ButtonRouter>
@@ -242,6 +236,7 @@ export default function Header() {
                                 </div>
                             ) : (user && userData?.role === 'seller') ? (
                                 <div className="w-full flex flex-col md:flex-row gap-2">
+
                                 </div>
                             ) : (user && userData?.role === 'customer') ? (
                                 <div className="w-full flex flex-col md:flex-row gap-2">
@@ -249,22 +244,32 @@ export default function Header() {
                                         <ButtonRouter
                                             color="flex flex-row gap-2 bg-blue-500 text-white font-bold px-4 py-3 rounded hover:bg-blue-800 transition duration-300 w-full justify-center md:w-auto md:justify-start whitespace-nowrap"
                                             rota="/products"
+                                            disabled={false}
                                         >
                                             Produtos
                                         </ButtonRouter>
                                     </li>
                                     <li>
-                                        <ButtonRouter
+                                        {/* <ButtonRouter
                                             color="flex flex-row gap-2 bg-blue-500 text-white font-bold px-4 py-3 rounded hover:bg-blue-800 transition duration-300 w-full justify-center md:w-auto md:justify-start whitespace-nowrap"
                                             rota="/orders"
+                                            disabled={true}
                                         >
                                             Pedidos
-                                        </ButtonRouter>
+                                        </ButtonRouter> */}
+
+                                        <button
+                                            className="flex flex-row gap-2 bg-blue-500 text-white font-bold px-4 py-3 rounded hover:bg-blue-800 transition duration-300 w-full justify-center md:w-auto md:justify-start whitespace-nowrap"
+                                            onClick={() => { alert("🚧Página em Construção🚧") }}
+                                        >
+                                            <span className="whitespace-nowrap">Histórico de Pedidos</span>
+                                        </button>
                                     </li>
                                     <li>
                                         <ButtonRouter
                                             color="flex flex-row gap-2 bg-blue-500 text-white font-bold px-4 py-3 rounded hover:bg-blue-800 transition duration-300 w-full justify-center md:w-auto md:justify-start whitespace-nowrap"
                                             rota="/auth/profile"
+                                            disabled={false}
                                         >
                                             <div className="flex items-center gap-2">
                                                 <Image src={userIcon} alt="User Icon" width={20} height={20} />
@@ -288,6 +293,7 @@ export default function Header() {
                                         <ButtonRouter
                                             color="flex flex-row gap-2 bg-blue-500 text-white font-bold px-4 py-3 rounded hover:bg-blue-800 transition duration-300 w-full justify-center md:w-auto md:justify-start whitespace-nowrap"
                                             rota="/products"
+                                            disabled={false}
                                         >
                                             Produtos
                                         </ButtonRouter>
@@ -296,6 +302,7 @@ export default function Header() {
                                         <ButtonRouter
                                             color="flex flex-row gap-2 bg-blue-500 text-white font-bold px-4 py-3 rounded hover:bg-blue-800 transition duration-300 w-full justify-center md:w-auto md:justify-start whitespace-nowrap"
                                             rota="/auth/login"
+                                            disabled={false}
                                         >
                                             Login
                                         </ButtonRouter>
@@ -304,6 +311,7 @@ export default function Header() {
                                         <ButtonRouter
                                             color="flex flex-row gap-2 bg-blue-500 text-white font-bold px-4 py-3 rounded hover:bg-blue-800 transition duration-300 w-full justify-center md:w-auto md:justify-start whitespace-nowrap"
                                             rota="/auth/register"
+                                            disabled={false}
                                         >
                                             Criar Conta
                                         </ButtonRouter>
