@@ -45,7 +45,7 @@ export default function Header() {
                     {/* Logo */}
                     <Link href="/products" className='flex items-center space-x-3 rtl:space-x-reverse' title='Página inicial'>
                         <Image src={Logo} alt="Logo" width={40} height={40} className="h-10 w-10" />
-                        <span className='self-center text-lg font-semibold whitespace-nowrap dark:text-white'>IAD Eldorado - Cantina</span>
+                        <span className='self-center hidden text-lg font-semibold whitespace-nowrap md:block dark:text-white'>IAD Eldorado - Cantina</span>
                     </Link>
 
                     {/* Botão hamburguer */}
