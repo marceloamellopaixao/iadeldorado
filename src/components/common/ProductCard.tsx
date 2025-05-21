@@ -1,6 +1,6 @@
 import { Product } from "@/types/product";
 import Image from "next/image";
-import noStockIcon from "@/assets/icons/store-slash-solid.svg"
+import noStockIcon from "@/assets/icons/ban-solid.svg"
 import addCartIcon from "@/assets/icons/cart-plus-solid.svg"
 import itemCartIcon from "@/assets/icons/thumbs-up-regular.svg"
 
@@ -13,10 +13,19 @@ interface ProductCardProps {
 export function ProductCard({ product, onAddToCart, isInCart }: ProductCardProps) {
 
     return (
-        <div className="border rounded-lg p-4 shadow hover:shadow-md transition-shadow">
-            <h3 className="font-bold text-lg">{product.name}</h3>
-            <p className="text-gray-300 my-2">{product.description}</p>
-            <p className="font-bold text-lg">R$ {product.price.toFixed(2).replace('.', ',')}</p>
+        <div className="bg-zinc-900 border border-zinc-700 rounded-xl shadow-lg p-4 flex flex-col justify-between h-full transition hover:scale-105 hover:shadow-xl">
+            <h3 className="text-white text-lg font-semibold mb-2">{product.name}</h3>
+            {/* <div className="relative w-full h-48 mb-4">
+                <Image
+                    src={product.imageUrl}
+                    alt={product.name}
+                    layout="fill"
+                    objectFit="cover"
+                    className="rounded-lg"
+                />
+            </div> */}
+            <p className="text-zinc-400 text-sm mb-4">{product.description}</p>
+            <p className="text-white font-bold text-lg mb-4">R$ {product.price.toFixed(2).replace('.', ',')}</p>
             <button
                 onClick={onAddToCart}
                 disabled={product.stock <= 0}
