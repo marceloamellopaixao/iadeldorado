@@ -33,7 +33,7 @@ function ProductsPage() {
                     <Button
                         disabled={false}
                         rota='/checkout'
-                        color='bg-blue-500 text-white font-bold rounded-full h-10 w-40 hover:bg-blue-800 transition duration-300'>
+                        color=' hidden bg-blue-500 text-white font-bold rounded-full h-10 w-40 hover:bg-blue-800 transition duration-300 md:block'>
                         Finalizar Pedido
                     </Button>
                     <button
