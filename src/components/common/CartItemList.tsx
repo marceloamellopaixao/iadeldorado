@@ -24,7 +24,7 @@ export default function CartItemList({
                     <div key={item.id} className="border-b pb-4 flex justify-between items-center">
                         <div className="flex-1">
                             <h3 className="font-medium">{item.name}</h3>
-                            <p className="text-gray-600">
+                            <p className="text-gray-400">
                                 R$ {item.price.toFixed(2).replace('.', ',')}
                             </p>
                             <p className="text-sm text-gray-400">Estoque disponível: {stock}</p>
