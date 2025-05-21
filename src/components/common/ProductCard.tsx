@@ -1,4 +1,8 @@
 import { Product } from "@/types/product";
+import Image from "next/image";
+import noStockIcon from "@/assets/icons/store-slash-solid.svg"
+import addCartIcon from "@/assets/icons/cart-plus-solid.svg"
+import itemCartIcon from "@/assets/icons/thumbs-up-regular.svg"
 
 interface ProductCardProps {
     product: Product;  // Objeto do tipo Product que contém as informações do produto
@@ -17,13 +21,28 @@ export function ProductCard({ product, onAddToCart, isInCart }: ProductCardProps
                 onClick={onAddToCart}
                 disabled={product.stock <= 0}
                 className={`w-full mt-4 py-2 rounded ${product.stock <= 0
-                    ? 'bg-gray-400 text-white cursor-not-allowed'
+                    ? 'bg-gray-400 text-white font-bold cursor-not-allowed'
                     : isInCart
                         ? 'bg-green-500 text-white font-bold'
                         : 'bg-blue-500 text-white font-bold hover:bg-blue-600'
                     }`}
             >
-                {product.stock <= 0 ? 'Sem Estoque' : isInCart ? '✔ No Carrinho' : 'Adicionar'}
+                {product.stock <= 0 ? (
+                    <div className="flex items-center justify-center">
+                        <Image src={noStockIcon} alt="Sem Estoque" width={20} height={20} />
+                        <span className="ml-2">Sem Estoque</span>
+                    </div>
+                ) : isInCart ? (
+                    <div className="flex items-center justify-center">
+                        <Image src={itemCartIcon} alt="Produto no Carrinho" width={20} height={20} />
+                        <span className="ml-2">Produto no Carrinho</span>
+                    </div>
+                ) : (
+                    <div className="flex items-center justify-center">
+                        <Image src={addCartIcon} alt="Adicionar no Carrinho" width={20} height={20} />
+                        <span className="ml-2">Adicionar no Carrinho</span>
+                    </div>
+                )}
             </button>
         </div>
     );
