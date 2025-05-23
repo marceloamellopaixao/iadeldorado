@@ -37,11 +37,11 @@ function ProductsPage() {
             <div className="container mx-auto p-4">
                 <div className="flex justify-between items-center mb-6">
                     <h1 className="text-2xl font-bold">Produtos</h1>
-                    <div className='flex items-center gap-4'>
+                    <div className='flex items-center justify-center gap-4'>
                         <Button
                             disabled={cartItems.length === 0}
                             rota='/checkout'
-                            color={`${cartItems.length > 0 ? 'bg-blue-500' : 'bg-gray-400'} text-white font-bold rounded-full h-12 w-40 hover:bg-blue-800 transition duration-300 md:block`}>
+                            color="bg-blue-500 text-white font-bold rounded-full h-15 w-45 hover:bg-blue-800 transition duration-300 md:block">
                             {cartItems.length > 0 ? (
                                 <div className='flex flex-col items-center'>
                                     <span>Finalizar Pedido</span>
@@ -49,16 +49,16 @@ function ProductsPage() {
                                 </div>
                             ) : (
                                 <div className='flex justify-center items-center gap-2'>
-                                    <Image src={cartEmpty} alt="Carrinho Vazio" width={15} height={15} />
+                                    <Image src={cartEmpty} alt="Carrinho Vazio" width={20} height={20} />
                                     <span>Carrinho Vazio</span>
                                 </div>
                             )}
                         </Button>
                         <button
                             onClick={() => setShowCart(!showCart)}
-                            className="relative p-2 bg-blue-100 rounded-lg hover:cursor-pointer"
+                            className="relative flex items-center justify-center p-2 h-15 w-15 bg-blue-100 rounded-lg hover:cursor-pointer"
                         >
-                            <Image src={cartIcon} alt='Cart Icon' width={15} height={15} className="h-7 w-7" />
+                            <Image src={cartIcon} alt='Cart Icon' width={20} height={20} className="h-7 w-7" />
                             {cartItems.length > 0 && (
                                 <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                                     {cartItems.reduce((sum, item) => sum + item.quantity, 0)}
