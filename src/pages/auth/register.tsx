@@ -48,12 +48,12 @@ function Register() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="min-h-screen flex items-center justify-center">
             <Head>
                 <title>IAD Eldorado - Registro</title>
                 <meta name="description" content="Crie sua conta na IAD Eldorado." />
             </Head>
-            <div className="bg-white p-8 rounded shadow-md w-96">
+            <div className="bg-white p-8 rounded-2xl shadow-2xl w-100 hover:scale-105 transition-all duration-300">
                 <h1 className="text-2xl font-bold mb-6 text-center text-black">Crie sua Conta</h1>
                 {error && <p className="text-red-500 mb-4">{error}</p>}
                 <form onSubmit={handleRegister}>
@@ -61,8 +61,9 @@ function Register() {
                         <label className="block text-gray-700 mb-2">Nome Completo</label>
                         <input
                             type="text" value={name}
+                            placeholder="Digite seu nome completo"
                             onChange={(e) => setName(e.target.value)}
-                            className="w-full text-gray-700 px-3 py-2 border-3 rounded border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full text-gray-700 px-3 py-2 border-3 rounded border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             required
                         />
                     </div>
@@ -70,8 +71,9 @@ function Register() {
                         <label className="block text-gray-700 mb-2">Telefone (WhatsApp com DDD)</label>
                         <input
                             type="text" value={telephone}
+                            placeholder="Digite seu telefone"
                             onChange={(e) => setTelephone(e.target.value)}
-                            className="w-full text-gray-700 px-3 py-2 border-3 rounded border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full text-gray-700 px-3 py-2 border-3 rounded border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             required
                         />
                     </div>
@@ -79,8 +81,9 @@ function Register() {
                         <label className="block text-gray-700 mb-2">E-mail</label>
                         <input
                             type="email" value={email}
+                            placeholder="Digite seu e-mail"
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full text-gray-700 px-3 py-2 border-3 rounded border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full text-gray-700 px-3 py-2 border-3 rounded border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             required
                         />
                     </div>
@@ -89,9 +92,10 @@ function Register() {
                         <div className="relative ">
                             <input
                                 ref={passwordInputRef}
+                                placeholder="Digite sua senha"
                                 type={showPassword ? "text" : "password"} value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full text-gray-700 px-3 py-2 border-3 border-blue-500 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full text-gray-700 px-3 py-2 border-3 border-gray-500 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 required
                             />
                             <button className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer" type="button" onClick={togglePasswordVisibility}>
