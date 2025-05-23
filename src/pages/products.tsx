@@ -8,6 +8,7 @@ import CartPreview from '@/components/common/CartPreview';
 import Button from '@/components/common/ButtonRouter';
 import Image from 'next/image';
 import cartIcon from '@/assets/icons/cart-shopping-solid.svg';
+import cartEmpty from '@/assets/icons/ban-solid.svg'
 import Head from 'next/head';
 
 function ProductsPage() {
@@ -17,8 +18,9 @@ function ProductsPage() {
         addToCart,
         isInCart,
         total,
-        notification
+        notification,
     } = useCart();
+
 
     const [showCart, setShowCart] = useState(false);
 
@@ -37,10 +39,20 @@ function ProductsPage() {
                     <h1 className="text-2xl font-bold">Produtos</h1>
                     <div className='flex items-center gap-4'>
                         <Button
-                            disabled={false}
+                            disabled={cartItems.length === 0}
                             rota='/checkout'
-                            color=' hidden bg-blue-500 text-white font-bold rounded-full h-10 w-40 hover:bg-blue-800 transition duration-300 md:block'>
-                            Finalizar Pedido
+                            color={`${cartItems.length > 0 ? 'bg-blue-500' : 'bg-gray-400'} text-white font-bold rounded-full h-12 w-40 hover:bg-blue-800 transition duration-300 md:block`}>
+                            {cartItems.length > 0 ? (
+                                <div className='flex flex-col items-center'>
+                                    <span>Finalizar Pedido</span>
+                                    <span>R$ {total.toFixed(2).replace('.', ',')}</span>
+                                </div>
+                            ) : (
+                                <div className='flex justify-center items-center gap-2'>
+                                    <Image src={cartEmpty} alt="Carrinho Vazio" width={15} height={15} />
+                                    <span>Carrinho Vazio</span>
+                                </div>
+                            )}
                         </Button>
                         <button
                             onClick={() => setShowCart(!showCart)}
