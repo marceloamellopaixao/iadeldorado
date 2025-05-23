@@ -7,6 +7,7 @@ import withAuth from "@/hooks/withAuth";
 import Image from "next/image";
 import eyeIcon from "@/assets/icons/eye-solid.svg";
 import eyeCloseIcon from "@/assets/icons/eye-slash-solid.svg";
+import Head from "next/head";
 
 function Register() {
     const [email, setEmail] = useState("");
@@ -48,6 +49,10 @@ function Register() {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100">
+            <Head>
+                <title>IAD Eldorado - Registro</title>
+                <meta name="description" content="Crie sua conta na IAD Eldorado." />
+            </Head>
             <div className="bg-white p-8 rounded shadow-md w-96">
                 <h1 className="text-2xl font-bold mb-6 text-center text-black">Crie sua Conta</h1>
                 {error && <p className="text-red-500 mb-4">{error}</p>}

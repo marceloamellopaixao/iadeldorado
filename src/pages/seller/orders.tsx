@@ -7,6 +7,7 @@ import { withAuth } from '@/hooks/withAuth'
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { format } from 'date-fns';
 import { useDropdownClose } from '@/hooks/useDropdownClose';
+import Head from 'next/head';
 
 function SellerOrdersPage() {
     const [orders, setOrders] = useState<Order[]>([]);
@@ -190,6 +191,10 @@ function SellerOrdersPage() {
 
     return (
         <div className="container mx-auto p-4">
+            <Head>
+                <title>IAD Eldorado - Pedidos</title>
+                <meta name="description" content="Lista de pedidos realizados na IAD Eldorado." />
+            </Head>
             {/* Título sempre visível no topo */}
             <h1 className="text-2xl font-bold">Pedidos</h1>
 

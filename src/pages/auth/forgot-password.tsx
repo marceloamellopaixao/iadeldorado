@@ -3,6 +3,7 @@ import { sendPasswordResetEmail } from "firebase/auth";
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { auth } from "@/lib/firebase"; // Certifique-se de que o caminho esteja correto
+import Head from "next/head";
 
 function ForgotPassword() {
     const router = useRouter();
@@ -26,6 +27,10 @@ function ForgotPassword() {
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
+            <Head>
+                <title>IAD Eldorado - Recuperar Senha</title>
+                <meta name="description" content="Recuperar senha da conta IAD Eldorado." />
+            </Head>
             <div className="bg-white p-8 rounded shadow-md w-96">
                 <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Recuperar Senha</h2>
                 

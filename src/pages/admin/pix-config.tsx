@@ -4,6 +4,7 @@ import PixConfigForm from "@/components/admin/pix-config/PixConfigForm";
 import ActiveCantinaSelector from "@/components/admin/pix-config/ActiveCantinaSelector";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from '@/lib/firebase';
+import Head from "next/head";
 
 function AdminPixConfigPage() {
     // Estado para armazenar a cantina selecionada
@@ -38,6 +39,10 @@ function AdminPixConfigPage() {
 
     return (
         <div className="container mx-auto p-4">
+            <Head>
+                <title>IAD Eldorado - Configuração de Pix</title>
+                <meta name="description" content="Configuração do sistema de pagamento Pix na IAD Eldorado." />
+            </Head>
             <h1 className="text-2xl font-bold mb-6">Configuração de Cantinas</h1>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

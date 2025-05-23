@@ -6,6 +6,7 @@ import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { Order } from "@/types/order";
+import Head from "next/head";
 
 function SuccessPage() {
     const [order, setOrder] = useState<Order[]>([]);
@@ -108,46 +109,52 @@ function SuccessPage() {
     if (!order) return null;
 
     return (
-        <div className="container mx-auto p-4 text-center">
-            <div className="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md">
-                <svg
-                    className="w-16 h-16 text-green-500 mx-auto mb-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                >
-                    <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M5 13l4 4L19 7"
-                    />
-                </svg>
+        <>
+            <Head>
+                <title>IAD Eldorado - Sucesso</title>
+                <meta name="description" content="Confirmação de pedido bem-sucedido." />
+            </Head>
+            <div className="container mx-auto p-4 text-center">
+                <div className="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md">
+                    <svg
+                        className="w-16 h-16 text-green-500 mx-auto mb-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M5 13l4 4L19 7"
+                        />
+                    </svg>
 
-                <h1 className="text-2xl font-bold mb-4 text-black">Pedido Confirmado!</h1>
-                <p className="mb-6 text-black">Obrigado por sua compra. Seu pedido foi recebido e está sendo processado.</p>
+                    <h1 className="text-2xl font-bold mb-4 text-black">Pedido Confirmado!</h1>
+                    <p className="mb-6 text-black">Obrigado por sua compra. Seu pedido foi recebido e está sendo processado.</p>
 
-                {orderId && (
-                    <div className="bg-gray-50 p-4 rounded mb-6">
-                        <p className="font-medium text-black">Número do Pedido:</p>
-                        <p className="text-lg text-black">#{String(orderId?.slice(0, 5)).toUpperCase()}</p>
-                    </div>
-                )}
+                    {orderId && (
+                        <div className="bg-gray-50 p-4 rounded mb-6">
+                            <p className="font-medium text-black">Número do Pedido:</p>
+                            <p className="text-lg text-black">#{String(orderId?.slice(0, 5)).toUpperCase()}</p>
+                        </div>
+                    )}
 
-                <button
-                    onClick={() => router.push(userData?.role === 'admin' ? '/admin/products' : '/products')}
-                    className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600"
-                >
-                    {userData?.role === 'admin' ? 'Voltar para o Painel' : 'Voltar para Produtos'}
-                </button>
-                <button
-                    onClick={() => router.push('/seller/orders')}
-                    className={userData?.role === 'admin' || userData?.role === 'seller' ? 'bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 ml-4' : 'hidden'}
-                >
-                    {userData?.role === 'admin' || userData?.role === 'seller' ? 'Ver Pedidos' : ''}
-                </button>
+                    <button
+                        onClick={() => router.push(userData?.role === 'admin' ? '/admin/products' : '/products')}
+                        className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600"
+                    >
+                        {userData?.role === 'admin' ? 'Voltar para o Painel' : 'Voltar para Produtos'}
+                    </button>
+                    <button
+                        onClick={() => router.push('/seller/orders')}
+                        className={userData?.role === 'admin' || userData?.role === 'seller' ? 'bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 ml-4' : 'hidden'}
+                    >
+                        {userData?.role === 'admin' || userData?.role === 'seller' ? 'Ver Pedidos' : ''}
+                    </button>
+                </div>
             </div>
-        </div>
+        </>
     );
 }
 

@@ -8,6 +8,7 @@ import Image from "next/image";
 import eyeIcon from "@/assets/icons/eye-solid.svg";
 import eyeCloseIcon from "@/assets/icons/eye-slash-solid.svg";
 import Link from "next/link";
+import Head from "next/head";
 
 function Login() {
     const [email, setEmail] = useState("");
@@ -42,6 +43,10 @@ function Login() {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100">
+            <Head>
+                <title>IAD Eldorado - Login</title>
+                <meta name="description" content="Página de login da IAD Eldorado." />
+            </Head>
             <div className="bg-white p-8 rounded shadow-md w-96">
                 <h1 className="text-2xl font-bold mb-6 text-center text-black">Login</h1>
                 {error && <p className="text-red-500 mb-4">{error}</p>}
