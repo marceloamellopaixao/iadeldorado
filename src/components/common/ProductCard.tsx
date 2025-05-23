@@ -17,16 +17,7 @@ export function ProductCard({ product, onAddToCart, isInCart }: ProductCardProps
             <div className="flex items-center justify-between mb-4">
                 <h3 className="text-white text-lg font-semibold mb-2">{product.name}</h3>
             </div>
-            {/* <div className="relative w-full h-48 mb-4">
-                <Image
-                    src={product.imageUrl}
-                    alt={product.name}
-                    layout="fill"
-                    objectFit="cover"
-                    className="rounded-lg"
-                />
-            </div> */}
-            <div className="relative w-full h-15 mb-4">
+            <div className="flex items-center w-full h-15 mb-4">
                 <p className="text-zinc-400 text-sm mb-4">{product.description ? product.description : "Sem descrição"}</p>
             </div>
             <div className="flex items-center justify-between">
