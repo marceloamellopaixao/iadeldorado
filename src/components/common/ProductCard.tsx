@@ -14,7 +14,9 @@ export function ProductCard({ product, onAddToCart, isInCart }: ProductCardProps
 
     return (
         <div className="bg-zinc-900 border border-zinc-700 rounded-xl shadow-lg p-4 flex flex-col justify-between h-full transition hover:scale-105 hover:shadow-xl">
-            <h3 className="text-white text-lg font-semibold mb-2">{product.name}</h3>
+            <div className="flex items-center justify-between mb-4">
+                <h3 className="text-white text-lg font-semibold mb-2">{product.name}</h3>
+            </div>
             {/* <div className="relative w-full h-48 mb-4">
                 <Image
                     src={product.imageUrl}
@@ -24,8 +26,17 @@ export function ProductCard({ product, onAddToCart, isInCart }: ProductCardProps
                     className="rounded-lg"
                 />
             </div> */}
-            <p className="text-zinc-400 text-sm mb-4">{product.description}</p>
-            <p className="text-white font-bold text-lg mb-4">R$ {product.price.toFixed(2).replace('.', ',')}</p>
+            <div className="relative w-full h-15 mb-4">
+                <p className="text-zinc-400 text-sm mb-4">{product.description ? product.description : "Sem descrição"}</p>
+            </div>
+            <div className="flex items-center justify-between">
+            </div>
+            <div className="flex flex-col justify-between mb-4">
+                <p className="text-white font-bold text-lg mb-2">R$ {product.price.toFixed(2).replace('.', ',')}</p>
+                <p className={`text-sm ${product.stock <= 0 ? 'text-red-500' : 'text-green-500'}`}>
+                    {product.stock <= 0 ? 'Sem Estoque' : `Em Estoque: ${product.stock}`}
+                </p>
+            </div>
             <button
                 onClick={onAddToCart}
                 disabled={product.stock <= 0}
