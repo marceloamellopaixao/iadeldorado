@@ -11,7 +11,12 @@ function CheckoutPage() {
 
     if (cartItems.length === 0) {
         return (
+            
             <div className="container mx-auto p-4 text-center">
+                <Head>
+                    <title>IAD Eldorado - Carrinho Vazio</title>
+                    <meta name="description" content="Seu carrinho está vazio." />
+                </Head>
                 <h1 className="text-2xl font-bold mb-4">Seu carrinho está vazio</h1>
                 <button
                     onClick={() => router.push("/products")}
@@ -24,44 +29,42 @@ function CheckoutPage() {
     }
 
     return (
-        <>
+        <div className="container mx-auto p-4">
             <Head>
                 <title>IAD Eldorado - Finalizar Pedido</title>
                 <meta name="description" content="Finalize seu pedido na IAD Eldorado." />
             </Head>
-            <div className="container mx-auto p-4">
-                <h1 className="text-2xl font-bold mb-6">Finalizar Pedido</h1>
-                <div className="grid md:grid-cols-3 gap-8">
-                    <div className="md:col-span-2">
-                        <CartItemList
-                            items={cartItems}
-                            onUpdateQuantity={updateQuantity}
-                            onRemoveFromCart={removeFromCart}
-                        />
-                    </div>
+            <h1 className="text-2xl font-bold mb-6">Finalizar Pedido</h1>
+            <div className="grid md:grid-cols-3 gap-8">
+                <div className="md:col-span-2">
+                    <CartItemList
+                        items={cartItems}
+                        onUpdateQuantity={updateQuantity}
+                        onRemoveFromCart={removeFromCart}
+                    />
+                </div>
 
-                    <div className="md:col-span-1">
-                        <div className="bg-gray-50 p-4 rounded-lg sticky top-4">
-                            <h2 className="text-xl font-bold md-4 text-black">Resumo do Pedido</h2>
-                            <div className="space-y-2 mb-4">
-                                {cartItems.map(item => (
-                                    <div key={item.id} className="flex justify-between">
-                                        <span className="text-black">{item.name} x {item.quantity}</span>
-                                        <span className="text-black">R$ {(item.price * item.quantity).toFixed(2).replace('.', ',')}</span>
-                                    </div>
-                                ))}
-                            </div>
-                            <div className="border-t pt-2 font-bold text-lg flex justify-between">
-                                <span className="text-black">Total:</span>
-                                <span className="text-black">R$ {total.toFixed(2).replace('.', ',')}</span>
-                            </div>
+                <div className="md:col-span-1">
+                    <div className="bg-gray-50 p-4 rounded-lg sticky top-4">
+                        <h2 className="text-xl font-bold md-4 text-black">Resumo do Pedido</h2>
+                        <div className="space-y-2 mb-4">
+                            {cartItems.map(item => (
+                                <div key={item.id} className="flex justify-between">
+                                    <span className="text-black">{item.name} x {item.quantity}</span>
+                                    <span className="text-black">R$ {(item.price * item.quantity).toFixed(2).replace('.', ',')}</span>
+                                </div>
+                            ))}
                         </div>
-
-                        <CheckoutForm cartItems={cartItems} />
+                        <div className="border-t pt-2 font-bold text-lg flex justify-between">
+                            <span className="text-black">Total:</span>
+                            <span className="text-black">R$ {total.toFixed(2).replace('.', ',')}</span>
+                        </div>
                     </div>
+
+                    <CheckoutForm cartItems={cartItems} />
                 </div>
             </div>
-        </>
+        </div>
     );
 }
 
