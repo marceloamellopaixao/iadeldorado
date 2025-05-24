@@ -138,26 +138,15 @@ export default function Header() {
                                             <div ref={(el) => setDropdownRef('users', el)} className={`${dropdownStates.users ? 'block' : 'hidden'} w-full md:mt-12 md:absolute md:z-10 md:bg-blue-500 md:divide-y md:divide-gray-100 md:rounded-lg md:shadow md:w-44`}>
                                                 <ul className="space-y-1 bg-blue-500 md:py-2 md:text-sm">
                                                     <li>
-                                                        {/* <Link
+                                                        <Link
                                                             href="/admin/users"
                                                             className="block w-full bg-blue-600 text-white px-2 py-2 hover:bg-blue-700 transition duration-300 md:bg-transparent md:hover:bg-blue-800"
-                                                            // onClick={() => { alert("🚧Página em Construção🚧") }}
                                                         >
                                                             <div className="flex items-center gap-2">
                                                                 <Image src={userIcon} alt="User Icon" width={20} height={20} />
                                                                 <span className="whitespace-nowrap">Gerenciar Usuários</span>
                                                             </div>
-                                                        </Link> */}
-
-                                                        <button
-                                                            className="block w-full bg-blue-600 text-white px-2 py-2 hover:bg-blue-700 transition duration-300 md:bg-transparent md:hover:bg-blue-800 hover:cursor-pointer"
-                                                            onClick={() => { alert("🚧Página em Construção🚧") }}
-                                                        >
-                                                            <div className="flex items-center gap-2">
-                                                                <Image src={userIcon} alt="User Icon" width={20} height={20} />
-                                                                <span className="whitespace-nowrap">Gerenciar Usuários</span>
-                                                            </div>
-                                                        </button>
+                                                        </Link>
                                                     </li>
                                                     <li>
                                                         <Link
