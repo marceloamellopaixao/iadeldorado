@@ -11,19 +11,21 @@ function CheckoutPage() {
 
     if (cartItems.length === 0) {
         return (
-            
+
             <div className="container mx-auto p-4 text-center">
                 <Head>
                     <title>IAD Eldorado - Carrinho Vazio</title>
                     <meta name="description" content="Seu carrinho está vazio." />
                 </Head>
-                <h1 className="text-2xl font-bold mb-4">Seu carrinho está vazio</h1>
-                <button
-                    onClick={() => router.push("/products")}
-                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                >
-                    Ver Produtos
-                </button>
+                <div className="p-6 rounded-lg">
+                    <h1 className="text-white text-2xl font-bold mb-4">Seu carrinho está vazio</h1>
+                    <button
+                        onClick={() => router.push("/products")}
+                        className="bg-blue-500 text-white font-bold px-4 py-2 rounded hover:bg-blue-600"
+                    >
+                        Ver Produtos
+                    </button>
+                </div>
             </div>
         );
     }
@@ -34,7 +36,7 @@ function CheckoutPage() {
                 <title>IAD Eldorado - Finalizar Pedido</title>
                 <meta name="description" content="Finalize seu pedido na IAD Eldorado." />
             </Head>
-            <h1 className="text-2xl font-bold mb-6">Finalizar Pedido</h1>
+            <h1 className="text-2xl font-bold text-white mb-6">Finalizar Pedido</h1>
             <div className="grid md:grid-cols-3 gap-8">
                 <div className="md:col-span-2">
                     <CartItemList

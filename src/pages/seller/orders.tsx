@@ -247,67 +247,75 @@ function SellerOrdersPage() {
                 </div>
             ) : (
                 <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
-                    {filteredOrders.map((order) => (
-                        <div
-                            key={order.id}
-                            className='bg-[#041c35] border p-4 rounded-lg shadow-2lg hover:scale-105 hover:shadow-xl transition-all duration-300'
-                        >
-                            <div className='flex justify-between items-start gap-4'>
-                                <div className='flex-1'>
-                                    <h3 className='text-white font-bold text-sm sm:text-base'>
-                                        #{order.id?.slice(0, 5).toUpperCase()} - {order.clientName.charAt(0).toUpperCase() + order.clientName.slice(1)}
-                                    </h3>
-                                    <p className='text-white text-xs sm:text-sm'>Tel: {order.clientWhatsApp}</p> {/* Tentar tratar o numero para ficar da seguinte forma (11) 91234-1234 */}
-                                    <p className='text-white text-xs sm:text-sm'>
-                                        Pagamento: <span className='font-medium'>{order.paymentMethod.charAt(0).toUpperCase() + order.paymentMethod.slice(1)}</span>
-                                    </p>
-                                    <p className='text-white text-xs sm:text-sm'>Data de Compra: {format(order.createdAt, "dd/MM/yyyy - HH:mm")}</p>
-                                </div>
+                    {filteredOrders.map((order) => {
 
-                                <span className={`px-2 py-1 rounded-full text-sm font-bold whitespace-nowrap
+                        const prefixo = `(${order.clientWhatsApp.substring(0, 2)})`;
+                        const corpo = order.clientWhatsApp.substring(2, 7);
+                        const final = order.clientWhatsApp.substring(7, 11);
+                        const numeroFormatado = `${prefixo} ${corpo}-${final}`;
+
+                        return (
+                            <div
+                                key={order.id}
+                                className='bg-gray-800 border border-zinc-400 rounded-xl shadow-lg p-4 flex flex-col justify-between h-full transition hover:shadow-xl hover:scale-105 duration-300 ease-linear'
+                            >
+                                <div className='flex justify-between items-start gap-4'>
+                                    <div className='flex-1'>
+                                        <h3 className='text-white font-bold text-sm sm:text-base'>
+                                            #{order.id?.slice(0, 5).toUpperCase()} - {order.clientName.charAt(0).toUpperCase() + order.clientName.slice(1)}
+                                        </h3>
+                                        <p className='text-white text-xs sm:text-sm'>Tel: {numeroFormatado}</p>
+                                        <p className='text-white text-xs sm:text-sm'>
+                                            Pagamento: <span className='font-medium'>{order.paymentMethod.charAt(0).toUpperCase() + order.paymentMethod.slice(1)}</span>
+                                        </p>
+                                        <p className='text-white text-xs sm:text-sm'>Data de Compra: {format(order.createdAt, "dd/MM/yyyy - HH:mm")}</p>
+                                    </div>
+
+                                    <span className={`px-2 py-1 rounded-full text-sm font-bold whitespace-nowrap
                                         ${order.status === 'pendente' ? 'bg-yellow-200 text-yellow-800' :
-                                        order.status === 'preparando' ? 'bg-blue-200 text-blue-800' :
-                                            order.status === 'pagamento pendente' ? 'bg-orange-200 text-orange-800' :
-                                                order.status === 'pago' ? 'bg-green-200 text-green-800' :
-                                                    order.status === 'não pago' ? 'bg-red-200 text-red-800' :
-                                                        order.status === 'concluido' ? 'bg-purple-200 text-purple-800' :
-                                                            order.status === 'entregue' ? 'bg-gray-200 text-gray-800' :
-                                                                order.status === 'cancelado' ? 'bg-red-200 text-red-800' :
-                                                                    'bg-gray-100 text-gray-800'
-                                    }
+                                            order.status === 'preparando' ? 'bg-blue-200 text-blue-800' :
+                                                order.status === 'pagamento pendente' ? 'bg-orange-200 text-orange-800' :
+                                                    order.status === 'pago' ? 'bg-green-200 text-green-800' :
+                                                        order.status === 'não pago' ? 'bg-red-200 text-red-800' :
+                                                            order.status === 'concluido' ? 'bg-purple-200 text-purple-800' :
+                                                                order.status === 'entregue' ? 'bg-gray-200 text-gray-800' :
+                                                                    order.status === 'cancelado' ? 'bg-red-200 text-red-800' :
+                                                                        'bg-gray-100 text-gray-800'
+                                        }
                                 `}>
-                                    {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                                </span>
-                            </div>
+                                        {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                                    </span>
+                                </div>
 
-                            <div className='my-3 border-t pt-2'>
-                                <h4 className='text-white font-semibold text-sm sm:text-base mb-2'>Itens:</h4>
-                                <ul className='space-y-1 text-xs sm:text-sm'>
-                                    {order.items.map((item) => (
-                                        <li key={item.id} className='flex justify-between'>
-                                            <span className='text-white truncate max-w-[70%]'>{item.quantity}x {item.name}</span>
-                                            <span className='text-white whitespace-nowrap'>R$ {(item.price * item.quantity).toFixed(2).replace(".", ",")}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
+                                <div className='my-3 border-t pt-2'>
+                                    <h4 className='text-white font-semibold text-sm sm:text-base mb-2'>Itens:</h4>
+                                    <ul className='space-y-1 text-xs sm:text-sm'>
+                                        {order.items.map((item) => (
+                                            <li key={item.id} className='flex justify-between'>
+                                                <span className='text-white truncate max-w-[70%]'>{item.quantity}x {item.name}</span>
+                                                <span className='text-white whitespace-nowrap'>R$ {(item.price * item.quantity).toFixed(2).replace(".", ",")}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
 
-                            <div className='border-t pt-3 flex justify-between items-center'>
-                                <p className='text-white font-bold text-sm sm:text-base'>Total: R$ {order.total}</p>
-                                <div className='flex gap-1 flex-wrap justify-end'>
-                                    {getStatusOptions(order.status).map((option) => (
-                                        <button
-                                            key={option.value}
-                                            onClick={() => updateOrderStatus(order.id!, option.value)}
-                                            className={`${option.color} text-white px-2 py-1 rounded text-xs whitespace-nowrap`}
-                                        >
-                                            {option.label}
-                                        </button>
-                                    ))}
+                                <div className='border-t pt-3 flex justify-between items-center'>
+                                    <p className='text-white font-bold text-sm sm:text-base'>Total: R$ {order.total}</p>
+                                    <div className='flex gap-1 flex-wrap justify-end'>
+                                        {getStatusOptions(order.status).map((option) => (
+                                            <button
+                                                key={option.value}
+                                                onClick={() => updateOrderStatus(order.id!, option.value)}
+                                                className={`${option.color} text-white px-2 py-1 rounded text-xs whitespace-nowrap`}
+                                            >
+                                                {option.label}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        )
+                    })}
                 </div>
             )}
         </div>

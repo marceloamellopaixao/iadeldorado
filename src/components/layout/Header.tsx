@@ -256,14 +256,47 @@ export default function Header() {
                                             <span className="whitespace-nowrap">Site da Igreja</span>
                                         </ButtonRouter>
                                     </li>
+                                    {/* DROPDOWN DE PRODUTOS */}
                                     <li>
-                                        <ButtonRouter
-                                            color="flex flex-row gap-2 bg-blue-500 text-white font-bold px-4 py-3 rounded hover:bg-blue-800 transition duration-300 w-full justify-center md:w-auto md:justify-start whitespace-nowrap"
-                                            rota="/products"
-                                            disabled={false}
-                                        >
-                                            Produtos
-                                        </ButtonRouter>
+                                        <div className="flex flex-col md:flex-row md:relative">
+                                            <button
+                                                onClick={() => toggleDropdown('products')}
+                                                className="flex flex-row items-center justify-between w-full bg-blue-500 text-white font-bold px-4 py-3 rounded hover:bg-blue-800 transition duration-300 md:w-auto"
+                                            >
+                                                <span className="whitespace-nowrap">Produtos</span>
+                                                <svg className={`w-2.5 h-2.5 ms-2.5 transition-transform ${dropdownStates.products ? 'rotate-180' : ''}`} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                                                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4" />
+                                                </svg>
+                                            </button>
+
+                                            {/* Dropdown Menu */}
+                                            <div ref={(el) => setDropdownRef('products', el)} className={`${dropdownStates.products ? 'block' : 'hidden'} w-full md:mt-12 md:absolute md:z-10 md:bg-blue-500 md:divide-y md:divide-gray-100 md:rounded-lg md:shadow md:w-44`}>
+                                                <ul className="space-y-1 bg-blue-500 md:py-2 md:text-sm">
+                                                    <li>
+                                                        <Link
+                                                            href="/products"
+                                                            className="block w-full bg-blue-600 text-white px-4 py-2 hover:bg-blue-700 transition duration-300 md:bg-transparent md:hover:bg-blue-800"
+                                                        >
+                                                            <div className="flex items-center gap-2">
+                                                                <Image src={productIcon} alt="User Icon" width={20} height={20} />
+                                                                <span className="whitespace-nowrap">Lista de Produtos</span>
+                                                            </div>
+                                                        </Link>
+                                                    </li>
+                                                    <li>
+                                                        <Link
+                                                            href="/admin/products"
+                                                            className="block w-full bg-blue-600 text-white px-4 py-2 hover:bg-blue-700 transition duration-300 md:bg-transparent md:hover:bg-blue-800"
+                                                        >
+                                                            <div className="flex items-center gap-2">
+                                                                <Image src={listProductIcon} alt="User Icon" width={20} height={20} />
+                                                                <span className="whitespace-nowrap">Gerenciar Produtos</span>
+                                                            </div>
+                                                        </Link>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
                                     </li>
                                     <li>
                                         <ButtonRouter

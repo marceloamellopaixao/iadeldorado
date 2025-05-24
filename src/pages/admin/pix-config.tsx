@@ -19,8 +19,7 @@ function AdminPixConfigPage() {
         // Atualiza no Firestore o campo current
         const currentRef = doc(db, "pixConfig", "current");
         await setDoc(currentRef, { current: cantina }, { merge: true });
-
-        alert("Cantina selecionada com sucesso!")
+        return cantina;
     };
 
     // Busca a cantina atual do Firestore
@@ -43,9 +42,18 @@ function AdminPixConfigPage() {
                 <title>IAD Eldorado - Configuração de Pix</title>
                 <meta name="description" content="Configuração do sistema de pagamento Pix na IAD Eldorado." />
             </Head>
-            <h1 className="text-2xl font-bold mb-6">Configuração de Cantinas</h1>
+            <div className="bg-[#041c35] shadow-md rounded-lg p-6 flex flex-col gap-2">
+                <h1 className="text-2xl font-bold mb-4 text-white">Configuração de Pix</h1>
+                <p className="text-white mb-4">
+                    Aqui você pode configurar o sistema de pagamento Pix da IAD Eldorado.
+                </p>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                { selectedCantina && (
+                    <div className="flex justify-center bg-green-500 text-white p-2 rounded">
+                        <span className="text-lg">O PIX da Cantina <span className="font-bold">"{selectedCantina}"</span> está ativa!</span>
+                    </div>
+                )}
+
                 <div className="lg:col-span-1">
                     <ActiveCantinaSelector
                         current={selectedCantina}
