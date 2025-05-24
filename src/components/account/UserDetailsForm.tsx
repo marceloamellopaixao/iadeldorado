@@ -48,6 +48,7 @@ export default function UserDetailsForm({ initialData }: UserDetailsFormProps) {
                 <label htmlFor="name" className="block mb-1">Nome</label>
                 <input
                     type="text"
+                    placeholder="Digite seu nome completo"
                     id="name"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -63,7 +64,7 @@ export default function UserDetailsForm({ initialData }: UserDetailsFormProps) {
                     value={formData.telephone}
                     onChange={(e) => setFormData({ ...formData, telephone: e.target.value })}
                     className="w-full p-2 border rounded"
-                    placeholder="119123456789"
+                    placeholder="Digite seu número de celular com DDD (119123456789)"
                     pattern="\d{2}\d{5}\d{4}"
                     title="Formato esperado: 119123456789"
                     required
@@ -73,6 +74,7 @@ export default function UserDetailsForm({ initialData }: UserDetailsFormProps) {
                 <label htmlFor="email" className="block mb-1">E-mail</label>
                 <input
                     type="email"
+                    placeholder="Digite seu e-mail"
                     id="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
