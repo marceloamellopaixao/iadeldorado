@@ -36,7 +36,7 @@ function ProductsPage() {
             </Head>
             <div className="container mx-auto p-4">
                 <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-bold">Produtos</h1>
+                    <h1 className="text-2xl font-bold text-white">Produtos</h1>
                     <div className='flex items-center justify-center gap-4'>
                         <Button
                             disabled={cartItems.length === 0}
@@ -69,7 +69,7 @@ function ProductsPage() {
                 </div>
 
                 <div className='mb-10 flex flex-col items-center'>
-                    <h4 className='font-medium text-center'>A escolha da quantidade de produtos será feita ao finalizar a compra no carrinho</h4>
+                    <h4 className='font-medium text-center text-white'>A escolha da quantidade de produtos será feita ao finalizar a compra no carrinho</h4>
                 </div>
 
                 {notification.visible && (
