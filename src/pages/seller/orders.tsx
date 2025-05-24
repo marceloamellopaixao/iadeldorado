@@ -195,18 +195,18 @@ function SellerOrdersPage() {
                 <title>IAD Eldorado - Pedidos</title>
                 <meta name="description" content="Lista de pedidos realizados na IAD Eldorado." />
             </Head>
-            {/* Título sempre visível no topo */}
-            <h1 className="text-2xl font-bold">Pedidos</h1>
 
             {/* Linha com filtros e dropdown */}
             <div className="flex flex-wrap justify-between items-center mb-6">
                 <div className='flex flex-row space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2'>
+                    {/* Título sempre visível no topo */}
+                    <h1 className="text-white text-2xl font-bold">Pedidos</h1>
                     <div className="flex flex-col md:flex-row md:relative">
                         <button
                             onClick={() => toggleDropdown('status')}
                             className="flex flex-row items-center justify-between w-full bg-blue-500 text-white font-bold px-2 py-1 rounded hover:bg-blue-800 transition duration-300 md:w-auto"
                         >
-                            <span>Status</span>
+                            <span>{filter.charAt(0).toUpperCase() + filter.substring(1)}</span>
                             <svg className={`w-2.5 h-2.5 ms-2.5 transition-transform ${dropdownStates.status ? 'rotate-180' : ''}`} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                                 <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4" />
                             </svg>
@@ -246,25 +246,25 @@ function SellerOrdersPage() {
                     </button>
                 </div>
             ) : (
-                <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
+                <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
                     {filteredOrders.map((order) => (
                         <div
                             key={order.id}
-                            className='border p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300'
+                            className='bg-[#041c35] border p-4 rounded-lg shadow-2lg hover:scale-105 hover:shadow-xl transition-all duration-300'
                         >
                             <div className='flex justify-between items-start gap-4'>
                                 <div className='flex-1'>
-                                    <h3 className='font-bold text-sm sm:text-base'>
+                                    <h3 className='text-white font-bold text-sm sm:text-base'>
                                         #{order.id?.slice(0, 5).toUpperCase()} - {order.clientName.charAt(0).toUpperCase() + order.clientName.slice(1)}
                                     </h3>
-                                    <p className='text-xs sm:text-sm'>Tel: {order.clientWhatsApp}</p> {/* Tentar tratar o numero para ficar da seguinte forma (11) 91234-1234 */}
-                                    <p className='text-xs sm:text-sm'>
+                                    <p className='text-white text-xs sm:text-sm'>Tel: {order.clientWhatsApp}</p> {/* Tentar tratar o numero para ficar da seguinte forma (11) 91234-1234 */}
+                                    <p className='text-white text-xs sm:text-sm'>
                                         Pagamento: <span className='font-medium'>{order.paymentMethod.charAt(0).toUpperCase() + order.paymentMethod.slice(1)}</span>
                                     </p>
-                                    <p>Data de Compra: {format(order.createdAt, "dd/MM/yyyy - HH:mm")}</p>
+                                    <p className='text-white text-xs sm:text-sm'>Data de Compra: {format(order.createdAt, "dd/MM/yyyy - HH:mm")}</p>
                                 </div>
 
-                                <span className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap
+                                <span className={`px-2 py-1 rounded-full text-sm font-bold whitespace-nowrap
                                         ${order.status === 'pendente' ? 'bg-yellow-200 text-yellow-800' :
                                         order.status === 'preparando' ? 'bg-blue-200 text-blue-800' :
                                             order.status === 'pagamento pendente' ? 'bg-orange-200 text-orange-800' :
@@ -281,19 +281,19 @@ function SellerOrdersPage() {
                             </div>
 
                             <div className='my-3 border-t pt-2'>
-                                <h4 className='font-semibold text-sm sm:text-base mb-2'>Itens:</h4>
+                                <h4 className='text-white font-semibold text-sm sm:text-base mb-2'>Itens:</h4>
                                 <ul className='space-y-1 text-xs sm:text-sm'>
                                     {order.items.map((item) => (
                                         <li key={item.id} className='flex justify-between'>
-                                            <span className='truncate max-w-[70%]'>{item.quantity}x {item.name}</span>
-                                            <span className='whitespace-nowrap'>R$ {(item.price * item.quantity).toFixed(2).replace(".", ",")}</span>
+                                            <span className='text-white truncate max-w-[70%]'>{item.quantity}x {item.name}</span>
+                                            <span className='text-white whitespace-nowrap'>R$ {(item.price * item.quantity).toFixed(2).replace(".", ",")}</span>
                                         </li>
                                     ))}
                                 </ul>
                             </div>
 
                             <div className='border-t pt-3 flex justify-between items-center'>
-                                <p className='font-bold text-sm sm:text-base'>Total: R$ {order.total}</p>
+                                <p className='text-white font-bold text-sm sm:text-base'>Total: R$ {order.total}</p>
                                 <div className='flex gap-1 flex-wrap justify-end'>
                                     {getStatusOptions(order.status).map((option) => (
                                         <button
