@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Product } from '@/types/product';
 
@@ -14,7 +14,7 @@ export const useProducts = () => {
         const loadProducts = async () => {
             setLoading(true);
             try {
-                const q = query(collection(db, 'products'), where('status', '==', true));
+                const q = query(collection(db, 'products'), where('status', '==', true), orderBy('name', 'asc'));
                 unsubscribe = onSnapshot(q, (snapshot) => {
                     setProducts(snapshot.docs.map(doc => ({
                         id: doc.id,
