@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { collection, deleteDoc, doc, query, onSnapshot } from "firebase/firestore";
+import { collection, deleteDoc, doc, query, onSnapshot, orderBy } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Product } from "@/types/product";
 import LoadingSpinner from "../../common/LoadingSpinner";
@@ -19,7 +19,7 @@ export default function ProductTable({ onEdit }: ProductTableProps) {
         const fetchProducts = async () => {
 
             try {
-                const q = query(collection(db, "products"));
+                const q = query(collection(db, "products"), orderBy('name', 'asc'));
 
                 unsubscribe = onSnapshot(q, (querySnapshot) => {
                     const productsData = querySnapshot.docs.map(doc => ({
@@ -28,8 +28,8 @@ export default function ProductTable({ onEdit }: ProductTableProps) {
                     })) as Product[];
                     setProducts(productsData);
                 });
-            } catch (error) {
-                console.error("Erro ao buscar produtos:", error);
+            } catch {
+                return;
             } finally {
                 setLoading(false);
             }
