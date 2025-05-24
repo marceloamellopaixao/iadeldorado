@@ -22,15 +22,15 @@ export default function ActiveCantinaSelector({
     ];
 
     return (
-        <div className="bg-white p-4 rounded-lg shadow">
-            <h3 className="font-medium text-black mb-3">Selecionar Cantina</h3>
+        <div className="border-2 border-white p-4 rounded-lg shadow">
+            <h3 className="font-medium text-white mb-3">Selecionar Cantina</h3>
             <select
                 value={current}
                 onChange={(e) => onChange(e.target.value as CantinaId)}
-                className="w-full p-2 text-black border rounded"
+                className=" w-full p-2 text-white border rounded"
             >
                 {cantinas.map((cantina) => (
-                    <option key={cantina.id} value={cantina.id}>
+                    <option key={cantina.id} value={cantina.id} className="text-black">
                         {cantina.name}
                     </option>
                 ))}
