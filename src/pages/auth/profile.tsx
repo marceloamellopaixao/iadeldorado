@@ -9,27 +9,27 @@ function ProfilePage() {
     const { user, userData } = useAuth();
 
     return (
-        <div className="container mx-auto p-4 max-w-2xl">
+        <div className="container mx-auto">
             <Head>
                 <title>IAD Eldorado - Perfil</title>
                 <meta name="description" content="Gerencie suas informações de perfil na IAD Eldorado." />
             </Head>
-            <h1 className="text-2xl font-bold mb-6">Meu Perfil</h1>
+            <div className="flex min-w-100% flex-col items-center justify-center p-4 gap-4 md:flex-row">
+                <div className='bg-[#041c35] w-full p-6 rounded-lg shadow-md'>
+                    <h2 className='text-xl text-white font-bold mb-4'>Informações Pessoais</h2>
+                    <UserDetailsForm
+                        initialData={{
+                            name: userData?.name || '',
+                            telephone: userData?.telephone || '',
+                            email: user?.email || ''
+                        }}
+                    />
+                </div>
 
-            <div className='p-6 rounded-lg shadow-md mb-6'>
-                <h2 className='text-xl font-semibold mb-4'>Informações Pessoais</h2>
-                <UserDetailsForm
-                    initialData={{
-                        name: userData?.name || '',
-                        telephone: userData?.telephone || '',
-                        email: user?.email || ''
-                    }}
-                />
-            </div>
-
-            <div className='p-6 rounded-lg shadow-md'>
-                <h2 className='text-xl font-semibold mb-4'>Alterar Senha</h2>
-                <PasswordUpdateForm />
+                <div className='bg-[#041c35] w-full p-6 rounded-lg shadow-md'>
+                    <h2 className='text-xl text-white font-bold mb-4'>Alterar Senha</h2>
+                    <PasswordUpdateForm />
+                </div>
             </div>
 
         </div>
