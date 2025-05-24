@@ -71,27 +71,29 @@ export default function ProductForm({ product, onClear, onSuccess }: ProductForm
     };
 
     return (
-        <div className="bg-white p-4 rounded-lg shadow">
-            <h2 className="text-lg font-medium mb-4 text-black">
+        <div className="flex flex-col bg-gray-800 border border-zinc-400 rounded-xl shadow-lg p-4 gap-4 justify-between transition hover:shadow-xl hover:scale-105 duration-300 ease-linear">
+            <h2 className="text-lg font-bold text-white">
                 {product ? 'Editar Produto' : 'Adicionar Produto'}
             </h2>
 
             <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Nome</label>
+                <div className="flex flex-col gap-2">
+                    <label className="block text-sm font-medium text-white">Nome</label>
                     <input
                         type="text"
-                        className="mt-1 block w-full border border-gray-300 text-gray-700 rounded-md shadow-sm p-2"
+                        placeholder="Nome do produto"
+                        className="block w-full border border-gray-300 text-white rounded-md shadow-sm p-2"
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         required
                     />
                 </div>
 
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Descrição</label>
+                <div className="flex flex-col gap-2">
+                    <label className="block text-sm font-medium text-white">Descrição</label>
                     <textarea
-                        className="mt-1 block w-full border border-gray-300 text-gray-700 rounded-md shadow-sm p-2"
+                        placeholder="Descrição do produto"
+                        className="block w-full border border-gray-300 text-white rounded-md shadow-sm p-2"
                         value={formData.description}
                         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                         rows={3}
@@ -99,13 +101,13 @@ export default function ProductForm({ product, onClear, onSuccess }: ProductForm
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Preço (R$)</label>
+                    <div className="flex flex-col gap-2">
+                        <label className="block text-sm font-medium text-white">Preço (R$)</label>
                         <input
                             type="number"
                             step="0.01"
                             min="0"
-                            className="mt-1 block w-full border border-gray-300 text-gray-700 rounded-md shadow-sm p-2"
+                            className="block w-full border border-gray-300 text-white rounded-md shadow-sm p-2"
                             value={formData.price}
                             onChange={(e) => {
                                 const value = parseFloat(e.target.value);
@@ -115,24 +117,25 @@ export default function ProductForm({ product, onClear, onSuccess }: ProductForm
                         />
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Categoria</label>
+                    <div className="flex flex-col gap-2">
+                        <label className="block text-sm font-medium text-white">Categoria</label>
                         <input
                             type="text"
-                            className="mt-1 block w-full border border-gray-300 text-gray-700 rounded-md shadow-sm p-2"
+                            placeholder="Categoria do produto"
+                            className="block w-full border border-gray-300 text-white rounded-md shadow-sm p-2"
                             value={formData.category}
                             onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                             required
                         />
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Estoque</label>
+                    <div className="flex flex-col gap-2">
+                        <label className="block text-sm font-medium text-white">Estoque</label>
                         <input
                             type="text"
                             min="0"
                             max="999999999"
-                            className="mt-1 block w-full border border-gray-300 text-gray-700 rounded-md shadow-sm p-2"
+                            className="block w-full border border-gray-300 text-white rounded-md shadow-sm p-2"
                             value={formData.stock}
                             onChange={(e) => {
                                 const value = parseInt(e.target.value.replace(".", ","), 10);
@@ -142,15 +145,15 @@ export default function ProductForm({ product, onClear, onSuccess }: ProductForm
                         />
                     </div>
 
-                    <div className="flex items-center mb-4">
-                        <label className="block text-sm font-medium text-gray-700">Status</label>
+                    <div className="flex flex-col gap-2">
+                        <label className="block text-sm font-medium text-white">Status</label>
                         <select
-                            className="mt-1 block w-full border border-gray-300 text-gray-700 rounded-md shadow-sm p-2"
+                            className="block w-full border border-gray-300 text-white rounded-md shadow-sm p-2"
                             value={formData.status ? "true" : "false"}
                             onChange={(e) => setFormData({ ...formData, status: e.target.value === "true" })}
                         >
-                            <option value="true">Ativo</option>
-                            <option value="false">Inativo</option>
+                            <option value="true" className="text-black">Ativo</option>
+                            <option value="false" className="text-black">Inativo</option>
                         </select>
                     </div>
                 </div>
@@ -160,7 +163,7 @@ export default function ProductForm({ product, onClear, onSuccess }: ProductForm
                         <button
                             type="button"
                             onClick={onClear}
-                            className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50"
+                            className="px-4 py-2 border-2 border-transparent rounded-md shadow-sm text-sm font-bold text-white  bg-red-500 hover:bg-red-900 transition-all duration-300 ease-linear"
                         >
                             Cancelar
                         </button>
@@ -168,7 +171,7 @@ export default function ProductForm({ product, onClear, onSuccess }: ProductForm
 
                     <button
                         type="submit"
-                        className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+                        className="px-4 py-2 border-2 border-transparent rounded-md shadow-sm text-sm font-bold text-white bg-blue-500 hover:bg-blue-700 transition-all duration-300 ease-linear"
                     >
                         {product ? 'Atualizar' : 'Cadastrar'}
                     </button>
