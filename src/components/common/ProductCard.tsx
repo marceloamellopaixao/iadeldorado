@@ -13,7 +13,7 @@ interface ProductCardProps {
 export function ProductCard({ product, onAddToCart, isInCart }: ProductCardProps) {
 
     return (
-        <div className="bg-gray-800 border border-zinc-600 rounded-xl shadow-lg p-4 flex flex-col justify-between h-full transition hover:scale-105 hover:shadow-xl">
+        <div className="flex flex-col bg-gray-800 border border-zinc-400 rounded-xl shadow-lg p-4 justify-between transition hover:shadow-xl hover:scale-105 duration-300 ease-linear">
             <div className="flex items-center justify-between mb-4">
                 <h3 className="text-white text-lg font-semibold mb-2">{product.name}</h3>
             </div>
