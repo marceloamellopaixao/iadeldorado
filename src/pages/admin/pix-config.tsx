@@ -50,7 +50,7 @@ function AdminPixConfigPage() {
 
                 { selectedCantina && (
                     <div className="flex justify-center bg-green-500 text-white p-2 rounded">
-                        <span className="text-lg">O PIX da Cantina <span className="font-bold">"{selectedCantina}"</span> está ativa!</span>
+                        <span className="text-lg">O PIX da Cantina <span className="font-bold">{selectedCantina}</span> está ativa!</span>
                     </div>
                 )}
 
