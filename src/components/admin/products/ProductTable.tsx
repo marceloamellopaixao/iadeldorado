@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
-import { collection, deleteDoc, doc, query, onSnapshot, orderBy } from "firebase/firestore";
+import { deleteDoc, doc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Product } from "@/types/product";
 import LoadingSpinner from "../../common/LoadingSpinner";
 import { useAuth } from "@/contexts/AuthContext";
+import { useProductsAdmin } from "@/hooks/useProductsAdmin";
 
 interface ProductTableProps {
     onEdit: (product: Product) => void;
@@ -11,38 +11,7 @@ interface ProductTableProps {
 
 export default function ProductTable({ onEdit }: ProductTableProps) {
     const { userData } = useAuth();
-    const [products, setProducts] = useState<Product[]>([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        let unsubscribe: () => void;
-        const fetchProducts = async () => {
-
-            try {
-                const q = query(collection(db, "products"), orderBy('name', 'asc'));
-
-                unsubscribe = onSnapshot(q, (querySnapshot) => {
-                    const productsData = querySnapshot.docs.map(doc => ({
-                        id: doc.id,
-                        ...doc.data()
-                    })) as Product[];
-                    setProducts(productsData);
-                });
-            } catch {
-                return;
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchProducts();
-
-        return () => {
-            if (unsubscribe) {
-                unsubscribe();
-            }
-        }
-    }, [])
+    const { products, loading } = useProductsAdmin();
 
     const handleDelete = async (id: string) => {
         if (!confirm("Tem certeza que deseja excluir este produto?")) return;
