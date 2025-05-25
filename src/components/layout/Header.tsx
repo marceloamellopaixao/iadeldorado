@@ -72,7 +72,7 @@ export default function Header() {
                                     <li>
                                         <ButtonRouter
                                             color="flex flex-row gap-2 bg-blue-500 text-white font-bold px-4 py-3 rounded hover:bg-blue-800 transition duration-300 w-full justify-center md:w-auto md:justify-start whitespace-nowrap"
-                                            rota="https://www.iadeldorado.com.br/"
+                                            rota="https://iadeldorado.com.br/"
                                             disabled={false}
                                         >
                                             <span className="whitespace-nowrap">Site da Igreja</span>
@@ -239,7 +239,7 @@ export default function Header() {
                                     <li>
                                         <ButtonRouter
                                             color="flex flex-row gap-2 bg-blue-500 text-white font-bold px-4 py-3 rounded hover:bg-blue-800 transition duration-300 w-full justify-center md:w-auto md:justify-start whitespace-nowrap"
-                                            rota="https://www.iadeldorado.com.br/"
+                                            rota="https://iadeldorado.com.br/"
                                             disabled={false}
                                         >
                                             <span className="whitespace-nowrap">Site da Igreja</span>
@@ -324,7 +324,7 @@ export default function Header() {
                                     <li>
                                         <ButtonRouter
                                             color="flex flex-row gap-2 bg-blue-500 text-white font-bold px-4 py-3 rounded hover:bg-blue-800 transition duration-300 w-full justify-center md:w-auto md:justify-start whitespace-nowrap"
-                                            rota="https://www.iadeldorado.com.br/"
+                                            rota="https://iadeldorado.com.br/"
                                             disabled={false}
                                         >
                                             <span className="whitespace-nowrap">Site da Igreja</span>
@@ -383,7 +383,7 @@ export default function Header() {
                                     <li>
                                         <ButtonRouter
                                             color="flex flex-row gap-2 bg-blue-500 text-white font-bold px-4 py-3 rounded hover:bg-blue-800 transition duration-300 w-full justify-center md:w-auto md:justify-start whitespace-nowrap"
-                                            rota="https://www.iadeldorado.com.br/"
+                                            rota="https://iadeldorado.com.br/"
                                             disabled={false}
                                         >
                                             <span className="whitespace-nowrap">Site da Igreja</span>
