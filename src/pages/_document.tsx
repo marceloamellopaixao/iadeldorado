@@ -10,7 +10,7 @@ export default function Document() {
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="icon" href="/logo-adeldorado.png" />
       </Head>
-      <body className="bg-gray-50">
+      <body>
         <Main />
         <NextScript />
       </body>
