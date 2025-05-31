@@ -101,8 +101,8 @@ function SellerOrdersPage() {
                 updatedAt: new Date(),
             });
 
-            // Se for concluído, enviar mensagem pelo WhatsApp
-            if (newStatus === 'concluido') {
+            // Se for preparando, enviar mensagem pelo WhatsApp
+            if (newStatus === 'preparando') {
                 const message = createWhatsAppMessage({
                     name: order.clientName,
                     items: order.items,
@@ -112,7 +112,7 @@ function SellerOrdersPage() {
                 });
 
                 window.open(
-                    `https://wa.me/+55${order.clientWhatsApp}?text=${encodeURIComponent(message)}`,
+                    `https://api.whatsapp.com/send?phone=55${order.clientWhatsApp}&text=${encodeURIComponent(message)}`,
                     '_blank'
                 );
             }
