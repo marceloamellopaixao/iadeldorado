@@ -104,8 +104,15 @@ export default function CheckoutForm({ cartItems }: CheckoutFormProps) {
             // Se for PIX, busca os dados da cantina atual
             let pixDetails = null;
             if (formData.paymentMethod === "pix") {
-                const pixDoc = await getDoc(doc(db, 'pixConfig', 'jovens'));
-                pixDetails = pixDoc.exists() ? pixDoc.data() : null;
+                const pixDoc = await getDoc(doc(db, 'pixConfig', 'current'));
+                const actualPixConfig = pixDoc.exists() ? pixDoc.data() : null;
+                const pixData = await getDoc(doc(db, 'pixConfig', actualPixConfig?.current));
+                pixDetails = pixData.exists() ? pixData.data() : null;
+                if (!pixDetails) {
+                    setLoading(false);
+                    return;
+                }
+
             }
 
             // Cria o pedido no Firestore
