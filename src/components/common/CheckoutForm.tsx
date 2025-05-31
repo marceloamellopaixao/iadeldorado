@@ -4,7 +4,6 @@ import { db } from "@/lib/firebase";
 import { CartItem, PaymentType } from "@/types/order";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/router";
-import LoadingSpinner from "./LoadingSpinner";
 import { useCart } from "@/hooks/useCart";
 
 interface CheckoutFormProps {
@@ -251,7 +250,7 @@ export default function CheckoutForm({ cartItems }: CheckoutFormProps) {
                     } transition-colors`}
             >
                 {loading ? (
-                    <LoadingSpinner message="Processando Pedido..." />
+                    "Processando Pedido..."
                 ) : (
                     "Finalizar Pedido"
                 )}
