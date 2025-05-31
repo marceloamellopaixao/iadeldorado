@@ -16,7 +16,7 @@ export const createWhatsAppMessage = ({
     pixDetails,
 }: WhatsAppMessageParams): string => {
     const itemsText = items.map(item =>
-        `➡ ${item.name} (${item.quantity}x): R$ ${(item.price * item.quantity).toFixed(2)}`
+        `➡ ${item.name} (${item.quantity}x): R$ ${(item.price * item.quantity).toFixed(2).replace('.', ',')}`
     ).join('\n');
 
     let paymentText = "";
@@ -25,7 +25,7 @@ export const createWhatsAppMessage = ({
             paymentText = pixDetails
                 ? `💳 *Pagamento via PIX*\n` +
                 `🔹 ${pixDetails.name}\n` +
-                `🔹 Tipo: ${pixDetails.keyType}\n` +
+                `🔹 Tipo: ${pixDetails.keyType.toUpperCase()}\n` +
                 `🔹 Chave: ${pixDetails.key}\n` +
                 `🔹 Titular: ${pixDetails.owner}`
                 : `💳 *Pagamento via PIX*`;
@@ -44,11 +44,13 @@ export const createWhatsAppMessage = ({
             break;
     }
 
-    return `*IAD Eldorado - Recibo do Pedido*` +
+    const message = `*IAD Eldorado - Recibo do Pedido*` +
         `\n\n👋 Olá ${name}!` +
         `\n\n📝 *Resumo da sua compra:*` +
         `\n${itemsText}` +
         `\n\n💰 *Total: R$ ${total}*` +
         `\n\n${paymentText}\n\n` +
-        `🙏 Obrigado pela preferência!`;
+        `🙏 Obrigado pela preferência!`
+
+    return message;
 }
