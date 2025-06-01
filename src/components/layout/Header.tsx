@@ -14,7 +14,6 @@ import userIcon from '@/assets/icons/user-solid.svg'
 import menuIcon from '@/assets/icons/bars-solid.svg'
 import closeIcon from '@/assets/icons/times-white-solid.svg'
 import pixIcon from '@/assets/icons/pix-brands.svg'
-import relatorioIcon from '@/assets/icons/calendar-solid.svg'
 import configIcon from '@/assets/icons/sliders-solid.svg'
 import productIcon from '@/assets/icons/product-icon.svg'
 import listProductIcon from '@/assets/icons/list-products-icon.svg'
@@ -192,17 +191,6 @@ export default function Header() {
                                                             <div className="flex items-center gap-2">
                                                                 <Image src={pixIcon} alt="PIX Icon" width={20} height={20} />
                                                                 <span className="whitespace-nowrap">Configuração de PIX</span>
-                                                            </div>
-                                                        </Link>
-                                                    </li>
-                                                    <li>
-                                                        <Link
-                                                            href="/admin/reports"
-                                                            className="block w-full bg-blue-600 text-white px-2 py-2 hover:bg-blue-700 transition duration-300 md:bg-transparent md:hover:bg-blue-800"
-                                                        >
-                                                            <div className="flex items-center gap-2">
-                                                                <Image src={relatorioIcon} alt="Relatório Icon" width={20} height={20} />
-                                                                <span className="whitespace-nowrap">Relatório de Vendas</span>
                                                             </div>
                                                         </Link>
                                                     </li>
