@@ -14,7 +14,12 @@ export const useProductsAdmin = () => {
         const loadProducts = async () => {
             setLoading(true);
             try {
-                const q = query(collection(db, 'products'), orderBy('status', 'desc'), orderBy('stock', 'desc'), orderBy('name', 'asc'));
+                const q = query(
+                    collection(db, 'products'),
+                    orderBy('status', 'desc'),
+                    orderBy('stock', 'desc'),
+                    orderBy('name', 'asc')
+                );
                 unsubscribe = onSnapshot(q, (snapshot) => {
                     setProducts(snapshot.docs.map(doc => ({
                         id: doc.id,
