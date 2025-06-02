@@ -129,7 +129,6 @@ export default function CheckoutForm({ cartItems }: CheckoutFormProps) {
                 status: "pendente",
                 createdAt: new Date(),
                 userId: user?.uid || null, // Adiciona o ID do usuário se estiver logado
-                paymentStatus: "pendente"
             });
 
             // Atualiza o estoque dos produtos
