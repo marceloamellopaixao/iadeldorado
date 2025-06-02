@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, query, where, updateDoc, doc, onSnapshot, orderBy, increment } from 'firebase/firestore';
+import { collection, query, where, updateDoc, doc, onSnapshot, orderBy, increment, deleteDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Order, OrderStatus } from '@/types/order';
 import { createWhatsAppMessage } from '@/utils/whatsapp';
@@ -8,8 +8,10 @@ import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { format } from 'date-fns';
 import { useDropdownClose } from '@/hooks/useDropdownClose';
 import Head from 'next/head';
+import { useAuth } from '@/contexts/AuthContext';
 
 function SellerOrdersPage() {
+    const { userData } = useAuth();
     const [orders, setOrders] = useState<Order[]>([]);
     const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
@@ -74,6 +76,28 @@ function SellerOrdersPage() {
             setFilteredOrders(orders.filter((order) => order.status === filter));
         }
     }, [filter, orders]);
+
+    // Deleta um pedido
+    const deleteOrder = async (orderId: string) => {
+        try {
+            const orderRef = doc(db, 'orders', orderId);
+            const order = orders.find((o) => o.id === orderId);
+
+            if (!order) throw new Error('Pedido não encontrado');
+
+            const updateStockPromises = order.items.map(async (item) => {
+                const productRef = doc(db, 'products', item.id); // supondo que `item.id` é o mesmo do produto
+                await updateDoc(productRef, {
+                    stock: increment(item.quantity) // adiciona a quantidade cancelada de volta
+                });
+            });
+
+            await Promise.all(updateStockPromises);
+            await deleteDoc(orderRef);
+        } catch (error) {
+            console.error('Erro ao deletar pedido:', error);
+        }
+    };
 
     // Atualiza o status do pedido
     const updateOrderStatus = async (orderId: string, newStatus: OrderStatus) => {
@@ -146,19 +170,20 @@ function SellerOrdersPage() {
                 break;
             case 'pagamento pendente':
                 options.push(
+                    { value: 'concluido', label: 'Concluir', color: 'bg-green-500 hover:bg-green-600' },
                     { value: 'pago', label: 'Marcar como Pago', color: 'bg-blue-500 hover:bg-blue-600' },
                     { value: 'não pago', label: 'Marcar como Não Pago', color: 'bg-gray-500 hover:bg-gray-600' }
-                );
-                break;
-            case 'pago':
-                options.push(
-                    { value: 'concluido', label: 'Concluir', color: 'bg-green-500 hover:bg-green-600' },
-                    { value: 'cancelado', label: 'Cancelar', color: 'bg-red-500 hover:bg-red-600' }
                 );
                 break;
             case 'não pago':
                 options.push(
                     { value: 'pago', label: 'Marcar como Pago', color: 'bg-blue-500 hover:bg-blue-600' },
+                    { value: 'cancelado', label: 'Cancelar', color: 'bg-red-500 hover:bg-red-600' }
+                );
+                break;
+            case 'pago':
+                options.push(
+                    { value: 'concluido', label: 'Concluir', color: 'bg-green-500 hover:bg-green-600' },
                     { value: 'cancelado', label: 'Cancelar', color: 'bg-red-500 hover:bg-red-600' }
                 );
                 break;
@@ -312,6 +337,19 @@ function SellerOrdersPage() {
                                             </button>
                                         ))}
                                     </div>
+                                </div>
+                                <div className='mt-2 text-xs text-gray-400'>
+                                    {userData?.role === 'admin' && (
+                                        <button
+                                            onClick={() => deleteOrder(order.id!)}
+                                            className='px-2 py-1 rounded text-xs whitespace-nowrap bg-red-500 text-white hover:bg-red-900 transition duration-300'
+                                            title="Excluir Pedido"
+                                            aria-label="Excluir Pedido"
+                                            disabled={order.status === 'entregue' || order.status === 'cancelado' || order.status === 'pago' || order.status === 'não pago' || order.status === 'concluido' || order.status === 'pagamento pendente'}
+                                        >
+                                            Excluir Pedido
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         )
