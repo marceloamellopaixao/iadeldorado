@@ -17,6 +17,7 @@ function SellerOrdersPage() {
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState<OrderStatus | 'todos'>('todos');
     const { dropdownStates, setDropdownRef, toggleDropdown } = useDropdownClose();
+    const [deletingOrderId, setDeletingOrderId] = useState<string | null>(null);
 
 
     // Busca pedidos com filtro e em tempo real
@@ -79,6 +80,7 @@ function SellerOrdersPage() {
 
     // Deleta um pedido
     const deleteOrder = async (orderId: string) => {
+        setDeletingOrderId(orderId);
         try {
             const orderRef = doc(db, 'orders', orderId);
             const order = orders.find((o) => o.id === orderId);
@@ -94,8 +96,11 @@ function SellerOrdersPage() {
 
             await Promise.all(updateStockPromises);
             await deleteDoc(orderRef);
+            setDeletingOrderId(null);
         } catch (error) {
-            console.error('Erro ao deletar pedido:', error);
+            setDeletingOrderId(null);
+            const errorMsg = error instanceof Error ? error.message : String(error);
+            console.error('Erro ao deletar pedido:', errorMsg);
         }
     };
 
@@ -125,8 +130,12 @@ function SellerOrdersPage() {
                 updatedAt: new Date(),
             });
 
-            // Se for preparando, enviar mensagem pelo WhatsApp
-            if (newStatus === 'preparando') {
+            // Se for preparando, enviar mensagem pelo WhatsApp SOMENTE se houver telefone válido (11 dígitos numéricos)
+            if (
+                newStatus === 'preparando' &&
+                order.clientWhatsApp &&
+                /^\d{11}$/.test(order.clientWhatsApp)
+            ) {
                 const message = createWhatsAppMessage({
                     name: order.clientName,
                     items: order.items,
@@ -140,7 +149,6 @@ function SellerOrdersPage() {
                     '_blank'
                 );
             }
-
         } catch (error) {
             console.error('Erro ao atualizar status do pedido:', error);
         }
@@ -308,6 +316,7 @@ function SellerOrdersPage() {
                                                                         'bg-gray-100 text-gray-800'
                                         }
                                 `}>
+
                                         {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                                     </span>
                                 </div>
@@ -345,9 +354,10 @@ function SellerOrdersPage() {
                                             className='px-2 py-1 rounded text-xs whitespace-nowrap bg-red-500 text-white hover:bg-red-900 transition duration-300'
                                             title="Excluir Pedido"
                                             aria-label="Excluir Pedido"
-                                            disabled={order.status === 'entregue' || order.status === 'cancelado' || order.status === 'pago' || order.status === 'não pago' || order.status === 'concluido' || order.status === 'pagamento pendente'}
+                                            disabled={order.status === 'cancelado' || order.status === 'entregue' || deletingOrderId === order.id}
+                                            style={{ cursor: order.status === 'cancelado' || order.status === 'entregue' || deletingOrderId === order.id ? 'not-allowed' : 'pointer' }}
                                         >
-                                            Excluir Pedido
+                                            {deletingOrderId === order.id ? 'Excluindo...' : 'Excluir Pedido'}
                                         </button>
                                     )}
                                 </div>
