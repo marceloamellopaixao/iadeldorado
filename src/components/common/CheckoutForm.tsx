@@ -17,20 +17,17 @@ export default function CheckoutForm({ cartItems }: CheckoutFormProps) {
 
     const [formData, setFormData] = useState({
         clientName: userData?.name || "",
-        clientWhatsApp: userData?.telephone || "",
         paymentMethod: "dinheiro" as PaymentType
     });
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({
-        clientName: "",
-        clientWhatsApp: ""
+        clientName: ""
     });
 
     const validateForm = () => {
         let valid = true;
         const newErrors = {
-            clientName: "",
-            clientWhatsApp: ""
+            clientName: ""
         };
 
         if (!user) {
@@ -41,31 +38,10 @@ export default function CheckoutForm({ cartItems }: CheckoutFormProps) {
                 newErrors.clientName = "Nome muito curto";
                 valid = false;
             }
-
-            if (!formData.clientWhatsApp.trim()) {
-                newErrors.clientWhatsApp = "WhatsApp é obrigatório";
-                valid = false;
-            } else if (!/^\d{11}$/.test(formData.clientWhatsApp.replace(/\D/g, ""))) {
-                newErrors.clientWhatsApp = "WhatsApp inválido (11 dígitos com DDD)";
-                valid = false;
-            }
         }
 
         setErrors(newErrors);
         return valid;
-    };
-
-    const handleWhatsAppChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        // Remove todos os caracteres não numéricos
-        const numericValue = e.target.value.replace(/\D/g, "");
-
-        // Limita a 11 caracteres (DDD + número)
-        const formattedValue = numericValue.slice(0, 11);
-
-        setFormData({
-            ...formData,
-            clientWhatsApp: formattedValue
-        });
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -91,14 +67,11 @@ export default function CheckoutForm({ cartItems }: CheckoutFormProps) {
 
                 const productData = productDoc.data();
                 if (productData.stock < item.quantity) {
-                    alert(`Produto "${item.name}" não possui estoque suficiente. Estoque: ${productData.stock}`);
+                    alert(`Produto \"${item.name}\" não possui estoque suficiente. Estoque: ${productData.stock}`);
                     setLoading(false);
                     return;
                 }
             }
-
-            // Formata o número de WhatsApp
-            const formattedWhatsApp = formData.clientWhatsApp.replace(/\D/g, "");
 
             // Se for PIX, busca os dados da cantina atual
             let pixDetails = null;
@@ -111,13 +84,12 @@ export default function CheckoutForm({ cartItems }: CheckoutFormProps) {
                     setLoading(false);
                     return;
                 }
-
             }
 
             // Cria o pedido no Firestore
             const orderRef = await addDoc(collection(db, "orders"), {
                 clientName: formData.clientName.trim(),
-                clientWhatsApp: formattedWhatsApp,
+                clientWhatsApp: user ? userData?.telephone || "" : "",
                 items: cartItems.map(item => ({
                     id: item.id,
                     name: item.name,
@@ -148,7 +120,6 @@ export default function CheckoutForm({ cartItems }: CheckoutFormProps) {
 
             if (!user) {
                 localStorage.setItem('lastOrderId', orderRef.id); // Armazena o ID do pedido no localStorage
-                localStorage.setItem('lastOrderPhone', formData.clientWhatsApp.replace(/\D/g, ""));
             }
 
             if (user) {
@@ -193,28 +164,6 @@ export default function CheckoutForm({ cartItems }: CheckoutFormProps) {
                         {errors.clientName && (
                             <p className="text-red-500 text-xs mt-1">{errors.clientName}</p>
                         )}
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-white-700 mb-1">
-                            WhatsApp (com DDD) <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                            type="tel"
-                            value={formData.clientWhatsApp}
-                            onChange={handleWhatsAppChange}
-                            className={`w-full p-2 border rounded ${errors.clientWhatsApp ? "border-red-500" : "border-gray-300"
-                                }`}
-                            placeholder="Exemplo: 11912345678"
-                            required
-                            pattern="\d{11}"
-                            maxLength={11}
-                        />
-                        {errors.clientWhatsApp && (
-                            <p className="text-red-500 text-xs mt-1">{errors.clientWhatsApp}</p>
-                        )}
-                        <p className="text-xs text-white-500 mt-1">
-                            Digite apenas números (DDD + número)
-                        </p>
                     </div>
                 </>
             )}
