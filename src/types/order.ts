@@ -50,4 +50,5 @@ export interface Order {
     updatedAt?: Date; // Data de atualização do pedido
     lastOrderId?: string; // ID do último pedido (opcional, se o usuário estiver deslogado)
     lastOrderPhone?: string; // Número do último pedido (opcional, se o usuário estiver deslogado)
+    cantinaId: string; // ID da cantina ativa no momento da compra
 }

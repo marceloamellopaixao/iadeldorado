@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { addDoc, collection, doc, getDoc, updateDoc } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, updateDoc, Timestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { CartItem, PaymentType } from "@/types/order";
 import { useAuth } from "@/contexts/AuthContext";
@@ -73,12 +73,15 @@ export default function CheckoutForm({ cartItems }: CheckoutFormProps) {
                 }
             }
 
+            // Busca a cantina ativa SEMPRE
+            const pixDoc = await getDoc(doc(db, 'pixConfig', 'current'));
+            const actualPixConfig = pixDoc.exists() ? pixDoc.data() : null;
+            const cantinaId = actualPixConfig?.current || 'indefinido';
+
             // Se for PIX, busca os dados da cantina atual
             let pixDetails = null;
             if (formData.paymentMethod === "pix") {
-                const pixDoc = await getDoc(doc(db, 'pixConfig', 'current'));
-                const actualPixConfig = pixDoc.exists() ? pixDoc.data() : null;
-                const pixData = await getDoc(doc(db, 'pixConfig', actualPixConfig?.current));
+                const pixData = await getDoc(doc(db, 'pixConfig', cantinaId));
                 pixDetails = pixData.exists() ? pixData.data() : null;
                 if (!pixDetails) {
                     setLoading(false);
@@ -87,7 +90,7 @@ export default function CheckoutForm({ cartItems }: CheckoutFormProps) {
             }
 
             // Cria o pedido no Firestore
-            const orderRef = await addDoc(collection(db, "orders"), {
+            const orderData = {
                 clientName: formData.clientName.trim(),
                 clientWhatsApp: user ? userData?.telephone || "" : "",
                 items: cartItems.map(item => ({
@@ -99,9 +102,13 @@ export default function CheckoutForm({ cartItems }: CheckoutFormProps) {
                 paymentMethod: formData.paymentMethod,
                 selectedPix: pixDetails,
                 status: "pendente",
-                createdAt: new Date(),
+                createdAt: Timestamp.now(),
                 userId: user?.uid || null, // Adiciona o ID do usuário se estiver logado
-            });
+                cantinaId, // Adiciona o ID da cantina ativa
+            };
+            const orderRef = await addDoc(collection(db, "orders"), orderData);
+            // Atualiza o pedido com o orderId
+            await updateDoc(orderRef, { orderId: orderRef.id });
 
             // Atualiza o estoque dos produtos
             for (const item of cartItems) {
