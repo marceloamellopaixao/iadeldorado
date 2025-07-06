@@ -42,6 +42,7 @@ function ReportPage() {
         const end = new Date(selectedDate + 'T23:59:59');
         const q = query(
             collection(db, 'orders'),
+            where('status', 'in', ['preparando', 'concluido', 'entregue', 'pagamento pendente', 'pago', 'não pago']),
             where('createdAt', '>=', start),
             where('createdAt', '<=', end)
         );
