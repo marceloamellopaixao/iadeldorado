@@ -17,6 +17,7 @@ import pixIcon from '@/assets/icons/pix-brands.svg'
 import configIcon from '@/assets/icons/sliders-solid.svg'
 import productIcon from '@/assets/icons/product-icon.svg'
 import listProductIcon from '@/assets/icons/list-products-icon.svg'
+import basketShoppingIcon from '@/assets/icons/basket-shopping-solid.svg'
 import { useDropdownClose } from "@/hooks/useDropdownClose";
 
 export default function Header() {
@@ -163,6 +164,49 @@ export default function Header() {
                                         </div>
                                     </li>
 
+                                    {/* DROPDOWN DE PEDIDOS */}
+                                    <li>
+                                        <div className="flex flex-col md:flex-row md:relative">
+                                            <button
+                                                onClick={() => toggleDropdown('orders')}
+                                                className="flex flex-row items-center justify-between w-full bg-blue-500 text-white font-bold px-4 py-3 rounded hover:bg-blue-800 transition duration-300 md:w-auto"
+                                            >
+                                                <span>Pedidos</span>
+                                                <svg className={`w-2.5 h-2.5 ms-2.5 transition-transform ${dropdownStates.orders ? 'rotate-180' : ''}`} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                                                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4" />
+                                                </svg>
+                                            </button>
+
+                                            {/* Dropdown Menu */}
+                                            <div ref={(el) => setDropdownRef('orders', el)} className={`${dropdownStates.orders ? 'block' : 'hidden'} w-full md:mt-12 md:absolute md:z-10 md:bg-blue-500 md:divide-y md:divide-gray-100 md:rounded-lg md:shadow md:w-44`}>
+                                                <ul className="space-y-1 bg-blue-500 md:py-2 md:text-sm">
+                                                    <li>
+                                                        <Link
+                                                            href="/seller/orders"
+                                                            className="block w-full bg-blue-600 text-white px-2 py-2 hover:bg-blue-700 transition duration-300 md:bg-transparent md:hover:bg-blue-800"
+                                                        >
+                                                            <div className="flex items-center gap-2">
+                                                                <Image src={basketShoppingIcon} alt="User Icon" width={20} height={20} />
+                                                                <span className="whitespace-nowrap">Gerenciar Pedidos</span>
+                                                            </div>
+                                                        </Link>
+                                                    </li>
+                                                    <li>
+                                                        <Link
+                                                            href="/seller/report"
+                                                            className="block w-full bg-blue-600 text-white px-2 py-2 hover:bg-blue-700 transition duration-300 md:bg-transparent md:hover:bg-blue-800"
+                                                        >
+                                                            <div className="flex items-center gap-2">
+                                                                <Image src={basketShoppingIcon} alt="User Icon" width={20} height={20} />
+                                                                <span className="whitespace-nowrap">Ver Relatório</span>
+                                                            </div>
+                                                        </Link>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </li>
+
                                     {/* DROPDOWN DE CONFIGURAÇÕES */}
                                     <li>
                                         <div className="flex flex-col md:flex-row md:relative">
@@ -197,17 +241,6 @@ export default function Header() {
                                                 </ul>
                                             </div>
                                         </div>
-                                    </li>
-
-                                    {/* BOTÃO DE PEDIDOS */}
-                                    <li>
-                                        <ButtonRouter
-                                            color="flex flex-row gap-2 bg-blue-500 text-white font-bold px-4 py-3 rounded hover:bg-blue-800 transition duration-300 w-full justify-center md:w-auto md:justify-start whitespace-nowrap"
-                                            rota="/seller/orders"
-                                            disabled={false}
-                                        >
-                                            Pedidos
-                                        </ButtonRouter>
                                     </li>
 
                                     {/* BOTÃO DE LOGOUT */}
