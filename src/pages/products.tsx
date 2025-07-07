@@ -6,100 +6,107 @@ import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { useProducts } from '@/hooks/useProducts';
 import CartPreview from '@/components/common/CartPreview';
 import Button from '@/components/common/ButtonRouter';
-import Image from 'next/image';
-import cartIcon from '@/assets/icons/cart-shopping-solid.svg';
-import cartEmpty from '@/assets/icons/ban-solid.svg'
 import Head from 'next/head';
+import { FiShoppingCart, FiInfo, FiFrown, FiCheckCircle, FiArrowRight } from 'react-icons/fi';
 
 function ProductsPage() {
     const { products, loading } = useProducts();
-    const {
-        cartItems,
-        addToCart,
-        isInCart,
-        total,
-        notification,
-    } = useCart();
-
-
+    const { cartItems, addToCart, isInCart, total, notification } = useCart();
     const [showCart, setShowCart] = useState(false);
 
     if (loading) {
-        return <LoadingSpinner message='Carregando produtos...' />
+        return <LoadingSpinner message='Carregando produtos...' />;
     }
+
+    const totalItemsInCart = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
     return (
         <>
             <Head>
                 <title>IAD Eldorado - Produtos</title>
-                <meta name="description" content="Lista de produtos disponíveis para compra." />
+                <meta name="description" content="Lista de produtos disponíveis na cantina da IAD Eldorado." />
             </Head>
-            <div className="container mx-auto p-4">
-                <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-bold text-white">Produtos</h1>
-                    <div className='flex items-center justify-center gap-4'>
-                        <Button
-                            disabled={cartItems.length === 0}
-                            rota='/checkout'
-                            color="bg-blue-500 text-white font-bold rounded-full h-15 w-45 hover:bg-blue-800 transition duration-300 md:block">
-                            {cartItems.length > 0 ? (
-                                <div className='flex flex-col items-center'>
-                                    <span>Finalizar Pedido</span>
-                                    <span>R$ {total.toFixed(2).replace('.', ',')}</span>
-                                </div>
-                            ) : (
-                                <div className='flex justify-center items-center gap-2'>
-                                    <Image src={cartEmpty} alt="Carrinho Vazio" width={20} height={20} />
-                                    <span>Carrinho Vazio</span>
-                                </div>
-                            )}
-                        </Button>
-                        <button
-                            onClick={() => setShowCart(!showCart)}
-                            className="relative flex items-center justify-center p-2 h-15 w-15 bg-blue-100 rounded-lg hover:cursor-pointer"
-                        >
-                            <Image src={cartIcon} alt='Cart Icon' width={20} height={20} className="h-7 w-7" />
-                            {cartItems.length > 0 && (
-                                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                                    {cartItems.reduce((sum, item) => sum + item.quantity, 0)}
-                                </span>
-                            )}
-                        </button>
+            
+            {/* Fundo claro para a página */}
+            <main className="bg-slate-100 min-h-screen">
+                <div className="container mx-auto p-4 md:p-8">
+                    
+                    {/* Barra de Título e Ações */}
+                    <div className="flex flex-wrap justify-between items-center mb-8 gap-4">
+                        <h1 className="text-3xl font-bold text-slate-800">Nossos Produtos</h1>
+                        
+                        <div className='flex items-center justify-center gap-3'>
+                            <Button
+                                disabled={cartItems.length === 0}
+                                rota='/checkout'
+                                color={`font-bold rounded-lg transition-all duration-300 transform hover:scale-105 px-4 py-2.5 flex items-center gap-2 ${cartItems.length > 0 ? 'bg-teal-500 text-white' : 'bg-slate-200 text-slate-500 cursor-not-allowed'}`}
+                            >
+                                {cartItems.length > 0 ? (
+                                    <>
+                                        <span>Finalizar (R$ {total.toFixed(2).replace('.', ',')})</span>
+                                        <FiArrowRight size={20} />
+                                    </>
+                                ) : (
+                                    <>
+                                        <FiFrown size={20} />
+                                        <span>Carrinho Vazio</span>
+                                    </>
+                                )}
+                            </Button>
+
+                            <button
+                                onClick={() => setShowCart(true)}
+                                className="relative flex items-center justify-center p-3 bg-white border border-slate-200 rounded-lg shadow-sm hover:bg-slate-100 transition-colors"
+                                aria-label={`Ver carrinho com ${totalItemsInCart} itens`}
+                            >
+                                <FiShoppingCart size={24} className="text-sky-700" />
+                                {totalItemsInCart > 0 && (
+                                    <span className="absolute -top-2 -right-2 bg-rose-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center">
+                                        {totalItemsInCart}
+                                    </span>
+                                )}
+                            </button>
+                        </div>
                     </div>
-                </div>
 
-                <div className='mb-10 flex flex-col items-center'>
-                    <h4 className='font-medium text-center text-white'>A escolha da quantidade de produtos será feita ao finalizar a compra no carrinho</h4>
-                </div>
-
-                {notification.visible && (
-                    <div className="fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded">
-                        {notification.message}
+                    {/* Mensagem Informativa */}
+                    <div className='mb-8 flex items-center justify-center gap-3 bg-sky-100 text-sky-800 p-3 rounded-lg'>
+                        <FiInfo size={20} />
+                        <h4 className='font-medium text-center text-sm'>A quantidade de cada produto é ajustada na tela de finalização.</h4>
                     </div>
-                )}
-
-                {showCart && (
-                    <CartPreview
-                        items={cartItems}
-                        total={total}
-                        onClose={() => setShowCart(false)}
-                    />
-                )}
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {products.map(product => (
-                        <ProductCard
-                            key={product.id}
-                            product={product}
-                            onAddToCart={() => addToCart(product)}
-                            isInCart={isInCart(product.id!)}
+                    
+                    {/* Notificação de Adicionar ao Carrinho */}
+                    {notification.visible && (
+                        <div className="fixed top-24 right-4 bg-teal-500 text-white px-5 py-3 rounded-lg shadow-lg flex items-center gap-3 z-50">
+                            <FiCheckCircle size={22} />
+                            <span>{notification.message}</span>
+                        </div>
+                    )}
+                    
+                    {/* Preview do Carrinho */}
+                    {showCart && (
+                        <CartPreview
+                            items={cartItems}
+                            total={total}
+                            onClose={() => setShowCart(false)}
                         />
-                    ))}
+                    )}
+                    
+                    {/* Grade de Produtos */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        {products.map(product => (
+                            <ProductCard
+                                key={product.id}
+                                product={product}
+                                onAddToCart={() => addToCart(product)}
+                                isInCart={isInCart(product.id!)}
+                            />
+                        ))}
+                    </div>
                 </div>
-            </div>
+            </main>
         </>
     );
-
 }
 
-export default withAuth([])(ProductsPage); // [] permite acesso sem autenticação
+export default withAuth([])(ProductsPage);
