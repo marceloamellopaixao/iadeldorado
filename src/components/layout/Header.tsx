@@ -1,33 +1,39 @@
 import { useState } from "react";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
-import { useAuth } from '@/contexts/AuthContext'
-import ButtonRouter from "@/components/common/ButtonRouter";
-import Link from 'next/link'
-import Image from 'next/image'
+import { useAuth } from '@/contexts/AuthContext';
+import { useDropdownClose } from "@/hooks/useDropdownClose";
+import Link from 'next/link';
+import Image from 'next/image';
 
 // Logo Import
-import Logo from '@/assets/images/logo-adeldorado.png'
+import Logo from '@/assets/images/logo-adeldorado.png';
 
-// Icons Imports
-import userIcon from '@/assets/icons/user-solid.svg'
-import menuIcon from '@/assets/icons/bars-solid.svg'
-import closeIcon from '@/assets/icons/times-white-solid.svg'
-import pixIcon from '@/assets/icons/pix-brands.svg'
-import configIcon from '@/assets/icons/sliders-solid.svg'
-import productIcon from '@/assets/icons/product-icon.svg'
-import listProductIcon from '@/assets/icons/list-products-icon.svg'
-import basketShoppingIcon from '@/assets/icons/basket-shopping-solid.svg'
-import { useDropdownClose } from "@/hooks/useDropdownClose";
+// Imports dos Ícones (react-icons/fi)
+import {
+    FiUser,
+    FiMenu,
+    FiX,
+    FiSettings,
+    FiBox,
+    FiList,
+    FiShoppingCart,
+    FiLogOut,
+    FiChevronDown,
+    FiDollarSign,
+    FiGlobe,
+    FiClipboard,
+    FiPlusCircle
+} from 'react-icons/fi';
 
 export default function Header() {
-    const { user, userData } = useAuth()
-    const [isMenuOpen, setIsMenuOpen] = useState(false)
+    const { user, userData } = useAuth();
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
     const { dropdownStates, setDropdownRef, toggleDropdown } = useDropdownClose();
 
     const toggleMenu = () => {
-        setIsMenuOpen(!isMenuOpen)
-    }
+        setIsMenuOpen(!isMenuOpen);
+    };
 
     const handleLogout = async () => {
         try {
@@ -37,415 +43,211 @@ export default function Header() {
         }
     };
 
+    // Estilos reutilizáveis para os botões e links do menu
+    const menuItemBaseStyle = "flex items-center gap-3 w-full px-4 py-3 font-semibold text-white rounded-lg transition-colors duration-300";
+    const buttonStyle = `${menuItemBaseStyle} bg-blue-500 hover:bg-blue-700 justify-center md:justify-start`;
+    const dropdownButtonStyle = `${buttonStyle} justify-between`;
+    const dropdownLinkStyle = "flex items-center gap-3 px-4 py-2 text-sm text-white hover:bg-blue-700 rounded-md transition-colors duration-300";
+
     return (
-        <header>
-            <nav className="bg-blue-600 text-white p-4">
-                <div className='flex flex-wrap items-center justify-between p-4 gap-4'>
+        <header className="bg-sky-700 shadow-lg sticky top-0 z-1">
+            <nav className="container mx-auto px-4">
+                <div className='flex flex-wrap items-center justify-between py-3'>
 
                     {/* Logo */}
-                    <Link href="/products" className='flex items-center space-x-3 rtl:space-x-reverse' title='Página inicial'>
-                        <Image src={Logo} alt="Logo" width={40} height={40} className="h-10 w-10" />
-                        <span className='self-center hidden text-lg font-semibold whitespace-nowrap md:block dark:text-white'>IAD Eldorado - Cantina</span>
+                    <Link href="/products" className='flex items-center gap-3' title='Página inicial'>
+                        <Image src={Logo} alt="Logo IAD Eldorado Cantina" width={40} height={40} className="rounded-full border-2 border-white" />
+                        <span className='self-center text-xl font-bold text-white whitespace-nowrap hidden sm:block'>
+                            IAD Eldorado - Cantina
+                        </span>
                     </Link>
 
-                    {/* Botão hamburguer */}
+                    {/* Botão Hamburguer (Mobile) */}
                     <button
-                        data-collapse-toggle="navbar-default"
                         type='button'
-                        className='inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:cursor-pointer'
-                        aria-controls="navbar-default" aria-expanded="false"
+                        className='inline-flex items-center justify-center p-2 w-10 h-10 text-white rounded-lg md:hidden hover:bg-sky-600 focus:outline-none'
+                        aria-controls="navbar-default"
+                        aria-expanded={isMenuOpen}
                         onClick={toggleMenu}
                     >
-                        <span>
-                            {isMenuOpen ?
-                                <Image src={closeIcon} alt="Close menu" title='Fechar menu' />
-                                :
-                                <Image src={menuIcon} alt="Open menu" title='Abrir menu' />
-                            }
-                        </span>
+                        <span className="sr-only">{isMenuOpen ? 'Fechar menu' : 'Abrir menu'}</span>
+                        {isMenuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
                     </button>
-                    <div className={`${isMenuOpen ? 'block' : 'hidden'} justify-center w-full md:block md:w-auto`} id="navbar-default">
-                        <ul className='flex flex-col items-center gap-2 rounded-lg bg-blue-600 md:mt-0 md:flex-row md:space-x-2 md:space-y-0'>
-                            {user && userData?.role === 'admin' ? (
-                                <div className="w-full flex flex-col md:flex-row gap-2">
-                                    {/* BOTÃO DE SITE DA IGREJA */}
-                                    <li>
-                                        <ButtonRouter
-                                            color="flex flex-row gap-2 bg-blue-500 text-white font-bold px-4 py-3 rounded hover:bg-blue-800 transition duration-300 w-full justify-center md:w-auto md:justify-start whitespace-nowrap"
-                                            rota="https://iadeldorado.com.br/"
-                                            disabled={false}
-                                        >
-                                            <span className="whitespace-nowrap">Site da Igreja</span>
-                                        </ButtonRouter>
-                                    </li>
-                                    {/* DROPDOWN DE PRODUTOS */}
-                                    <li>
-                                        <div className="flex flex-col md:flex-row md:relative">
-                                            <button
-                                                onClick={() => toggleDropdown('products')}
-                                                className="flex flex-row items-center justify-between w-full bg-blue-500 text-white font-bold px-4 py-3 rounded hover:bg-blue-800 transition duration-300 md:w-auto"
-                                            >
-                                                <span className="whitespace-nowrap">Produtos</span>
-                                                <svg className={`w-2.5 h-2.5 ms-2.5 transition-transform ${dropdownStates.products ? 'rotate-180' : ''}`} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                                                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4" />
-                                                </svg>
-                                            </button>
 
-                                            {/* Dropdown Menu */}
-                                            <div ref={(el) => setDropdownRef('products', el)} className={`${dropdownStates.products ? 'block' : 'hidden'} w-full md:mt-12 md:absolute md:z-10 md:bg-blue-500 md:divide-y md:divide-gray-100 md:rounded-lg md:shadow md:w-44`}>
-                                                <ul className="space-y-1 bg-blue-500 md:py-2 md:text-sm">
-                                                    <li>
-                                                        <Link
-                                                            href="/products"
-                                                            className="block w-full bg-blue-600 text-white px-4 py-2 hover:bg-blue-700 transition duration-300 md:bg-transparent md:hover:bg-blue-800"
-                                                        >
-                                                            <div className="flex items-center gap-2">
-                                                                <Image src={productIcon} alt="User Icon" width={20} height={20} />
-                                                                <span className="whitespace-nowrap">Lista de Produtos</span>
-                                                            </div>
-                                                        </Link>
-                                                    </li>
-                                                    <li>
-                                                        <Link
-                                                            href="/admin/products"
-                                                            className="block w-full bg-blue-600 text-white px-4 py-2 hover:bg-blue-700 transition duration-300 md:bg-transparent md:hover:bg-blue-800"
-                                                        >
-                                                            <div className="flex items-center gap-2">
-                                                                <Image src={listProductIcon} alt="User Icon" width={20} height={20} />
-                                                                <span className="whitespace-nowrap">Gerenciar Produtos</span>
-                                                            </div>
-                                                        </Link>
-                                                    </li>
-                                                </ul>
-                                            </div>
+                    {/* Menu de Navegação */}
+                    <div className={`${isMenuOpen ? 'block' : 'hidden'} w-full md:block md:w-auto mt-4 md:mt-0`} id="navbar-default">
+                        <ul className='flex flex-col items-center gap-2 md:flex-row md:gap-3'>
+
+                            {/* Menus para ADMIN */}
+                            {user && userData?.role === 'admin' && (
+                                <>
+                                    {/* Link Site da Igreja */}
+                                    <li>
+                                        <a href="https://iadeldorado.com.br/" target="_blank" rel="noopener noreferrer" className={buttonStyle}>
+                                            <FiGlobe size={20} />
+                                            <span>Site da Igreja</span>
+                                        </a>
+                                    </li>
+
+                                    {/* Dropdown de Produtos */}
+                                    <li className="relative w-full md:w-auto">
+                                        <button onClick={() => toggleDropdown('products')} className={dropdownButtonStyle}>
+                                            <span className="flex items-center gap-3"><FiBox size={20} /> Produtos</span>
+                                            <FiChevronDown className={`transition-transform duration-300 ${dropdownStates.products ? 'rotate-180' : ''}`} size={20} />
+                                        </button>
+                                        <div ref={(el) => setDropdownRef('products', el)} className={`${dropdownStates.products ? 'block' : 'hidden'} mt-2 w-full md:absolute md:right-0 md:w-56 bg-blue-600 rounded-lg shadow-xl z-20`}>
+                                            <ul className="p-2 space-y-1">
+                                                <li><Link href="/products" className={dropdownLinkStyle}><FiList size={20} /> <span>Lista de Produtos</span></Link></li>
+                                                <li><Link href="/admin/products" className={dropdownLinkStyle}><FiClipboard size={20} /> <span>Gerenciar Produtos</span></Link></li>
+                                            </ul>
                                         </div>
                                     </li>
 
-                                    {/* DROPDOWN DE USUÁRIOS */}
-                                    <li>
-                                        <div className="flex flex-col md:flex-row md:relative">
-                                            <button
-                                                onClick={() => toggleDropdown('users')}
-                                                className="flex flex-row items-center justify-between w-full bg-blue-500 text-white font-bold px-4 py-3 rounded hover:bg-blue-800 transition duration-300 md:w-auto"
-                                            >
-                                                <span>Usuários</span>
-                                                <svg className={`w-2.5 h-2.5 ms-2.5 transition-transform ${dropdownStates.users ? 'rotate-180' : ''}`} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                                                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4" />
-                                                </svg>
-                                            </button>
-
-                                            {/* Dropdown Menu */}
-                                            <div ref={(el) => setDropdownRef('users', el)} className={`${dropdownStates.users ? 'block' : 'hidden'} w-full md:mt-12 md:absolute md:z-10 md:bg-blue-500 md:divide-y md:divide-gray-100 md:rounded-lg md:shadow md:w-44`}>
-                                                <ul className="space-y-1 bg-blue-500 md:py-2 md:text-sm">
-                                                    <li>
-                                                        <Link
-                                                            href="/admin/users"
-                                                            className="block w-full bg-blue-600 text-white px-2 py-2 hover:bg-blue-700 transition duration-300 md:bg-transparent md:hover:bg-blue-800"
-                                                        >
-                                                            <div className="flex items-center gap-2">
-                                                                <Image src={userIcon} alt="User Icon" width={20} height={20} />
-                                                                <span className="whitespace-nowrap">Gerenciar Usuários</span>
-                                                            </div>
-                                                        </Link>
-                                                    </li>
-                                                    <li>
-                                                        <Link
-                                                            href="/auth/profile"
-                                                            className="block w-full bg-blue-600 text-white px-2 py-2 hover:bg-blue-700 transition duration-300 md:bg-transparent md:hover:bg-blue-800"
-                                                        >
-                                                            <div className="flex items-center gap-2">
-                                                                <Image src={userIcon} alt="User Icon" width={20} height={20} />
-                                                                <span className="whitespace-nowrap">Meu Perfil</span>
-                                                            </div>
-                                                        </Link>
-                                                    </li>
-                                                </ul>
-                                            </div>
+                                    {/* Dropdown de Usuários */}
+                                    <li className="relative w-full md:w-auto">
+                                        <button onClick={() => toggleDropdown('users')} className={dropdownButtonStyle}>
+                                            <span className="flex items-center gap-3"><FiUser size={20} /> Usuários</span>
+                                            <FiChevronDown className={`transition-transform duration-300 ${dropdownStates.users ? 'rotate-180' : ''}`} size={20} />
+                                        </button>
+                                        <div ref={(el) => setDropdownRef('users', el)} className={`${dropdownStates.users ? 'block' : 'hidden'} mt-2 w-full md:absolute md:right-0 md:w-56 bg-blue-600 rounded-lg shadow-xl z-20`}>
+                                            <ul className="p-2 space-y-1">
+                                                <li><Link href="/admin/users" className={dropdownLinkStyle}><FiList size={20} /> <span>Gerenciar Usuários</span></Link></li>
+                                                <li><Link href="/auth/profile" className={dropdownLinkStyle}><FiUser size={20} /> <span>Meu Perfil</span></Link></li>
+                                            </ul>
                                         </div>
                                     </li>
 
-                                    {/* DROPDOWN DE PEDIDOS */}
-                                    <li>
-                                        <div className="flex flex-col md:flex-row md:relative">
-                                            <button
-                                                onClick={() => toggleDropdown('orders')}
-                                                className="flex flex-row items-center justify-between w-full bg-blue-500 text-white font-bold px-4 py-3 rounded hover:bg-blue-800 transition duration-300 md:w-auto"
-                                            >
-                                                <span>Pedidos</span>
-                                                <svg className={`w-2.5 h-2.5 ms-2.5 transition-transform ${dropdownStates.orders ? 'rotate-180' : ''}`} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                                                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4" />
-                                                </svg>
-                                            </button>
-
-                                            {/* Dropdown Menu */}
-                                            <div ref={(el) => setDropdownRef('orders', el)} className={`${dropdownStates.orders ? 'block' : 'hidden'} w-full md:mt-12 md:absolute md:z-10 md:bg-blue-500 md:divide-y md:divide-gray-100 md:rounded-lg md:shadow md:w-44`}>
-                                                <ul className="space-y-1 bg-blue-500 md:py-2 md:text-sm">
-                                                    <li>
-                                                        <Link
-                                                            href="/seller/orders"
-                                                            className="block w-full bg-blue-600 text-white px-2 py-2 hover:bg-blue-700 transition duration-300 md:bg-transparent md:hover:bg-blue-800"
-                                                        >
-                                                            <div className="flex items-center gap-2">
-                                                                <Image src={basketShoppingIcon} alt="User Icon" width={20} height={20} />
-                                                                <span className="whitespace-nowrap">Gerenciar Pedidos</span>
-                                                            </div>
-                                                        </Link>
-                                                    </li>
-                                                    <li>
-                                                        <Link
-                                                            href="/seller/report"
-                                                            className="block w-full bg-blue-600 text-white px-2 py-2 hover:bg-blue-700 transition duration-300 md:bg-transparent md:hover:bg-blue-800"
-                                                        >
-                                                            <div className="flex items-center gap-2">
-                                                                <Image src={basketShoppingIcon} alt="User Icon" width={20} height={20} />
-                                                                <span className="whitespace-nowrap">Ver Relatório</span>
-                                                            </div>
-                                                        </Link>
-                                                    </li>
-                                                </ul>
-                                            </div>
+                                    {/* Dropdown de Pedidos */}
+                                    <li className="relative w-full md:w-auto">
+                                        <button onClick={() => toggleDropdown('orders')} className={dropdownButtonStyle}>
+                                            <span className="flex items-center gap-3"><FiShoppingCart size={20} /> Pedidos</span>
+                                            <FiChevronDown className={`transition-transform duration-300 ${dropdownStates.orders ? 'rotate-180' : ''}`} size={20} />
+                                        </button>
+                                        <div ref={(el) => setDropdownRef('orders', el)} className={`${dropdownStates.orders ? 'block' : 'hidden'} mt-2 w-full md:absolute md:right-0 md:w-56 bg-blue-600 rounded-lg shadow-xl z-20`}>
+                                            <ul className="p-2 space-y-1">
+                                                <li><Link href="/seller/orders" className={dropdownLinkStyle}><FiList size={20} /> <span>Gerenciar Pedidos</span></Link></li>
+                                                <li><Link href="/seller/report" className={dropdownLinkStyle}><FiClipboard size={20} /> <span>Ver Relatório</span></Link></li>
+                                            </ul>
                                         </div>
                                     </li>
 
-                                    {/* DROPDOWN DE CONFIGURAÇÕES */}
+                                    {/* Dropdown de Configurações */}
+                                    <li className="relative w-full md:w-auto">
+                                        <button onClick={() => toggleDropdown('config')} className={dropdownButtonStyle}>
+                                            <span className="flex items-center gap-3"><FiSettings size={20} /> Geral</span>
+                                            <FiChevronDown className={`transition-transform duration-300 ${dropdownStates.config ? 'rotate-180' : ''}`} size={20} />
+                                        </button>
+                                        <div ref={(el) => setDropdownRef('config', el)} className={`${dropdownStates.config ? 'block' : 'hidden'} mt-2 w-full md:absolute md:right-0 md:w-56 bg-blue-600 rounded-lg shadow-xl z-20`}>
+                                            <ul className="p-2 space-y-1">
+                                                <li><Link href="/admin/pix-config" className={dropdownLinkStyle}><FiDollarSign size={20} /> <span>Configuração PIX</span></Link></li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                </>
+                            )}
+
+                            {/* Menus para VENDEDOR (SELLER) */}
+                            {user && userData?.role === 'seller' && (
+                                <>
+                                    {/* Link Site da Igreja */}
                                     <li>
-                                        <div className="flex flex-col md:flex-row md:relative">
-                                            <button
-                                                onClick={() => toggleDropdown('config')}
-                                                className="flex flex-row items-center justify-between w-full bg-blue-500 text-white font-bold px-4 py-3 gap-2 rounded hover:bg-blue-800 transition duration-300 md:min-w-max md:w-auto"
-                                            >
-                                                <div className="flex items-center gap-2">
-                                                    <Image src={configIcon} alt="Config Icon" width={20} height={20} />
-                                                    <span className="whitespace-nowrap">Geral</span>
-                                                </div>
+                                        <a href="https://iadeldorado.com.br/" target="_blank" rel="noopener noreferrer" className={buttonStyle}>
+                                            <FiGlobe size={20} />
+                                            <span>Site da Igreja</span>
+                                        </a>
+                                    </li>
 
-                                                <svg className={`w-2.5 h-2.5 ms-2.5 transition-transform ${dropdownStates.config ? 'rotate-180' : ''}`} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                                                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4" />
-                                                </svg>
-                                            </button>
-
-                                            {/* Dropdown Menu */}
-                                            <div ref={(el) => setDropdownRef('config', el)} className={`${dropdownStates.config ? 'block' : 'hidden'} w-full mt-1 md:absolute md:mt-12 md:z-10 md:bg-blue-500 md:divide-y md:divide-gray-100 md:rounded-lg md:shadow md:w-44`}>
-                                                <ul className="space-y-1 bg-blue-500 md:py-2 md:text-sm">
-                                                    <li>
-                                                        <Link
-                                                            href="/admin/pix-config"
-                                                            className="block w-full bg-blue-600 text-white px-2 py-2 hover:bg-blue-700 transition duration-300 md:bg-transparent md:hover:bg-blue-800"
-                                                        >
-                                                            <div className="flex items-center gap-2">
-                                                                <Image src={pixIcon} alt="PIX Icon" width={20} height={20} />
-                                                                <span className="whitespace-nowrap">Configuração de PIX</span>
-                                                            </div>
-                                                        </Link>
-                                                    </li>
-                                                </ul>
-                                            </div>
+                                    {/* Dropdown de Produtos */}
+                                    <li className="relative w-full md:w-auto">
+                                        <button onClick={() => toggleDropdown('products')} className={dropdownButtonStyle}>
+                                            <span className="flex items-center gap-3"><FiBox size={20} /> Produtos</span>
+                                            <FiChevronDown className={`transition-transform duration-300 ${dropdownStates.products ? 'rotate-180' : ''}`} size={20} />
+                                        </button>
+                                        <div ref={(el) => setDropdownRef('products', el)} className={`${dropdownStates.products ? 'block' : 'hidden'} mt-2 w-full md:absolute md:right-0 md:w-56 bg-blue-600 rounded-lg shadow-xl z-20`}>
+                                            <ul className="p-2 space-y-1">
+                                                <li><Link href="/products" className={dropdownLinkStyle}><FiList size={20} /> <span>Lista de Produtos</span></Link></li>
+                                                <li><Link href="/admin/products" className={dropdownLinkStyle}><FiClipboard size={20} /> <span>Gerenciar Produtos</span></Link></li>
+                                            </ul>
                                         </div>
                                     </li>
 
-                                    {/* BOTÃO DE LOGOUT */}
+                                    {/* Link para Pedidos */}
                                     <li>
-                                        <Link
-                                            href={!user ? "/auth/login" : ""}
-                                            onClick={handleLogout}
-                                            className="flex flex-row gap-2 bg-red-500 text-white font-bold px-4 py-3 rounded hover:bg-red-800 transition duration-300 w-full justify-center md:w-auto md:justify-start whitespace-nowrap"
-                                        >
-                                            <span className="whitespace-nowrap">Sair</span>
+                                        <Link href="/seller/orders" className={buttonStyle}>
+                                            <FiShoppingCart size={20} />
+                                            <span>Pedidos</span>
                                         </Link>
                                     </li>
-                                </div>
-                            ) : (user && userData?.role === 'seller') ? (
-                                <div className="w-full flex flex-col md:flex-row gap-2">
-                                    {/* BOTÃO DE SITE DA IGREJA */}
-                                    <li>
-                                        <ButtonRouter
-                                            color="flex flex-row gap-2 bg-blue-500 text-white font-bold px-4 py-3 rounded hover:bg-blue-800 transition duration-300 w-full justify-center md:w-auto md:justify-start whitespace-nowrap"
-                                            rota="https://iadeldorado.com.br/"
-                                            disabled={false}
-                                        >
-                                            <span className="whitespace-nowrap">Site da Igreja</span>
-                                        </ButtonRouter>
-                                    </li>
-                                    {/* DROPDOWN DE PRODUTOS */}
-                                    <li>
-                                        <div className="flex flex-col md:flex-row md:relative">
-                                            <button
-                                                onClick={() => toggleDropdown('products')}
-                                                className="flex flex-row items-center justify-between w-full bg-blue-500 text-white font-bold px-4 py-3 rounded hover:bg-blue-800 transition duration-300 md:w-auto"
-                                            >
-                                                <span className="whitespace-nowrap">Produtos</span>
-                                                <svg className={`w-2.5 h-2.5 ms-2.5 transition-transform ${dropdownStates.products ? 'rotate-180' : ''}`} aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                                                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4" />
-                                                </svg>
-                                            </button>
 
-                                            {/* Dropdown Menu */}
-                                            <div ref={(el) => setDropdownRef('products', el)} className={`${dropdownStates.products ? 'block' : 'hidden'} w-full md:mt-12 md:absolute md:z-10 md:bg-blue-500 md:divide-y md:divide-gray-100 md:rounded-lg md:shadow md:w-44`}>
-                                                <ul className="space-y-1 bg-blue-500 md:py-2 md:text-sm">
-                                                    <li>
-                                                        <Link
-                                                            href="/products"
-                                                            className="block w-full bg-blue-600 text-white px-4 py-2 hover:bg-blue-700 transition duration-300 md:bg-transparent md:hover:bg-blue-800"
-                                                        >
-                                                            <div className="flex items-center gap-2">
-                                                                <Image src={productIcon} alt="User Icon" width={20} height={20} />
-                                                                <span className="whitespace-nowrap">Lista de Produtos</span>
-                                                            </div>
-                                                        </Link>
-                                                    </li>
-                                                    <li>
-                                                        <Link
-                                                            href="/admin/products"
-                                                            className="block w-full bg-blue-600 text-white px-4 py-2 hover:bg-blue-700 transition duration-300 md:bg-transparent md:hover:bg-blue-800"
-                                                        >
-                                                            <div className="flex items-center gap-2">
-                                                                <Image src={listProductIcon} alt="User Icon" width={20} height={20} />
-                                                                <span className="whitespace-nowrap">Gerenciar Produtos</span>
-                                                            </div>
-                                                        </Link>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </li>
+                                    {/* Link para Perfil */}
                                     <li>
-                                        <ButtonRouter
-                                            color="flex flex-row gap-2 bg-blue-500 text-white font-bold px-4 py-3 rounded hover:bg-blue-800 transition duration-300 w-full justify-center md:w-auto md:justify-start whitespace-nowrap"
-                                            rota="/seller/orders"
-                                            disabled={false}
-                                        >
-                                            Pedidos
-                                        </ButtonRouter>
-                                    </li>
-                                    <li>
-                                        <ButtonRouter
-                                            color="flex flex-row gap-2 bg-blue-500 text-white font-bold px-4 py-3 rounded hover:bg-blue-800 transition duration-300 w-full justify-center md:w-auto md:justify-start whitespace-nowrap"
-                                            rota="/auth/profile"
-                                            disabled={false}
-                                        >
-                                            <div className="flex items-center gap-2">
-                                                <Image src={userIcon} alt="User Icon" width={20} height={20} />
-                                                <span className="whitespace-nowrap">Meu Perfil</span>
-                                            </div>
-                                        </ButtonRouter>
-                                    </li>
-                                    <li>
-                                        <Link
-                                            href={!user ? "/auth/login" : ""}
-                                            onClick={handleLogout}
-                                            className="flex flex-row gap-2 bg-red-500 text-white font-bold px-4 py-3 rounded hover:bg-red-800 transition duration-300 w-full justify-center md:w-auto md:justify-start whitespace-nowrap"
-                                        >
-                                            <span>Sair</span>
+                                        <Link href="/auth/profile" className={buttonStyle}>
+                                            <FiUser size={20} />
+                                            <span>Meu Perfil</span>
                                         </Link>
                                     </li>
-                                </div>
-                            ) : (user && userData?.role === 'customer') ? (
-                                <div className="w-full flex flex-col md:flex-row gap-2">
-                                    {/* BOTÃO DE SITE DA IGREJA */}
-                                    <li>
-                                        <ButtonRouter
-                                            color="flex flex-row gap-2 bg-blue-500 text-white font-bold px-4 py-3 rounded hover:bg-blue-800 transition duration-300 w-full justify-center md:w-auto md:justify-start whitespace-nowrap"
-                                            rota="https://iadeldorado.com.br/"
-                                            disabled={false}
-                                        >
-                                            <span className="whitespace-nowrap">Site da Igreja</span>
-                                        </ButtonRouter>
-                                    </li>
-                                    <li>
-                                        <ButtonRouter
-                                            color="flex flex-row gap-2 bg-blue-500 text-white font-bold px-4 py-3 rounded hover:bg-blue-800 transition duration-300 w-full justify-center md:w-auto md:justify-start whitespace-nowrap"
-                                            rota="/products"
-                                            disabled={false}
-                                        >
-                                            Produtos
-                                        </ButtonRouter>
-                                    </li>
-                                    <li>
-                                        {/* <ButtonRouter
-                                            color="flex flex-row gap-2 bg-blue-500 text-white font-bold px-4 py-3 rounded hover:bg-blue-800 transition duration-300 w-full justify-center md:w-auto md:justify-start whitespace-nowrap"
-                                            rota="/orders"
-                                            disabled={true}
-                                        >
-                                            Pedidos
-                                        </ButtonRouter> */}
+                                </>
+                            )}
 
-                                        <button
-                                            className="flex flex-row gap-2 bg-blue-500 text-white font-bold px-4 py-3 rounded hover:bg-blue-800 transition duration-300 w-full justify-center md:w-auto md:justify-start whitespace-nowrap"
-                                            onClick={() => { alert("🚧Página em Construção🚧") }}
-                                        >
-                                            <span className="whitespace-nowrap">Histórico de Pedidos</span>
+                            {/* Menus para CLIENTE (CUSTOMER) */}
+                            {user && userData?.role === 'customer' && (
+                                <>
+                                    <li>
+                                        <a href="https://iadeldorado.com.br/" target="_blank" rel="noopener noreferrer" className={buttonStyle}>
+                                            <FiGlobe size={20} />
+                                            <span>Site da Igreja</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <Link href="/products" className={buttonStyle}>
+                                            <FiBox size={20} />
+                                            <span>Produtos</span>
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <button onClick={() => alert("🚧 Página em Construção 🚧")} className={buttonStyle}>
+                                            <FiList size={20} />
+                                            <span>Histórico de Pedidos</span>
                                         </button>
                                     </li>
                                     <li>
-                                        <ButtonRouter
-                                            color="flex flex-row gap-2 bg-blue-500 text-white font-bold px-4 py-3 rounded hover:bg-blue-800 transition duration-300 w-full justify-center md:w-auto md:justify-start whitespace-nowrap"
-                                            rota="/auth/profile"
-                                            disabled={false}
-                                        >
-                                            <div className="flex items-center gap-2">
-                                                <Image src={userIcon} alt="User Icon" width={20} height={20} />
-                                                <span className="whitespace-nowrap">Meu Perfil</span>
-                                            </div>
-                                        </ButtonRouter>
-                                    </li>
-                                    <li>
-                                        <Link
-                                            href={!user ? "/auth/login" : ""}
-                                            onClick={handleLogout}
-                                            className="flex flex-row gap-2 bg-red-500 text-white font-bold px-4 py-3 rounded hover:bg-red-800 transition duration-300 w-full justify-center md:w-auto md:justify-start whitespace-nowrap"
-                                        >
-                                            <span>Sair</span>
+                                        <Link href="/auth/profile" className={buttonStyle}>
+                                            <FiUser size={20} />
+                                            <span>Meu Perfil</span>
                                         </Link>
                                     </li>
-                                </div>
-                            ) : (
-                                <div className="w-full flex flex-col md:flex-row gap-2">
-                                    {/* BOTÃO DE SITE DA IGREJA */}
-                                    <li>
-                                        <ButtonRouter
-                                            color="flex flex-row gap-2 bg-blue-500 text-white font-bold px-4 py-3 rounded hover:bg-blue-800 transition duration-300 w-full justify-center md:w-auto md:justify-start whitespace-nowrap"
-                                            rota="https://iadeldorado.com.br/"
-                                            disabled={false}
-                                        >
-                                            <span className="whitespace-nowrap">Site da Igreja</span>
-                                        </ButtonRouter>
-                                    </li>
-                                    {/* BOTÃO DE PRODUTOS */}
-                                    <li>
-                                        <ButtonRouter
-                                            color="flex flex-row gap-2 bg-blue-500 text-white font-bold px-4 py-3 rounded hover:bg-blue-800 transition duration-300 w-full justify-center md:w-auto md:justify-start whitespace-nowrap"
-                                            rota="/products"
-                                            disabled={false}
-                                        >
-                                            Produtos
-                                        </ButtonRouter>
-                                    </li>
-                                    {/* BOTÃO DE LOGIN */}
-                                    <li>
-                                        <ButtonRouter
-                                            color="flex flex-row gap-2 bg-blue-500 text-white font-bold px-4 py-3 rounded hover:bg-blue-800 transition duration-300 w-full justify-center md:w-auto md:justify-start whitespace-nowrap"
-                                            rota="/auth/login"
-                                            disabled={false}
-                                        >
-                                            Login
-                                        </ButtonRouter>
-                                    </li>
-                                    {/* BOTÃO DE CRIAR CONTA */}
-                                    <li>
-                                        <ButtonRouter
-                                            color="flex flex-row gap-2 bg-blue-500 text-white font-bold px-4 py-3 rounded hover:bg-blue-800 transition duration-300 w-full justify-center md:w-auto md:justify-start whitespace-nowrap"
-                                            rota="/auth/register"
-                                            disabled={false}
-                                        >
-                                            Criar Conta
-                                        </ButtonRouter>
-                                    </li>
-                                </div>
+                                </>
                             )}
+
+                            {/* Botão de Sair ou Entrar */}
+                            <li>
+                                {user ? (
+                                    <button onClick={handleLogout} className={`${menuItemBaseStyle} bg-rose-600 hover:bg-rose-500 justify-center md:justify-start`}>
+                                        <FiLogOut size={20} />
+                                        <span>Sair</span>
+                                    </button>
+                                ) : (
+                                    // O container dos botões também foi ajustado com 'md:w-auto'
+                                    <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
+                                        <div>
+                                            <Link href="/auth/login" className={buttonStyle}>
+                                                <FiUser size={20} />
+                                                <span>Login</span>
+                                            </Link>
+                                        </div>
+                                        <div>
+                                            <Link href="/auth/register" className={`${menuItemBaseStyle} bg-teal-500 hover:bg-teal-400 justify-center md:justify-start`}>
+                                                <FiPlusCircle size={20} />
+                                                <span>Criar Conta</span>
+                                            </Link>
+                                        </div>
+                                    </div>
+                                )}
+                            </li>
                         </ul>
                     </div>
                 </div>
             </nav>
-        </header >
-    )
+        </header>
+    );
 }
