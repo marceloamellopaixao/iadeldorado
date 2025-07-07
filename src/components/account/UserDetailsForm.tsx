@@ -1,7 +1,9 @@
 import { useState } from "react";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "react-toastify";
+import { FiSave, FiLoader } from "react-icons/fi";
 
 interface UserDetailsFormProps {
     initialData: {
@@ -14,87 +16,63 @@ interface UserDetailsFormProps {
 export default function UserDetailsForm({ initialData }: UserDetailsFormProps) {
     const [formData, setFormData] = useState(initialData);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
     const { user } = useAuth();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!user?.uid) {
-            setError("Usuário não encontrado.");
+            toast.error("Usuário não encontrado. Por favor, faça login novamente.");
             return;
         }
 
         setLoading(true);
-        setError("");
-
         try {
             await updateDoc(doc(db, "users", user.uid), {
                 name: formData.name,
-                telephone: formData.telephone
-            })
-            alert("Dados atualizados com sucesso!");
-        } catch (error) {
-            alert("Erro ao atualizar os dados. Tente novamente mais tarde.");
-            console.error(error);
+                telephone: formData.telephone,
+                updatedAt: serverTimestamp(),
+            });
+            toast.success("Dados atualizados com sucesso!");
+        } catch {
+            toast.error("Erro ao atualizar os dados. Tente novamente mais tarde.");
         } finally {
             setLoading(false);
         }
-    }
+    };
+
+    const inputBaseStyle = "block w-full border-slate-300 rounded-lg shadow-sm p-3 focus:ring-sky-500 focus:border-sky-500 transition bg-slate-50 text-slate-900";
+    const labelBaseStyle = "block text-sm font-medium text-slate-700";
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="flex flex-col space-y-2">
-                <label htmlFor="name" className="block mb-1">Nome</label>
-                <input
-                    type="text"
-                    placeholder="Digite seu nome completo"
-                    id="name"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full p-2 border rounded"
-                    required
-                />
+        <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+                <label htmlFor="name" className={labelBaseStyle}>Nome Completo</label>
+                <input id="name" type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className={inputBaseStyle} required />
             </div>
-            <div className="flex flex-col space-y-2">
-                <label htmlFor="telephone" className="block mb-1">Celular (WhatsApp)</label>
-                <input
-                    type="text"
-                    id="telephone"
-                    value={formData.telephone}
-                    onChange={(e) => setFormData({ ...formData, telephone: e.target.value })}
-                    className="w-full p-2 border rounded"
-                    placeholder="Digite seu número de celular com DDD (119123456789)"
-                    pattern="\d{2}\d{5}\d{4}"
-                    title="Formato esperado: 119123456789"
-                    required
-                />
+            <div>
+                <label htmlFor="telephone" className={labelBaseStyle}>Celular (WhatsApp)</label>
+                <input id="telephone" type="tel" value={formData.telephone} onChange={(e) => setFormData({ ...formData, telephone: e.target.value })} className={inputBaseStyle} placeholder="(11) 99999-9999" />
             </div>
-            <div className="flex flex-col space-y-2">
-                <label htmlFor="email" className="block mb-1">E-mail</label>
-                <input
-                    type="email"
-                    placeholder="Digite seu e-mail"
-                    id="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full p-2 border rounded"
-                    disabled
-                />
+            <div>
+                <label htmlFor="email" className={labelBaseStyle}>E-mail (não pode ser alterado)</label>
+                <input id="email" type="email" value={formData.email} className={`${inputBaseStyle} bg-slate-200 cursor-not-allowed`} disabled />
             </div>
-            {error && <p className="text-red-500">{error}</p>}
-            <button
-                type="submit"
-                disabled={loading}
-                className={`bg-blue-600 text-white py-2 px-4 rounded ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
-            >
-                {loading ? (
-                    <div className="flex items-center justify-center gap-2">
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                        <p className="text-center">Salvando Alterações...</p>
-                    </div>
-                ) : "Salvar Alterações"}
-            </button>
+            <div className="pt-2">
+                <button type="submit" disabled={loading} className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-sky-600 text-white font-bold rounded-lg hover:bg-sky-700 transition-colors disabled:bg-slate-400">
+                    {loading ? (
+                        <>
+                            <FiLoader className="animate-spin" />
+                            <span>Salvando...</span>
+                        </>
+                    ) : (
+                        <>
+                            <FiSave />
+                            <span>Salvar Alterações</span>
+                        </>
+                    )}
+                </button>
+            </div>
         </form>
     );
 }
