@@ -1,4 +1,4 @@
-import { useRouter } from "next/router";
+import { useRouter, NextRouter } from "next/router";
 import { withAuth } from "@/hooks/withAuth";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState, useMemo } from "react";
@@ -11,11 +11,17 @@ import { toast } from "react-toastify";
 import { motion } from "framer-motion";
 import Confetti from "react-confetti";
 import { FiCheckCircle, FiCopy, FiInfo, FiArrowLeft, FiLock } from "react-icons/fi";
+import React from "react";
 
-const SuccessDisplay = ({ order, router, orderId }) => {
-    const { userData } = useAuth(); // userData é necessário para os botões de ação
+interface SuccessDisplayProps {
+    order: Order;
+    router: NextRouter;
+    orderId: string;
+}
+
+const SuccessDisplay: React.FC<SuccessDisplayProps> = ({ order, router, orderId }) => {
+    const { userData } = useAuth();
     
-    // Calcula o total do pedido
     const total = useMemo(() =>
         order.items.reduce((acc, item) => acc + item.price * item.quantity, 0),
         [order.items]
@@ -49,7 +55,14 @@ const SuccessDisplay = ({ order, router, orderId }) => {
                         <h3 className="font-semibold text-teal-900 mb-2">Instruções para Pagamento via PIX</h3>
                         <div className="bg-slate-100 p-3 rounded-md flex items-center justify-between gap-4">
                             <span className="text-slate-800 font-mono break-all font-semibold">{order.selectedPix.key}</span>
-                            <button onClick={() => { navigator.clipboard.writeText(order.selectedPix.key); toast.success('Chave PIX copiada!'); }} className="p-3 bg-slate-200 text-slate-600 rounded-lg hover:bg-slate-300">
+                            <button 
+                                onClick={() => { 
+                                    if (order.selectedPix?.key) {
+                                        navigator.clipboard.writeText(order.selectedPix.key); 
+                                        toast.success('Chave PIX copiada!'); 
+                                    }
+                                }} 
+                                className="p-3 bg-slate-200 text-slate-600 rounded-lg hover:bg-slate-300">
                                 <FiCopy />
                             </button>
                         </div>
@@ -82,8 +95,13 @@ const SuccessDisplay = ({ order, router, orderId }) => {
     );
 };
 
-// --- Componente de Exibição de Erro ---
-const ErrorDisplay = ({ title, message, router }) => (
+interface ErrorDisplayProps {
+    title: string;
+    message: string;
+    router: NextRouter;
+}
+
+const ErrorDisplay: React.FC<ErrorDisplayProps> = ({ title, message, router }) => (
     <div className="text-center bg-white p-8 rounded-xl shadow-lg max-w-md w-full">
         <FiLock size={40} className="mx-auto text-rose-500 mb-4" />
         <h1 className="text-2xl font-bold text-slate-800 mb-4">{title}</h1>
@@ -93,7 +111,6 @@ const ErrorDisplay = ({ title, message, router }) => (
         </button>
     </div>
 );
-
 
 function SuccessPage() {
     const [order, setOrder] = useState<Order | null>(null);
@@ -115,21 +132,25 @@ function SuccessPage() {
                 if (orderSnap.exists()) {
                     const orderData = { id: orderSnap.id, ...orderSnap.data() } as Order;
                     
-                    // LÓGICA DE AUTORIZAÇÃO
                     const isAdmin = userData?.role === 'admin';
                     const isOrderOwner = user && orderData.userId === user.uid;
-                    const isGuestOwner = !user && localStorage.getItem('lastOrderId') === orderId;
+
+                    let isGuestOwner = false;
+                    if (!user) {
+                        const guestOrderIds = JSON.parse(localStorage.getItem('guestOrderIds') || '[]');
+                        if (guestOrderIds.includes(orderId)) {
+                            isGuestOwner = true;
+                        }
+                    }
 
                     if (isAdmin || isOrderOwner || isGuestOwner) {
                         setOrder(orderData);
                         setIsAuthorized(true);
                     } else {
-                        // O usuário não tem permissão
                         setIsAuthorized(false);
-                        setOrder(null); // Garante que nenhum dado do pedido seja mantido
+                        setOrder(null);
                     }
                 } else {
-                    // Pedido não encontrado
                     setOrder(null);
                     setIsAuthorized(false);
                 }
@@ -143,7 +164,7 @@ function SuccessPage() {
         };
 
         fetchAndAuthorizeOrder();
-    }, [orderId, router, user, userData]);
+    }, [orderId, user, userData]);
 
     const getPageTitle = () => {
         if (loading) return 'Carregando...';
