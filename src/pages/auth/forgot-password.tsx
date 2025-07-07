@@ -2,82 +2,60 @@ import withAuth from "@/hooks/withAuth";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { useState } from "react";
 import { useRouter } from "next/router";
-import { auth } from "@/lib/firebase"; // Certifique-se de que o caminho esteja correto
+import { auth } from "@/lib/firebase";
 import Head from "next/head";
+import AuthLayout from "@/components/layout/AuthLayout";
+import Link from "next/link";
+import { FiArrowLeft, FiSend } from "react-icons/fi";
+import { toast } from "react-toastify";
 
 function ForgotPassword() {
     const router = useRouter();
     const [email, setEmail] = useState("");
-    const [message, setMessage] = useState("");
-    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const handleForgotPassword = async (e: React.FormEvent) => {
         e.preventDefault();
+        setLoading(true);
         try {
             await sendPasswordResetEmail(auth, email);
-            setMessage("Email de recuperação enviado com sucesso!");
-            setError("");
-            setTimeout(() => router.push("/auth/login"), 3000);
-        } catch (err) {
-            setError("Falha ao enviar email de recuperação. Verifique o email fornecido.");
-            setMessage("");
-            console.error("Error sending password reset email:", err);
+            toast.success("E-mail de recuperação enviado! Verifique sua caixa de entrada.");
+            setTimeout(() => router.push("/auth/login"), 4000);
+        } catch {
+            toast.error("Falha ao enviar. Verifique o e-mail fornecido.");
+        } finally {
+            setLoading(false);
         }
     };
+    
+    const inputBaseStyle = "block w-full border-slate-300 rounded-lg shadow-sm p-3 focus:ring-sky-500 focus:border-sky-500 transition bg-slate-50 text-slate-900";
+    const labelBaseStyle = "block text-sm font-medium text-slate-700";
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-100">
+        <>
             <Head>
-                <title>IAD Eldorado - Recuperar Senha</title>
-                <meta name="description" content="Recuperar senha da conta IAD Eldorado." />
+                <title>Recuperar Senha | IAD Eldorado</title>
             </Head>
-            <div className="bg-white p-8 rounded shadow-md w-96">
-                <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Recuperar Senha</h2>
-                
-                {message && (
-                    <div className="mb-4 p-3 bg-green-100 text-green-700 rounded">
-                        {message}
+            <AuthLayout title="Recuperar Senha">
+                <p className="text-center text-slate-600 text-sm mb-6">
+                    Digite seu e-mail e enviaremos um link para você voltar a acessar sua conta.
+                </p>
+                <form onSubmit={handleForgotPassword} className="space-y-5">
+                    <div>
+                        <label htmlFor="email" className={labelBaseStyle}>E-mail</label>
+                        <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seuemail@exemplo.com" className={inputBaseStyle} required />
                     </div>
-                )}
-                
-                {error && (
-                    <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">
-                        {error}
-                    </div>
-                )}
-
-                <form onSubmit={handleForgotPassword}>
-                    <div className="mb-4">
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                            Email
-                        </label>
-                        <input 
-                            type="email" 
-                            id="email" 
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 p-2"
-                            required 
-                        />
-                    </div>
-                    <button 
-                        type="submit" 
-                        className="w-full bg-blue-600 text-white font-medium py-2 px-4 rounded-md hover:bg-blue-700 transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                    >
-                        Enviar Email de Recuperação
+                    <button type="submit" disabled={loading} className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-sky-600 text-white font-bold rounded-lg hover:bg-sky-700 transition-colors disabled:bg-slate-400">
+                        {loading ? 'Enviando...' : <><FiSend/> Enviar Link de Recuperação</>}
                     </button>
                 </form>
-                
-                <div className="mt-4 text-center">
-                    <button 
-                        onClick={() => router.push("/auth/login")}
-                        className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                    >
-                        Voltar para Login
-                    </button>
+                <div className="mt-6 text-center text-sm">
+                     <Link href="/auth/login" className="font-bold text-slate-600 hover:text-sky-600 flex items-center justify-center gap-2">
+                        <FiArrowLeft/> Voltar para o Login
+                    </Link>
                 </div>
-            </div>
-        </div>
+            </AuthLayout>
+        </>
     );
 }
 
