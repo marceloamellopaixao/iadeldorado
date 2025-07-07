@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { CartItem } from '@/types/order';
 import { Product } from '@/types/product';
 import { db } from '@/lib/firebase';
@@ -8,147 +8,135 @@ import { useAuth } from '@/contexts/AuthContext';
 export const useCart = () => {
     const { user } = useAuth();
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
-    const [tempCart, setTempCart] = useState<CartItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [notification, setNotification] = useState<{ message: string, visible: boolean }>({
         message: '',
         visible: false
     });
 
-    // Exibe uma notificação temporária
-    const showNotification = (message: string) => {
+    const showNotification = useCallback((message: string) => {
         setNotification({ message, visible: true });
         setTimeout(() => setNotification({ message: '', visible: false }), 3000);
-    };
+    }, []);
 
-    // Carrega o carrinho do usuário ou o carrinho temporário em tempo real
     useEffect(() => {
-        let unsubscribe: () => void;
+        setLoading(true);
+        let unsubscribe = () => {};
 
-        const loadCart = async () => {
-            setLoading(true);
-            try {
-                if (user) {
-                    const cartRef = doc(db, 'carts', user.uid);
-                    const cartSnap = await getDoc(cartRef);
+        if (user) {
+            const cartRef = doc(db, 'carts', user.uid);
+            
+            const mergeGuestCart = async () => {
+                const guestCartJson = localStorage.getItem('tempCart');
+                if (!guestCartJson) return;
 
-                    if (cartSnap.exists()) {
-                        setCartItems(cartSnap.data().items || []);
+                const guestCart: CartItem[] = JSON.parse(guestCartJson);
+                if (guestCart.length === 0) return;
+
+                const cartSnap = await getDoc(cartRef);
+                const firestoreCart: CartItem[] = cartSnap.exists() ? cartSnap.data().items : [];
+
+                const mergedCart = [...firestoreCart];
+
+                guestCart.forEach(guestItem => {
+                    const existingItemIndex = mergedCart.findIndex(item => item.id === guestItem.id);
+                    if (existingItemIndex > -1) {
+                        mergedCart[existingItemIndex].quantity += guestItem.quantity;
+                    } else {
+                        mergedCart.push(guestItem);
                     }
+                });
+                
+                await setDoc(cartRef, { items: mergedCart });
+                localStorage.removeItem('tempCart'); // Limpa o carrinho local após mesclar
+                showNotification("Seu carrinho foi atualizado!");
+            };
 
-                    // Listener em tempo real para o carrinho
-                    unsubscribe = onSnapshot(cartRef, (doc) => {
-                        if (doc.exists()) {
-                            setCartItems(doc.data().items || []);
-                        }
-                    })
-                } else {
-                    const savedCart = localStorage.getItem('tempCart');
-                    setTempCart(savedCart ? JSON.parse(savedCart) : []);
-                }
-            } catch {
-                return;
-            } finally {
+            mergeGuestCart();
+
+            unsubscribe = onSnapshot(cartRef, (doc) => {
+                const items = doc.exists() ? doc.data().items : [];
+                setCartItems(items);
                 setLoading(false);
-            }
+            });
+        
+        } else {
+            const savedCart = localStorage.getItem('tempCart');
+            setCartItems(savedCart ? JSON.parse(savedCart) : []);
+            setLoading(false);
+        }
 
-        };
+        return () => unsubscribe();
+    }, [user, showNotification]);
 
-        loadCart();
-
-        return () => {
-            if (unsubscribe) {
-                unsubscribe();
-            }
-        };
-    }, [user]);
-
-    // Atualiza o carrinho no Firestore (Logado) ou no localStorage (Deslogado)
-    const updateCart = async (items: CartItem[]) => {
-        try {
-            if (user) {
-                await setDoc(doc(db, 'carts', user.uid), { items }, { merge: true });
-            } else {
-                localStorage.setItem('tempCart', JSON.stringify(items));
-            }
-        } catch {
-            return;
+    const updateCartInPersistence = async (items: CartItem[]) => {
+        if (user) {
+            await setDoc(doc(db, 'carts', user.uid), { items });
+        } else {
+            localStorage.setItem('tempCart', JSON.stringify(items));
         }
     };
 
-    // Adiciona somente 1 produto ao carrinho com notificação
-    const addToCart = async (product: Product) => {
+    const addToCart = async (product: Product, quantityToAdd: number) => {
         if (!product.id) return;
+        
+        const newCart = [...cartItems];
+        const existingIndex = newCart.findIndex(item => item.id === product.id);
 
-        const items = user ? [...cartItems] : [...tempCart];
-        const existingIndex = items.findIndex(item => item.id === product.id);
-
-        if (existingIndex >= 0) {
-            items[existingIndex].quantity = 1;
-            showNotification(`${product.name} já está no carrinho!`);
+        if (existingIndex > -1) {
+            newCart[existingIndex].quantity += quantityToAdd;
         } else {
-            items.push({
+            newCart.push({
                 id: product.id,
                 name: product.name,
                 price: product.price,
-                quantity: 1,
+                quantity: quantityToAdd,
             });
-
-            if (user) {
-                setCartItems(items);
-            } else {
-                setTempCart(items);
-            }
-
-            await updateCart(items);
-
-            showNotification(`${product.name} foi adicionado ao carrinho!`);
         }
+        
+        setCartItems(newCart);
+        await updateCartInPersistence(newCart);
+        showNotification(`${quantityToAdd}x ${product.name} adicionado(s) ao carrinho!`);
     };
 
-    // Remove item do carrinho
     const removeFromCart = async (productId: string) => {
-        const items = (user ? cartItems : tempCart).filter(item => item.id !== productId);
-
-        if (user) {
-            setCartItems(items);
-        } else {
-            setTempCart(items);
-        }
-
-        await updateCart(items);
+        const newCart = cartItems.filter(item => item.id !== productId);
+        setCartItems(newCart);
+        await updateCartInPersistence(newCart);
         showNotification('Produto removido do carrinho!');
     };
 
-    // Atualiza a quantidade do item no carrinho
     const updateQuantity = async (productId: string, newQuantity: number) => {
-        if (newQuantity < 1) return;
-
-        const items = user ? [...cartItems] : [...tempCart];
-        const itemIndex = items.findIndex(item => item.id === productId);
-
-        if (itemIndex >= 0) {
-            items[itemIndex].quantity = newQuantity;
-            if (user) {
-                setCartItems(items);
-            } else {
-                setTempCart(items);
-            }
-            await updateCart(items);
+        if (newQuantity < 1) {
+            removeFromCart(productId); // Remove o item se a quantidade for menor que 1
+            return;
         }
+
+        const newCart = cartItems.map(item =>
+            item.id === productId ? { ...item, quantity: newQuantity } : item
+        );
+        
+        setCartItems(newCart);
+        await updateCartInPersistence(newCart);
     };
 
+    const total = useMemo(() =>
+        cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
+        [cartItems]
+    );
+
+    const isInCart = useCallback((productId: string) =>
+        cartItems.some(item => item.id === productId),
+        [cartItems]
+    );
 
     return {
-        cartItems: user ? cartItems : tempCart,
+        cartItems,
         addToCart,
         removeFromCart,
         updateQuantity,
-        isInCart: (productId: string) =>
-            (user ? cartItems : tempCart).some(item => item.id === productId),
-        total: (user ? cartItems : tempCart).reduce(
-            (sum, item) => sum + (item.price * item.quantity), 0
-        ),
+        isInCart,
+        total,
         loading,
         notification
     };
