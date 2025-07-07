@@ -1,10 +1,20 @@
-export default function LoadingSpinner({ message }: { message: string }) {
+import { FiLoader } from 'react-icons/fi';
+
+interface LoadingSpinnerProps {
+    message?: string; // Mensagem agora é opcional
+}
+
+export default function LoadingSpinner({ message }: LoadingSpinnerProps) {
     return (
-        <div className='container mx-auto p-4'>
-            <div className="flex flex-col items-center justify-center h-[50vh]">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-                <p className="mt-4 text-lg">{message}</p>
-            </div>
+
+        <div className="flex flex-col items-center justify-center p-8 text-center">
+            <FiLoader className="animate-spin h-10 w-10 text-sky-600" />
+            
+            {message ? (
+                <p className="mt-4 text-lg font-medium text-slate-600">{message}</p>
+            ) : (
+                <p className="mt-4 text-lg font-medium text-slate-600">Carregando...</p>
+            )}
         </div>
     );
 }
