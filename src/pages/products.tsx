@@ -26,15 +26,15 @@ function ProductsPage() {
                 <title>IAD Eldorado - Produtos</title>
                 <meta name="description" content="Lista de produtos disponíveis na cantina da IAD Eldorado." />
             </Head>
-            
+
             {/* Fundo claro para a página */}
             <main className="bg-slate-100 min-h-screen">
                 <div className="container mx-auto p-4 md:p-8">
-                    
+
                     {/* Barra de Título e Ações */}
                     <div className="flex flex-wrap justify-between items-center mb-8 gap-4">
                         <h1 className="text-3xl font-bold text-slate-800">Nossos Produtos</h1>
-                        
+
                         <div className='flex items-center justify-center gap-3'>
                             <Button
                                 disabled={cartItems.length === 0}
@@ -74,7 +74,7 @@ function ProductsPage() {
                         <FiInfo size={20} />
                         <h4 className='font-medium text-center text-sm'>A quantidade de cada produto é ajustada na tela de finalização.</h4>
                     </div>
-                    
+
                     {/* Notificação de Adicionar ao Carrinho */}
                     {notification.visible && (
                         <div className="fixed top-24 right-4 bg-teal-500 text-white px-5 py-3 rounded-lg shadow-lg flex items-center gap-3 z-50">
@@ -82,7 +82,7 @@ function ProductsPage() {
                             <span>{notification.message}</span>
                         </div>
                     )}
-                    
+
                     {/* Preview do Carrinho */}
                     {showCart && (
                         <CartPreview
@@ -91,17 +91,23 @@ function ProductsPage() {
                             onClose={() => setShowCart(false)}
                         />
                     )}
-                    
+
                     {/* Grade de Produtos */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {products.map(product => (
-                            <ProductCard
-                                key={product.id}
-                                product={product}
-                                onAddToCart={() => addToCart(product)}
-                                isInCart={isInCart(product.id!)}
-                            />
-                        ))}
+                        {products.map(product => {
+                            const cartItem = cartItems.find(item => item.id === product.id);
+                            const quantityInCart = cartItem ? cartItem.quantity : 0;
+
+                            return (
+                                <ProductCard
+                                    key={product.id}
+                                    product={product}
+                                    onAddToCart={(product, quantity) => addToCart(product, quantity)}
+                                    isInCart={isInCart(product.id!)}
+                                    quantityInCart={quantityInCart}
+                                />
+                            );
+                        })}
                     </div>
                 </div>
             </main>
