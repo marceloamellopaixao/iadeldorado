@@ -5,6 +5,7 @@ import { CartItem, PaymentType } from "@/types/order";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/router";
 import { useCart } from "@/hooks/useCart";
+import { FiLoader } from "react-icons/fi";
 
 interface CheckoutFormProps {
     cartItems: CartItem[];
@@ -151,65 +152,68 @@ export default function CheckoutForm({ cartItems }: CheckoutFormProps) {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-            {!user && (
-                <>
+        <div className="bg-white p-6 rounded-lg shadow-md mt-8">
+            <h2 className="text-2xl font-bold text-slate-800 mb-6">Pagamento e Informações</h2>
+            <form onSubmit={handleSubmit} className="space-y-6">
+                {!user && (
                     <div>
-                        <label className="block text-sm font-medium text-white-700 mb-1">
-                            Nome Completo <span className="text-red-500">*</span>
+                        <label htmlFor="clientName" className="block text-sm font-medium text-slate-700 mb-1">
+                            Nome Completo <span className="text-rose-500">*</span>
                         </label>
                         <input
+                            id="clientName"
                             type="text"
                             value={formData.clientName}
                             onChange={(e) => setFormData({ ...formData, clientName: e.target.value })}
-                            className={`w-full p-2 border rounded ${errors.clientName ? "border-red-500" : "border-gray-300"
-                                }`}
-                            placeholder="Exemplo: Marcelo Augusto"
+                            className={`w-full p-3 border rounded-lg transition-colors ${errors.clientName ? "border-rose-400 focus:ring-rose-500" : "border-slate-300 focus:border-sky-500 focus:ring-sky-500"} focus:outline-none focus:ring-2`}
+                            placeholder="Seu nome completo"
                             required
                             minLength={3}
                         />
                         {errors.clientName && (
-                            <p className="text-red-500 text-xs mt-1">{errors.clientName}</p>
+                            <p className="text-rose-600 text-xs mt-1">{errors.clientName}</p>
                         )}
                     </div>
-                </>
-            )}
+                )}
 
-            <div>
-                <label className="block text-sm font-medium text-white-700 mb-1">
-                    Método de Pagamento <span className="text-red-500">*</span>
-                </label>
-                <select
-                    value={formData.paymentMethod}
-                    onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value as PaymentType })}
-                    className="w-full font-bold p-2 border border-gray-300 rounded"
-                    required
+                <div>
+                    <label htmlFor="paymentMethod" className="block text-sm font-medium text-slate-700 mb-1">
+                        Método de Pagamento <span className="text-rose-500">*</span>
+                    </label>
+                    <select
+                        id="paymentMethod"
+                        value={formData.paymentMethod}
+                        onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value as PaymentType })}
+                        className="w-full font-medium text-black p-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:border-sky-500 focus:ring-sky-500"
+                        required
+                    >
+                        <option value="dinheiro">💵 Dinheiro</option>
+                        <option value="pix">💸 Pix</option>
+                        <option value="credito">💳 Cartão de Crédito</option>
+                        <option value="debito">💳 Cartão de Débito</option>
+                    </select>
+                    {formData.paymentMethod === "pix" && (
+                        <p className="text-xs text-slate-500 mt-2 p-2 bg-sky-50 rounded-md">
+                            Você receberá as informações para pagamento via PIX na página de sucesso.
+                        </p>
+                    )}
+                </div>
+
+                <button
+                    type="submit"
+                    disabled={loading}
+                    className={`w-full p-4 text-white rounded-lg font-bold text-lg transition-all duration-300 flex items-center justify-center gap-3 transform hover:scale-105 ${loading ? "bg-slate-400 cursor-not-allowed" : "bg-teal-500 hover:bg-teal-600"}`}
                 >
-                    <option className="text-black" value="dinheiro">💵Dinheiro</option>
-                    <option className="text-black" value="pix">💸Pix</option>
-                    <option className="text-black" value="credito">💳Cartão de Crédito</option>
-                    <option className="text-black" value="debito">💳Cartão de Débito</option>
-                </select>
-
-                {formData.paymentMethod === "pix" && (
-                    <p className="text-xs text-white-500 mt-1">
-                        Você receberá as informações para pagamento via PIX após confirmar o pedido.
-                    </p>
-                )}
-            </div>
-
-            <button
-                type="submit"
-                disabled={loading}
-                className={`w-full p-3 text-white bg-blue-600 rounded-lg font-medium ${loading ? "opacity-50 cursor-not-allowed" : "hover:bg-blue-700"
-                    } transition-colors`}
-            >
-                {loading ? (
-                    "Processando Pedido..."
-                ) : (
-                    "Finalizar Pedido"
-                )}
-            </button>
-        </form>
+                    {loading ? (
+                        <>
+                            <FiLoader className="animate-spin" size={24} />
+                            <span>Processando...</span>
+                        </>
+                    ) : (
+                        "Confirmar e Finalizar Pedido"
+                    )}
+                </button>
+            </form>
+        </div>
     );
 }
