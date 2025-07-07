@@ -127,13 +127,15 @@ export default function CheckoutForm({ cartItems }: CheckoutFormProps) {
             }
 
             if (!user) {
-                localStorage.setItem('lastOrderId', orderRef.id); // Armazena o ID do pedido no localStorage
-            }
+                // 1. Pega a lista de IDs já existente no localStorage.
+                const guestOrderIdsJson = localStorage.getItem('guestOrderIds');
+                const guestOrderIds = guestOrderIdsJson ? JSON.parse(guestOrderIdsJson) : [];
 
-            if (user) {
-                localStorage.removeItem('lastOrderId'); // Remove o ID do pedido do localStorage se o usuário estiver logado
-                localStorage.removeItem('lastOrderPhone'); // Remove o telefone do pedido do localStorage se o usuário estiver logado
-                localStorage.removeItem('tempCart'); // Remove o carrinho temporário do localStorage se o usuário estiver logado
+                // 2. Adiciona o novo ID do pedido à lista.
+                guestOrderIds.push(orderRef.id);
+
+                // 3. Salva a lista atualizada de volta no localStorage.
+                localStorage.setItem('guestOrderIds', JSON.stringify(guestOrderIds));
             }
 
             // Remove os itens do carrinho após o pedido ser criado
