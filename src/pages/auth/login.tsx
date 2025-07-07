@@ -1,102 +1,84 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useRouter } from "next/router";
 import withAuth from "@/hooks/withAuth";
-import Image from "next/image";
-import eyeIcon from "@/assets/icons/eye-solid.svg";
-import eyeCloseIcon from "@/assets/icons/eye-slash-solid.svg";
 import Link from "next/link";
 import Head from "next/head";
+import AuthLayout from "@/components/layout/AuthLayout"; // Importando o novo layout
+import { FiEye, FiEyeOff, FiLogIn } from "react-icons/fi";
+import { toast } from "react-toastify";
 
 function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
-    const passwordInputRef = useRef<HTMLInputElement>(null);
-    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
     const { user } = useAuth();
     const router = useRouter();
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
+        setLoading(true);
         try {
             await signInWithEmailAndPassword(auth, email, password);
+            // O redirecionamento será tratado pelo HOC withAuth ou pelo hook useAuth
         } catch {
-            setError("Email ou senha inválidos!");
-        }
-    };
-
-    const togglePasswordVisibility = () => {
-        setShowPassword(!showPassword);
-
-        if (passwordInputRef.current) {
-            passwordInputRef.current.type = showPassword ? "text" : "password";
+            toast.error("E-mail ou senha inválidos. Por favor, verifique.");
+        } finally {
+            setLoading(false);
         }
     };
 
     if (user) {
-        router.push("/"); // Redireciona para a página inicial se o usuário já estiver logado
-        return null;
+        router.push("/");
+        return <div className="h-screen w-screen"></div>; // Retorna um placeholder enquanto redireciona
     }
 
+    const inputBaseStyle = "block w-full border-slate-300 rounded-lg shadow-sm p-3 pr-10 focus:ring-sky-500 focus:border-sky-500 transition bg-slate-50 text-slate-900";
+    const labelBaseStyle = "block text-sm font-medium text-slate-700";
+
     return (
-        <div className="flex items-center justify-center min-h-screen">
+        <>
             <Head>
-                <title>IAD Eldorado - Login</title>
-                <meta name="description" content="Página de login da IAD Eldorado." />
+                <title>Login | IAD Eldorado</title>
             </Head>
-            <div className="bg-white p-8 rounded-2xl shadow-2xl w-100 hover:scale-105 transition-all duration-300">
-                <h1 className="text-2xl font-bold mb-6 text-center text-black">Login</h1>
-                {error && <p className="text-red-500 mb-4">{error}</p>}
-
-                <form onSubmit={handleLogin}>
-                    <div className="mb-4">
-                        <label className="block text-gray-700 mb-2 font-bold">E-mail</label>
-                        <input
-                            type="email" value={email}
-                            placeholder="Digite seu e-mail"
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="w-full text-gray-700 px-3 py-2 border-3 rounded border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            required
-                        />
+            <AuthLayout title="Acessar sua Conta">
+                <form onSubmit={handleLogin} className="space-y-5">
+                    <div>
+                        <label htmlFor="email" className={labelBaseStyle}>E-mail</label>
+                        <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seuemail@exemplo.com" className={inputBaseStyle} required />
                     </div>
-                    <div className="mb-6">
-                        <label className="block text-gray-700 mb-2 font-bold">Senha</label>
-                        <div className="relative ">
-                            <input
-                                ref={passwordInputRef}
-                                placeholder="Digite sua senha"
-                                type={showPassword ? "text" : "password"} value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="w-full text-gray-700 px-3 py-2 border-3 border-gray-500 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                required
-                            />
-                            <button className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer" type="button" onClick={togglePasswordVisibility}>
-                                {showPassword ? (
-                                    <Image src={eyeCloseIcon} alt="Ocultar senha" width={20} height={20} />
-                                ) : (
-                                    <Image src={eyeIcon} alt="Mostrar senha" width={20} height={20} />
-
-                                )}
+                    <div>
+                        <label htmlFor="password" className={labelBaseStyle}>Senha</label>
+                        <div className="relative">
+                            <input id="password" type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Sua senha" className={inputBaseStyle} required />
+                            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500 hover:text-sky-600">
+                                {showPassword ? <FiEyeOff /> : <FiEye />}
                             </button>
                         </div>
-                        <Link href="/auth/forgot-password" className="text-blue-500 text-sm underline">
-                            Esqueceu sua senha?
-                        </Link>
+                        <div className="text-right mt-1">
+                            <Link href="/auth/forgot-password" className="text-sm font-medium text-sky-600 hover:text-sky-800">
+                                Esqueceu sua senha?
+                            </Link>
+                        </div>
                     </div>
-                    <button
-                        type="submit"
-                        className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition duration-300"
-                    >
-                        Entrar
+                    <button type="submit" disabled={loading} className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-teal-500 text-white font-bold rounded-lg hover:bg-teal-600 transition-colors disabled:bg-slate-400">
+                        {loading ? 'Entrando...' : <><FiLogIn/> Entrar</>}
                     </button>
                 </form>
-            </div>
-        </div>
-    )
-
+                <div className="mt-6 text-center text-sm">
+                    <p className="text-slate-600">
+                        Não tem uma conta?{' '}
+                        <Link href="/auth/register" className="font-bold text-sky-600 hover:underline">
+                            Crie uma agora
+                        </Link>
+                    </p>
+                </div>
+            </AuthLayout>
+        </>
+    );
 }
 
-export default withAuth([])(Login); // Permite acesso a todos os usuários, mesmo não autenticados
+export default withAuth([])(Login);
