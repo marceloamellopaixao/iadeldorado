@@ -75,7 +75,7 @@ export function ProductCard({ product, onAddToCart, isInCart, quantityInCart }: 
                 >
                     <FiMinus size={16} />
                 </button>
-                <span className="text-xl font-bold text-slate-800 w-8 text-center">
+                <span className="flex justify-center items-center text-xl font-bold text-slate-800 w-8 text-center">
                     {canAddToCart ? quantity : <FiSlash />}
                 </span>
                 <button 
