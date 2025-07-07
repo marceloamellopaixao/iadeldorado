@@ -1,11 +1,11 @@
 import { CartItem, PaymentType, PixDetails } from "@/types/order";
 
 interface WhatsAppMessageParams {
-    name: string; // Nome do cliente
-    items: CartItem[]; // Itens do pedido
-    total: number; // Valor total do pedido
-    paymentMethod: PaymentType; // Método de pagamento
-    pixDetails?: PixDetails; // Detalhes do pagamento via Pix (opcional)
+    name: string;
+    items: CartItem[];
+    total: number;
+    paymentMethod: PaymentType;
+    pixDetails?: PixDetails;
 }
 
 export const createWhatsAppMessage = ({
@@ -24,21 +24,18 @@ export const createWhatsAppMessage = ({
         case 'pix':
             paymentText = pixDetails
                 ? `💳 *Pagamento via PIX*\n` +
-                `🔹 ${pixDetails.name}\n` +
-                `🔹 Tipo: ${pixDetails.keyType.toUpperCase()}\n` +
-                `🔹 Chave: ${pixDetails.key}\n` +
-                `🔹 Titular: ${pixDetails.owner}`
+                  `🔹 ${pixDetails.name}\n` +
+                  `🔹 Tipo: ${pixDetails.keyType.toUpperCase()}\n` +
+                  `🔹 Chave: ${pixDetails.key}\n` +
+                  `🔹 Titular: ${pixDetails.owner}`
                 : `💳 *Pagamento via PIX*`;
             break;
-
         case 'dinheiro':
             paymentText = `💵 *Pago em Dinheiro*`;
             break;
-
         case 'cartão de crédito':
             paymentText = `💳 *Pago com Cartão de Crédito*`;
             break;
-
         case 'cartão de débito':
             paymentText = `💳 *Pago com Cartão de Débito*`;
             break;
@@ -48,9 +45,9 @@ export const createWhatsAppMessage = ({
         `\n\n👋 Olá ${name}!` +
         `\n\n📝 *Resumo da sua compra:*` +
         `\n${itemsText}` +
-        `\n\n💰 *Total: R$ ${total}*` +
+        `\n\n💰 *Total: R$ ${total.toFixed(2).replace('.',',')}*` +
         `\n\n${paymentText}\n\n` +
-        `🙏 Obrigado pela preferência!`
+        `🙏 Obrigado pela preferência!`;
 
     return message;
 }
