@@ -1,55 +1,68 @@
 import { CartItem } from "@/types/order";
 import EmptyState from "./EmptyState";
 import { useRouter } from "next/router";
-import Image from "next/image";
-import closeIcon from "@/assets/icons/times-solid.svg"
+import { FiX, FiArrowRight } from "react-icons/fi";
 
 interface CartPreviewProps {
-    items: CartItem[]; // Lista de itens do carrinho
-    total: number; // Total do carrinho
-    onClose: () => void; // Função chamada para fechar o preview do carrinho
+    items: CartItem[];
+    total: number;
+    onClose: () => void;
 }
 
 export default function CartPreview({ items, total, onClose }: CartPreviewProps) {
-    const router = useRouter(); // Hook do Next.js para manipulação de rotas
+    const router = useRouter();
 
     return (
-        <div className="fixed inset-0 flex justify-end">
-            <div className="bg-white w-full max-w-md h-full p-4 overflow-y-auto">
-                <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl text-black font-bold">Seu Carrinho</h2>
-                    <button onClick={onClose} className="text-gray-500 hover:cursor-pointer">
-                        <Image src={closeIcon} alt="Fechar" width={18} height={18} />
+        <div className="fixed inset-0 bg-black/60 z-50 flex justify-end" onClick={onClose}>
+            <div 
+                className="bg-slate-50 w-full max-w-sm h-full shadow-2xl p-6 flex flex-col transform transition-transform duration-300 ease-in-out" 
+                onClick={(e) => e.stopPropagation()} // Impede que o clique dentro do carrinho o feche
+            >
+                <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-2xl text-slate-800 font-bold">Seu Carrinho</h2>
+                    <button onClick={onClose} className="text-slate-500 hover:text-rose-500 transition-colors p-2 rounded-full hover:bg-slate-200">
+                        <FiX size={24} />
                     </button>
                 </div>
 
                 {items.length === 0 ? (
-                    <EmptyState message="Seu carrinho está vazio" />
+                    <EmptyState message="Seu carrinho ainda está vazio." />
                 ) : (
                     <>
-                        <div className="space-y-4 mb-4">
+                        {/* Lista de Itens */}
+                        <div className="flex-grow space-y-4 mb-4 overflow-y-auto pr-2">
                             {items.map(item => (
-                                <div key={item.id} className="flex justify-between border-b pb-2">
+                                <div key={item.id} className="flex justify-between items-start border-b border-slate-200 pb-3">
                                     <div>
-                                        <h3 className="font-medium text-black">{item.name}</h3>
-                                        <p className="text-black">R$ {item.price.toFixed(2).replace('.', ',')} x {item.quantity}</p>
+                                        <h3 className="font-bold text-slate-700">{item.name}</h3>
+                                        <p className="text-slate-500 text-sm">
+                                            R$ {item.price.toFixed(2).replace('.', ',')} x {item.quantity}
+                                        </p>
                                     </div>
-                                    <p className="text-black">R$ {(item.price * item.quantity).toFixed(2).replace('.', ',')}</p>
+                                    <p className="font-semibold text-slate-800">
+                                        R$ {(item.price * item.quantity).toFixed(2).replace('.', ',')}
+                                    </p>
                                 </div>
                             ))}
                         </div>
-                        <div className="border-t pt-4">
-                            <p className="font-bold text-right text-black">Total: R$ {total.toFixed(2).replace('.', ',')}</p>
+
+                        {/* Rodapé do Carrinho */}
+                        <div className="border-t border-slate-200 pt-4">
+                            <div className="flex justify-between items-center mb-4">
+                                <p className="text-slate-600 font-medium">Total:</p>
+                                <p className="font-bold text-2xl text-slate-800">R$ {total.toFixed(2).replace('.', ',')}</p>
+                            </div>
                             <button
                                 onClick={() => router.push("/checkout")}
-                                className="w-full mt-4 bg-blue-600 text-white font-bold py-2 rounded hover:bg-blue-900 transition duration-300"
+                                className="w-full mt-2 bg-teal-500 text-white font-bold py-3 rounded-lg hover:bg-teal-600 transition-all duration-300 flex items-center justify-center gap-2 transform hover:scale-105"
                             >
-                                Finalizar Compra
+                                <span>Finalizar Compra</span>
+                                <FiArrowRight size={20} />
                             </button>
                         </div>
                     </>
                 )}
             </div>
         </div>
-    )
+    );
 }
