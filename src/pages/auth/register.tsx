@@ -1,123 +1,92 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { useRouter } from "next/router";
 import withAuth from "@/hooks/withAuth";
-import Image from "next/image";
-import eyeIcon from "@/assets/icons/eye-solid.svg";
-import eyeCloseIcon from "@/assets/icons/eye-slash-solid.svg";
+import Link from "next/link";
 import Head from "next/head";
+import AuthLayout from "@/components/layout/AuthLayout";
+import { FiEye, FiEyeOff, FiUserPlus } from "react-icons/fi";
+import { toast } from "react-toastify";
 
 function Register() {
+    const [name, setName] = useState("");
+    const [telephone, setTelephone] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
-    const passwordInputRef = useRef<HTMLInputElement>(null);
-    const [name, setName] = useState("");
-    const [telephone, setTelephone] = useState("");
-    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
     const router = useRouter();
 
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
+        setLoading(true);
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-
             await setDoc(doc(db, "users", userCredential.user.uid), {
+                uid: userCredential.user.uid,
                 name,
                 email,
                 telephone,
                 role: "customer",
-                createdAt: new Date(),
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp(),
             });
-
-            router.push('/')
-
-        } catch (error) {
-            setError(error instanceof Error ? error.message : "Erro ao criar conta");
+            router.push('/');
+        } catch {
+            toast.error("Erro ao criar conta. Verifique se o e-mail já está em uso.");
+        } finally {
+            setLoading(false);
         }
     };
-
-    const togglePasswordVisibility = () => {
-        setShowPassword(!showPassword);
-
-        if (passwordInputRef.current) {
-            passwordInputRef.current.type = showPassword ? "text" : "password";
-        }
-    };
+    
+    const inputBaseStyle = "block w-full border-slate-300 rounded-lg shadow-sm p-3 pr-10 focus:ring-sky-500 focus:border-sky-500 transition bg-slate-50 text-slate-900";
+    const labelBaseStyle = "block text-sm font-medium text-slate-700";
 
     return (
-        <div className="min-h-screen flex items-center justify-center">
+        <>
             <Head>
-                <title>IAD Eldorado - Registro</title>
-                <meta name="description" content="Crie sua conta na IAD Eldorado." />
+                <title>Criar Conta | IAD Eldorado</title>
             </Head>
-            <div className="bg-white p-8 rounded-2xl shadow-2xl w-100 hover:scale-105 transition-all duration-300">
-                <h1 className="text-2xl font-bold mb-6 text-center text-black">Crie sua Conta</h1>
-                {error && <p className="text-red-500 mb-4">{error}</p>}
-                <form onSubmit={handleRegister}>
-                    <div className="mb-4">
-                        <label className="block text-gray-700 mb-2">Nome Completo</label>
-                        <input
-                            type="text" value={name}
-                            placeholder="Digite seu nome completo"
-                            onChange={(e) => setName(e.target.value)}
-                            className="w-full text-gray-700 px-3 py-2 border-3 rounded border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            required
-                        />
+            <AuthLayout title="Crie sua Conta">
+                <form onSubmit={handleRegister} className="space-y-5">
+                    <div>
+                        <label htmlFor="name" className={labelBaseStyle}>Nome Completo</label>
+                        <input id="name" type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Seu nome completo" className={inputBaseStyle} required />
                     </div>
-                    <div className="mb-4">
-                        <label className="block text-gray-700 mb-2">Telefone (WhatsApp com DDD)</label>
-                        <input
-                            type="text" value={telephone}
-                            placeholder="Digite seu telefone"
-                            onChange={(e) => setTelephone(e.target.value)}
-                            className="w-full text-gray-700 px-3 py-2 border-3 rounded border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            required
-                        />
+                    <div>
+                        <label htmlFor="telephone" className={labelBaseStyle}>Telefone (WhatsApp)</label>
+                        <input id="telephone" type="tel" value={telephone} onChange={(e) => setTelephone(e.target.value)} placeholder="(11) 99999-9999" className={inputBaseStyle} />
                     </div>
-                    <div className="mb-4">
-                        <label className="block text-gray-700 mb-2">E-mail</label>
-                        <input
-                            type="email" value={email}
-                            placeholder="Digite seu e-mail"
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="w-full text-gray-700 px-3 py-2 border-3 rounded border-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            required
-                        />
+                     <div>
+                        <label htmlFor="email" className={labelBaseStyle}>E-mail</label>
+                        <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seuemail@exemplo.com" className={inputBaseStyle} required />
                     </div>
-                    <div className="mb-6">
-                        <label className="block text-gray-700 mb-2">Senha</label>
-                        <div className="relative ">
-                            <input
-                                ref={passwordInputRef}
-                                placeholder="Digite sua senha"
-                                type={showPassword ? "text" : "password"} value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="w-full text-gray-700 px-3 py-2 border-3 border-gray-500 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                required
-                            />
-                            <button className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer" type="button" onClick={togglePasswordVisibility}>
-                                {showPassword ? (
-                                    <Image src={eyeCloseIcon} alt="Ocultar senha" width={20} height={20} />
-                                ) : (
-                                    <Image src={eyeIcon} alt="Mostrar senha" width={20} height={20} />
-
-                                )}
+                    <div>
+                        <label htmlFor="password" className={labelBaseStyle}>Senha</label>
+                        <div className="relative">
+                            <input id="password" type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Crie uma senha forte" className={inputBaseStyle} required />
+                            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500 hover:text-sky-600">
+                                {showPassword ? <FiEyeOff /> : <FiEye />}
                             </button>
                         </div>
                     </div>
-                    <button
-                        type="submit"
-                        className="w-full bg-green-500 text-white py-2 rounded"
-                    >
-                        Criar Conta
+                    <button type="submit" disabled={loading} className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-sky-600 text-white font-bold rounded-lg hover:bg-sky-700 transition-colors disabled:bg-slate-400">
+                        {loading ? 'Criando conta...' : <><FiUserPlus/> Criar Conta</>}
                     </button>
                 </form>
-            </div>
-        </div>
+                <div className="mt-6 text-center text-sm">
+                    <p className="text-slate-600">
+                        Já tem uma conta?{' '}
+                        <Link href="/auth/login" className="font-bold text-sky-600 hover:underline">
+                            Faça login
+                        </Link>
+                    </p>
+                </div>
+            </AuthLayout>
+        </>
     );
 }
 
-export default withAuth([])(Register); // Permite acesso a todos os usuários, mesmo não autenticados
+export default withAuth([])(Register);
