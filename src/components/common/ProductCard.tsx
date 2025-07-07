@@ -1,58 +1,67 @@
 import { Product } from "@/types/product";
-import Image from "next/image";
-import noStockIcon from "@/assets/icons/ban-solid.svg"
-import addCartIcon from "@/assets/icons/cart-plus-solid.svg"
-import itemCartIcon from "@/assets/icons/thumbs-up-regular.svg"
+import { FiShoppingCart, FiCheckCircle, FiSlash } from 'react-icons/fi';
 
 interface ProductCardProps {
-    product: Product;  // Objeto do tipo Product que contém as informações do produto
-    onAddToCart: () => void; // Função chamada ao adicionar o produto ao carrinho
-    isInCart: boolean; // Indica se o produto está no carrinho
+    product: Product;
+    onAddToCart: () => void;
+    isInCart: boolean;
 }
 
 export function ProductCard({ product, onAddToCart, isInCart }: ProductCardProps) {
+    const isOutOfStock = product.stock <= 0;
+
+    // Estilo base do botão
+    const buttonBaseStyle = "w-full mt-4 py-2.5 font-bold rounded-lg transition-all duration-300 flex items-center justify-center gap-2 text-white transform hover:scale-105";
+
+    // Estilos condicionais do botão
+    const buttonStyles = isOutOfStock
+        ? "bg-slate-300 text-slate-500 cursor-not-allowed" // Sem estoque
+        : isInCart
+            ? "bg-teal-500" // No carrinho (cor de sucesso)
+            : "bg-sky-600 hover:bg-sky-500"; // Padrão (Adicionar)
 
     return (
-        <div className="flex flex-col bg-gray-800 border border-zinc-400 rounded-xl shadow-lg p-4 justify-between transition hover:shadow-xl hover:scale-105 duration-300 ease-linear">
-            <div className="flex items-center justify-between mb-4">
-                <h3 className="text-white text-lg font-semibold mb-2">{product.name}</h3>
+        <div className="flex flex-col bg-white border border-slate-200 rounded-xl shadow-md p-4 justify-between transition-shadow duration-300 hover:shadow-xl">
+            {/* Seção de Informações do Produto */}
+            <div className="flex-grow">
+                <h3 className="text-slate-800 text-lg font-bold mb-2">{product.name}</h3>
+                {/* Container com altura fixa para alinhar os cards */}
+                <div className="h-14 mb-4">
+                    <p className="text-slate-500 text-sm">{product.description || "Este produto não possui descrição."}</p>
+                </div>
             </div>
-            <div className="flex items-center w-full h-15 mb-4">
-                <p className="text-zinc-400 text-sm mb-4">{product.description ? product.description : "Sem descrição"}</p>
-            </div>
-            <div className="flex items-center justify-between">
-            </div>
-            <div className="flex flex-col justify-between mb-4">
-                <p className="text-white font-bold text-lg mb-2">R$ {product.price.toFixed(2).replace('.', ',')}</p>
-                <p className={`text-sm ${product.stock <= 0 ? 'text-red-500' : 'text-green-500'}`}>
-                    {product.stock <= 0 ? 'Sem Estoque' : `Em Estoque: ${product.stock}`}
+
+            {/* Seção de Preço e Estoque */}
+            <div className="mb-2">
+                <p className="text-slate-800 font-black text-xl mb-1">
+                    R$ {product.price.toFixed(2).replace('.', ',')}
+                </p>
+                <p className={`text-sm font-semibold ${isOutOfStock ? 'text-rose-500' : 'text-green-600'}`}>
+                    {isOutOfStock ? 'Produto indisponível' : `Em estoque: ${product.stock}`}
                 </p>
             </div>
+
+            {/* Botão de Ação */}
             <button
                 onClick={onAddToCart}
-                disabled={product.stock <= 0}
-                className={`w-full mt-4 py-2 rounded ${product.stock <= 0
-                    ? 'bg-gray-400 text-white font-bold cursor-not-allowed'
-                    : isInCart
-                        ? 'bg-green-500 text-white font-bold'
-                        : 'bg-blue-500 text-white font-bold hover:bg-blue-600'
-                    }`}
+                disabled={isOutOfStock}
+                className={`${buttonBaseStyle} ${buttonStyles}`}
             >
-                {product.stock <= 0 ? (
-                    <div className="flex items-center justify-center">
-                        <Image src={noStockIcon} alt="Sem Estoque" width={20} height={20} />
-                        <span className="ml-2">Sem Estoque</span>
-                    </div>
+                {isOutOfStock ? (
+                    <>
+                        <FiSlash size={20} />
+                        <span>Indisponível</span>
+                    </>
                 ) : isInCart ? (
-                    <div className="flex items-center justify-center">
-                        <Image src={itemCartIcon} alt="Produto no Carrinho" width={20} height={20} />
-                        <span className="ml-2">Produto no Carrinho</span>
-                    </div>
+                    <>
+                        <FiCheckCircle size={20} />
+                        <span>Adicionado</span>
+                    </>
                 ) : (
-                    <div className="flex items-center justify-center">
-                        <Image src={addCartIcon} alt="Adicionar no Carrinho" width={20} height={20} />
-                        <span className="ml-2">Adicionar no Carrinho</span>
-                    </div>
+                    <>
+                        <FiShoppingCart size={20} />
+                        <span>Adicionar ao Carrinho</span>
+                    </>
                 )}
             </button>
         </div>
