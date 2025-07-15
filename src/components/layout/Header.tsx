@@ -30,31 +30,85 @@ interface MobileNavProps {
     onLogout: () => void;
 }
 
-const MobileNav: React.FC<MobileNavProps> = ({ items, onClose, onLogout }) => (
-    <div 
-        className="lg:hidden fixed inset-0 bg-sky-700 z-50 p-4 flex flex-col"
-        onClick={onClose}
-    >
-        <div className="flex justify-between items-center mb-8">
-            <span className="text-white font-bold text-lg">Menu</span>
-            <button onClick={onClose} className="text-white p-2">
-                <FiX size={24} />
-            </button>
+// ESTE É O COMPONENTE ATUALIZADO
+const MobileNav: React.FC<MobileNavProps> = ({ items, onClose, onLogout }) => {
+    // 1. Adicionamos um estado para controlar quais dropdowns estão abertos
+    const [openDropdowns, setOpenDropdowns] = useState<{ [key: string]: boolean }>({});
+
+    // 2. Função para abrir/fechar um dropdown específico
+    const toggleDropdown = (label: string) => {
+        // Impede que o menu inteiro feche ao clicar no dropdown
+        // event.stopPropagation(); 
+        setOpenDropdowns(prevState => ({
+            ...prevState,
+            [label]: !prevState[label]
+        }));
+    };
+
+    return (
+        <div 
+            className="fixed inset-0 z-50 flex lg:hidden bg-sky-700/80 backdrop-blur-sm"
+            onClick={onClose} // Fecha se clicar no fundo
+        >
+            <div 
+                className="flex flex-col w-4/5 h-full max-w-sm p-4 shadow-2xl bg-sky-700"
+                onClick={(e) => e.stopPropagation()} // Impede de fechar ao clicar dentro do menu
+            >
+                <div className="flex items-center justify-between mb-8">
+                    <span className="text-lg font-bold text-white">Menu</span>
+                    <button onClick={onClose} className="p-2 text-white">
+                        <FiX size={24} />
+                    </button>
+                </div>
+                
+                <nav className="flex flex-col flex-grow gap-2 overflow-y-auto">
+                    {items.map(item => (
+                        <div key={item.label}>
+                            {item.isDropdown ? (
+                                // 3. Se for um dropdown, renderiza como um botão de acordeão
+                                <>
+                                    <button 
+                                        onClick={() => toggleDropdown(item.label)} 
+                                        className="flex items-center justify-between w-full gap-3 p-3 font-semibold text-white transition-colors rounded-lg hover:bg-sky-600"
+                                    >
+                                        <div className="flex items-center gap-3">
+                                            {item.icon}
+                                            <span>{item.label}</span>
+                                        </div>
+                                        <FiChevronDown className={`transition-transform duration-200 ${openDropdowns[item.label] ? 'rotate-180' : ''}`} />
+                                    </button>
+                                    {/* 4. Mostra os sub-itens se o dropdown estiver aberto */}
+                                    {openDropdowns[item.label] && (
+                                        <div className="pl-6 mt-1 space-y-1">
+                                            {item.children?.map(child => (
+                                                <Link key={child.label} href={child.href || '#'} onClick={onClose} className="flex items-center gap-3 p-3 text-sm text-white transition-colors rounded-lg hover:bg-sky-600">
+                                                    {child.icon}
+                                                    <span>{child.label}</span>
+                                                </Link>
+                                            ))}
+                                        </div>
+                                    )}
+                                </>
+                            ) : (
+                                // Se não for dropdown, renderiza como um link simples (comportamento antigo)
+                                <Link href={item.href || '#'} onClick={item.onClick || onClose} className="flex items-center gap-3 p-3 font-semibold text-white transition-colors rounded-lg hover:bg-sky-600">
+                                    {item.icon}
+                                    <span>{item.label}</span>
+                                </Link>
+                            )}
+                        </div>
+                    ))}
+                    
+                    {/* Botão de Logout fica no final */}
+                    <button onClick={onLogout} className="flex items-center gap-3 p-3 mt-auto font-semibold text-white transition-colors rounded-lg bg-rose-600 hover:bg-rose-500">
+                        <FiLogOut size={20} />
+                        <span>Sair</span>
+                    </button>
+                </nav>
+            </div>
         </div>
-        <nav className="flex flex-col gap-4">
-            {items.map(item => (
-                <Link key={item.label} href={item.href || '#'} onClick={item.onClick || onClose} className="flex items-center gap-3 p-3 text-white font-semibold rounded-lg hover:bg-sky-600 transition-colors">
-                    {item.icon}
-                    <span>{item.label}</span>
-                </Link>
-            ))}
-            <button onClick={onLogout} className="flex items-center gap-3 p-3 mt-auto text-white font-semibold bg-rose-600 rounded-lg hover:bg-rose-500 transition-colors">
-                <FiLogOut size={20} />
-                <span>Sair</span>
-            </button>
-        </nav>
-    </div>
-);
+    );
+};
 
 interface DesktopDropdownProps {
     item: NavItem;
@@ -71,11 +125,11 @@ const DesktopDropdown: React.FC<DesktopDropdownProps> = ({ item, dropdownStates,
             <FiChevronDown className={`transition-transform duration-200 ${dropdownStates[item.label] ? 'rotate-180' : ''}`} />
         </button>
         {dropdownStates[item.label] && (
-            <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl z-20 p-2">
+            <div className="absolute right-0 z-20 w-56 p-2 mt-2 bg-white rounded-lg shadow-xl">
                 <ul className="space-y-1">
                     {item.children?.map(child => (
                         <li key={child.label}>
-                            <Link href={child.href || '#'} className="flex items-center gap-3 px-3 py-2 text-sm text-slate-700 hover:bg-slate-100 rounded-md transition-colors">
+                            <Link href={child.href || '#'} className="flex items-center gap-3 px-3 py-2 text-sm transition-colors rounded-md text-slate-700 hover:bg-slate-100">
                                 {child.icon}
                                 <span>{child.label}</span>
                             </Link>
@@ -152,15 +206,15 @@ export default function Header() {
     });
 
     return (
-        <header className="bg-sky-700 shadow-md sticky top-0 z-30">
-            <nav className="container mx-auto px-4">
+        <header className="sticky top-0 z-30 shadow-md bg-sky-700">
+            <nav className="container px-4 mx-auto">
                 <div className='flex items-center justify-between py-3'>
                     <Link href="/" className='flex items-center gap-3' title='Página inicial'>
-                        <Image src={Logo} alt="Logo IAD Eldorado Cantina" width={40} height={40} className="rounded-full border-2 border-sky-200" />
-                        <span className='self-center text-xl font-bold text-white whitespace-nowrap hidden sm:block'>IAD Eldorado - Cantina</span>
+                        <Image src={Logo} alt="Logo IAD Eldorado Cantina" width={40} height={40} className="border-2 rounded-full border-sky-200" />
+                        <span className='self-center hidden text-xl font-bold text-white whitespace-nowrap sm:block'>IAD Eldorado - Cantina</span>
                     </Link>
 
-                    <div className='hidden lg:flex items-center gap-2'>
+                    <div className='items-center hidden gap-2 lg:flex'>
                         {visibleLinks.map(item => (
                              item.isDropdown ? (
                                 <DesktopDropdown key={item.label} item={item} dropdownStates={dropdownStates} setDropdownRef={setDropdownRef} toggleDropdown={toggleDropdown} />
@@ -179,7 +233,7 @@ export default function Header() {
                         )}
                     </div>
                     
-                    <button type='button' className='lg:hidden p-2 text-white' onClick={() => setIsMenuOpen(true)}>
+                    <button type='button' className='p-2 text-white lg:hidden' onClick={() => setIsMenuOpen(true)}>
                         <span className="sr-only">Abrir menu</span>
                         <FiMenu size={28} />
                     </button>
