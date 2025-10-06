@@ -8,7 +8,6 @@ import { FiSave, FiX } from "react-icons/fi";
 interface ProductFormProps {
     product: Product | null;
     onSuccess: () => void;
-    // Prop 'onClear' foi renomeada para 'onClose' para maior clareza
     onClose: () => void; 
 }
 
@@ -67,16 +66,16 @@ export default function ProductForm({ product, onSuccess, onClose }: ProductForm
     const labelBaseStyle = "block text-sm font-medium text-slate-700";
 
     return (
-        <div className="bg-white rounded-xl shadow-lg p-6 relative">
+        <div className="relative p-6 bg-white shadow-lg rounded-xl">
             <button 
                 onClick={onClose}
-                className="lg:hidden absolute top-4 right-4 text-slate-500 hover:text-rose-600 transition-colors z-10"
+                className="absolute z-10 transition-colors lg:hidden top-4 right-4 text-slate-500 hover:text-rose-600"
                 aria-label="Fechar formulário"
             >
                 <FiX size={24} />
             </button>
 
-            <h2 className="text-2xl font-bold text-slate-800 mb-6">
+            <h2 className="mb-6 text-2xl font-bold text-slate-800">
                 {product ? 'Editar Produto' : 'Adicionar Novo Produto'}
             </h2>
 
@@ -91,7 +90,7 @@ export default function ProductForm({ product, onSuccess, onClose }: ProductForm
                     <textarea id="description" placeholder="Uma breve descrição do produto" className={inputBaseStyle} value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={3} />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                     <div>
                         <label htmlFor="price" className={labelBaseStyle}>Preço (R$)</label>
                         <input id="price" type="number" step="0.01" min="0" className={inputBaseStyle} value={formData.price} onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })} required />
@@ -115,11 +114,11 @@ export default function ProductForm({ product, onSuccess, onClose }: ProductForm
                     </select>
                 </div>
 
-                <div className="flex justify-end space-x-3 pt-4">
-                    <button type="button" onClick={onClose} className="flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-lg text-sm font-bold text-slate-700 hover:bg-slate-50 transition-colors">
+                <div className="flex justify-end pt-4 space-x-3">
+                    <button type="button" onClick={onClose} className="flex items-center gap-2 px-4 py-2 text-sm font-bold transition-colors border rounded-lg border-slate-300 text-slate-700 hover:bg-slate-50">
                         <span>Cancelar</span>
                     </button>
-                    <button type="submit" disabled={loading} className="flex items-center gap-2 px-5 py-2 bg-teal-500 text-white font-bold rounded-lg hover:bg-teal-600 transition-colors disabled:bg-slate-400">
+                    <button type="submit" disabled={loading} className="flex items-center gap-2 px-5 py-2 font-bold text-white transition-colors bg-teal-500 rounded-lg hover:bg-teal-600 disabled:bg-slate-400">
                         <FiSave />
                         <span>{loading ? 'Salvando...' : (product ? 'Atualizar' : 'Cadastrar')}</span>
                     </button>
