@@ -29,45 +29,55 @@ const getStatusBadgeStyle = (status: OrderStatus) => {
 
 export default function OrderCard({ order, onUpdateStatus, onDelete, isAdmin, deletingOrderId }: OrderCardProps) {
     const [isUpdating, setIsUpdating] = useState(false);
-    
+
     const getStatusOptions = (currentStatus: OrderStatus) => {
         const options: { value: OrderStatus; label: string; icon: React.ReactNode, color: string; }[] = [];
         switch (currentStatus) {
             case 'pendente':
-                options.push({ value: 'preparando', label: 'Preparar', icon: <FiPlay/>, color: 'bg-yellow-500 hover:bg-yellow-600' });
+                options.push({ value: 'preparando', label: 'Preparar', icon: <FiPlay />, color: 'bg-yellow-500 hover:bg-yellow-600' });
                 break;
             case 'preparando':
-                options.push({ value: 'concluido', label: 'Concluir', icon: <FiCheck/>, color: 'bg-blue-500 hover:bg-blue-600' });
-                options.push({ value: 'pagamento pendente', label: 'Aguardar Pag.', icon: <FiClock/>, color: 'bg-orange-500 hover:bg-orange-600' });
+                options.push({ value: 'concluido', label: 'Concluir', icon: <FiCheck />, color: 'bg-blue-500 hover:bg-blue-600' });
+                options.push({ value: 'pagamento pendente', label: 'Aguardar Pag.', icon: <FiClock />, color: 'bg-orange-500 hover:bg-orange-600' });
                 break;
             case 'pagamento pendente':
-                options.push({ value: 'pago', label: 'Pago', icon: <FiDollarSign/>, color: 'bg-green-500 hover:bg-green-600' });
-                options.push({ value: 'não pago', label: 'Não Pago', icon: <FiAlertCircle/>, color: 'bg-slate-500 hover:bg-slate-600' });
+                options.push({ value: 'pago', label: 'Pago', icon: <FiDollarSign />, color: 'bg-green-500 hover:bg-green-600' });
+                options.push({ value: 'não pago', label: 'Não Pago', icon: <FiAlertCircle />, color: 'bg-slate-500 hover:bg-slate-600' });
                 break;
             case 'não pago':
-                options.push({ value: 'pago', label: 'Marcar como Pago', icon: <FiDollarSign/>, color: 'bg-green-500 hover:bg-green-600' });
+                options.push({ value: 'pago', label: 'Marcar como Pago', icon: <FiDollarSign />, color: 'bg-green-500 hover:bg-green-600' });
                 break;
             case 'pago':
-                options.push({ value: 'não pago', label: 'Não Pago', icon: <FiAlertCircle/>, color: 'bg-slate-500 hover:bg-slate-600' });
-                options.push({ value: 'concluido', label: 'Concluir', icon: <FiCheck/>, color: 'bg-blue-500 hover:bg-blue-600' });
+                options.push({ value: 'não pago', label: 'Não Pago', icon: <FiAlertCircle />, color: 'bg-slate-500 hover:bg-slate-600' });
+                options.push({ value: 'concluido', label: 'Concluir', icon: <FiCheck />, color: 'bg-blue-500 hover:bg-blue-600' });
                 break;
             case 'concluido':
-                options.push({ value: 'não pago', label: 'Não Pago', icon: <FiAlertCircle/>, color: 'bg-slate-500 hover:bg-slate-600' });
-                options.push({ value: 'entregue', label: 'Entregar', icon: <FiTruck/>, color: 'bg-teal-500 hover:bg-teal-600' });
+                options.push({ value: 'não pago', label: 'Não Pago', icon: <FiAlertCircle />, color: 'bg-slate-500 hover:bg-slate-600' });
+                options.push({ value: 'entregue', label: 'Entregar', icon: <FiTruck />, color: 'bg-teal-500 hover:bg-teal-600' });
                 break;
         }
-        if(currentStatus !== 'cancelado' && currentStatus !== 'entregue') {
-             options.push({ value: 'cancelado', label: 'Cancelar', icon: <FiX/>, color: 'bg-rose-500 hover:bg-rose-600' });
+        if (currentStatus !== 'cancelado' && currentStatus !== 'entregue') {
+            options.push({ value: 'cancelado', label: 'Cancelar', icon: <FiX />, color: 'bg-rose-500 hover:bg-rose-600' });
         }
         return options;
     };
-    
+
+    const getCantinaName = (cantinaId: string) => {
+        switch (cantinaId) {
+            case 'criancas': return 'Crianças';
+            case 'jovens': return 'Jovens';
+            case 'irmas': return 'Irmãs';
+            case 'missoes': return 'Missões';
+            default: return 'Cantina Desconhecida';
+        }
+    };
+
     const handleStatusUpdate = async (newStatus: OrderStatus) => {
         setIsUpdating(true);
         await onUpdateStatus(order.id, newStatus);
         setIsUpdating(false);
     }
-    
+
     const handleSendReceipt = () => {
         if (!order.clientWhatsApp || !/^\d{10,13}$/.test(order.clientWhatsApp)) {
             toast.warn("Este cliente não possui um número de WhatsApp válido cadastrado.");
@@ -87,7 +97,9 @@ export default function OrderCard({ order, onUpdateStatus, onDelete, isAdmin, de
         <div className="flex flex-col justify-between h-full p-5 bg-white border shadow-md border-slate-200 rounded-xl">
             <div className="flex items-start justify-between gap-4 mb-3">
                 <div className="flex-1">
-                    <p className="text-sm text-slate-500">ID da Cantina: <span className="font-bold text-sky-600">{order.cantinaId}</span></p>
+                    {order.cantinaId && (
+                        <p className="text-sm text-slate-500">ID da Cantina: <span className="font-bold text-sky-600">{getCantinaName(order.cantinaId)}</span></p>
+                    )}
                     <p className="text-sm text-slate-500">Pedido <span className="font-bold text-sky-600">#{order.id.slice(0, 5).toUpperCase()}</span></p>
                     <h3 className="text-lg font-bold text-slate-800">{order.clientName}</h3>
                 </div>
@@ -97,16 +109,16 @@ export default function OrderCard({ order, onUpdateStatus, onDelete, isAdmin, de
             </div>
 
             <div className="py-3 my-3 space-y-2 text-sm border-t border-b text-slate-600 border-slate-100">
-                <div className="flex items-center gap-2"><FiClock size={14}/><span>{format(order.createdAt, "dd/MM/yyyy 'às' HH:mm")}</span></div>
-                <div className="flex items-center gap-2"><FiDollarSign size={14}/><span>{order.paymentMethod.charAt(0).toUpperCase() + order.paymentMethod.slice(1)}</span></div>
+                <div className="flex items-center gap-2"><FiClock size={14} /><span>{format(order.createdAt, "dd/MM/yyyy 'às' HH:mm")}</span></div>
+                <div className="flex items-center gap-2"><FiDollarSign size={14} /><span>{order.paymentMethod.charAt(0).toUpperCase() + order.paymentMethod.slice(1)}</span></div>
                 {order.clientWhatsApp && (
                     <div className="flex items-center gap-2">
-                        <FiPhone size={14}/>
+                        <FiPhone size={14} />
                         <a onClick={handleSendReceipt} className="font-medium cursor-pointer hover:underline text-sky-600">Contatar via WhatsApp</a>
                     </div>
                 )}
             </div>
-            
+
             <div className="flex-grow">
                 <h4 className='mb-2 text-sm font-semibold text-slate-800'>Itens:</h4>
                 <ul className='space-y-1 text-sm'>
@@ -124,18 +136,18 @@ export default function OrderCard({ order, onUpdateStatus, onDelete, isAdmin, de
                     <span className="font-medium text-slate-600">Total:</span>
                     <span className='text-xl font-bold text-slate-900'>R$ {order.total.toFixed(2).replace('.', ',')}</span>
                 </div>
-                
+
                 <div className="mb-3">
-                     <button onClick={handleSendReceipt} className="flex items-center justify-center w-full gap-2 px-4 py-2 font-bold text-green-600 transition-colors border-2 border-green-500 rounded-lg hover:bg-green-50">
-                        <FiSend/>
+                    <button onClick={handleSendReceipt} className="flex items-center justify-center w-full gap-2 px-4 py-2 font-bold text-green-600 transition-colors border-2 border-green-500 rounded-lg hover:bg-green-50">
+                        <FiSend />
                         <span>Enviar Recibo</span>
                     </button>
                 </div>
 
                 <div className='flex flex-wrap justify-end gap-2'>
                     {isUpdating ? (
-                         <button className="flex items-center justify-center w-full gap-2 px-4 py-2 font-bold rounded-lg cursor-wait bg-slate-200 text-slate-500" disabled>
-                            <FiLoader className="animate-spin"/> Atualizando...
+                        <button className="flex items-center justify-center w-full gap-2 px-4 py-2 font-bold rounded-lg cursor-wait bg-slate-200 text-slate-500" disabled>
+                            <FiLoader className="animate-spin" /> Atualizando...
                         </button>
                     ) : (
                         getStatusOptions(order.status).map((option) => (
@@ -145,14 +157,14 @@ export default function OrderCard({ order, onUpdateStatus, onDelete, isAdmin, de
                         ))
                     )}
                 </div>
-                
-                 {isAdmin && (
+
+                {isAdmin && (
                     <div className='mt-3 text-right'>
                         <button onClick={() => onDelete(order.id)} disabled={deletingOrderId === order.id || order.status === 'cancelado'} className='text-xs text-rose-500 hover:underline disabled:opacity-50'>
                             {deletingOrderId === order.id ? 'Excluindo...' : 'Excluir Pedido'}
                         </button>
                     </div>
-                 )}
+                )}
             </div>
         </div>
     );
