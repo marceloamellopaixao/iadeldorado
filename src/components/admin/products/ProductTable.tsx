@@ -7,11 +7,15 @@ import { useProductsAdmin } from "@/hooks/useProductsAdmin";
 import { toast } from "react-toastify";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
 
+type StatusFilterType = 'ativos' | 'inativos' | 'todos';
+
 interface ProductTableProps {
     onEdit: (product: Product) => void;
+    status: StatusFilterType;
 }
 
-export default function ProductTable({ onEdit }: ProductTableProps) {
+
+export default function ProductTable({ onEdit, status }: ProductTableProps) {
     const { userData } = useAuth();
     const { products, loading } = useProductsAdmin();
 
@@ -26,31 +30,47 @@ export default function ProductTable({ onEdit }: ProductTableProps) {
         }
     };
 
+    const filteredProducts = products.filter(product => {
+        if (status === 'todos') return true;
+        if (status === 'ativos') return product.status === true;
+        if (status === 'inativos') return product.status === false;
+        return true;
+    })
+
     if (loading) {
         return <LoadingSpinner message="Carregando produtos..." />;
     }
 
-    if (products.length === 0) {
+    // Mensagem para quando não há produtos após filtrar
+    if (products.length > 0 && filteredProducts.length === 0) {
         return (
-            <div className="bg-white rounded-xl shadow-md p-8 text-center text-slate-500">
+            <div className="p-8 text-center bg-white shadow-md rounded-xl text-slate-500">
+                <p>Nenhum produto encontrado com o filtro selecionado.</p>
+            </div>
+        );
+    }
+
+    if (filteredProducts.length === 0) {
+        return (
+            <div className="p-8 text-center bg-white shadow-md rounded-xl text-slate-500">
                 <p>Nenhum produto cadastrado ainda.</p>
-                <p className="text-sm mt-2">Use o formulário ao lado para adicionar o primeiro produto.</p>
+                <p className="mt-2 text-sm">Use o formulário ao lado para adicionar o primeiro produto.</p>
             </div>
         );
     }
 
     return (
         // Grade responsiva, otimizada para o layout de 2 colunas do admin
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {products.map((product) => (
-                <div 
-                    key={product.id} 
-                    className="bg-white border border-slate-200 rounded-xl shadow-md p-5 flex flex-col justify-between h-full transition-shadow hover:shadow-lg"
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            {filteredProducts.map((product) => (
+                <div
+                    key={product.id}
+                    className="flex flex-col justify-between h-full p-5 transition-shadow bg-white border shadow-md border-slate-200 rounded-xl hover:shadow-lg"
                 >
                     {/* Corpo do Card */}
                     <div className="flex-grow">
-                        <div className="flex justify-between items-start mb-2 gap-3">
-                            <h3 className="text-slate-900 text-lg font-bold">{product.name}</h3>
+                        <div className="flex items-start justify-between gap-3 mb-2">
+                            <h3 className="text-lg font-bold text-slate-900">{product.name}</h3>
                             <span className={`px-2.5 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${product.status ? 'bg-green-100 text-green-800' : 'bg-slate-200 text-slate-800'}`}>
                                 {product.status ? 'Ativo' : 'Inativo'}
                             </span>
@@ -62,8 +82,8 @@ export default function ProductTable({ onEdit }: ProductTableProps) {
 
                     {/* Rodapé do Card */}
                     <div>
-                        <div className="flex justify-between items-baseline mb-5">
-                            <p className="text-slate-900 font-black text-xl">
+                        <div className="flex items-baseline justify-between mb-5">
+                            <p className="text-xl font-black text-slate-900">
                                 R$ {product.price.toFixed(2).replace('.', ',')}
                             </p>
                             <p className={`text-sm font-semibold ${product.stock <= 0 ? 'text-rose-500' : 'text-slate-600'}`}>
@@ -72,10 +92,10 @@ export default function ProductTable({ onEdit }: ProductTableProps) {
                         </div>
 
                         {/* Botões de Ação com alto contraste */}
-                        <div className="flex justify-end gap-3 border-t border-slate-100 pt-4">
+                        <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
                             <button
                                 onClick={() => onEdit(product)}
-                                className="flex items-center justify-center gap-2 flex-1 px-4 py-2 bg-sky-600 text-white font-bold rounded-lg hover:bg-sky-700 transition-colors"
+                                className="flex items-center justify-center flex-1 gap-2 px-4 py-2 font-bold text-white transition-colors rounded-lg bg-sky-600 hover:bg-sky-700"
                                 title="Editar Produto"
                             >
                                 <FiEdit size={16} />
@@ -84,7 +104,7 @@ export default function ProductTable({ onEdit }: ProductTableProps) {
                             {userData?.role === "admin" && (
                                 <button
                                     onClick={() => handleDelete(product.id)}
-                                    className="flex items-center justify-center gap-2 flex-1 px-4 py-2 bg-rose-600 text-white font-bold rounded-lg hover:bg-rose-700 transition-colors"
+                                    className="flex items-center justify-center flex-1 gap-2 px-4 py-2 font-bold text-white transition-colors rounded-lg bg-rose-600 hover:bg-rose-700"
                                     title="Excluir Produto"
                                 >
                                     <FiTrash2 size={16} />
