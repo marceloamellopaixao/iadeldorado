@@ -9,7 +9,16 @@ export default function App({ Component, pageProps }: AppProps) {
     <AuthProvider>
       <MainLayout>
         <Component {...pageProps} />
-        <ToastContainer />
+        <ToastContainer
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="colored"
+        />
       </MainLayout>
     </AuthProvider>
   );
