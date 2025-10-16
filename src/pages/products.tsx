@@ -7,7 +7,7 @@ import { useProducts } from '@/hooks/useProducts';
 import CartPreview from '@/components/common/CartPreview';
 import Button from '@/components/common/ButtonRouter';
 import Head from 'next/head';
-import { FiShoppingCart, FiInfo, FiFrown, FiCheckCircle, FiArrowRight } from 'react-icons/fi';
+import { FiShoppingCart, FiInfo, FiFrown, FiCheckCircle, FiArrowRight, FiAlertTriangle } from 'react-icons/fi';
 
 function ProductsPage() {
     const { products, loading } = useProducts();
@@ -27,11 +27,10 @@ function ProductsPage() {
                 <meta name="description" content="Lista de produtos disponíveis na cantina da IAD Eldorado." />
             </Head>
 
-            {/* A tag <main> foi removida daqui. O conteúdo agora é renderizado diretamente dentro do <main> do MainLayout. */}
-            <div className="container mx-auto p-4 md:p-8">
+            <div className="container p-4 mx-auto">
 
                 {/* Barra de Título e Ações */}
-                <div className="flex flex-wrap justify-between items-center mb-8 gap-4">
+                <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
                     <h1 className="text-3xl font-bold text-slate-800">Nossos Produtos</h1>
                     <div className='flex items-center justify-center gap-3'>
                         <Button
@@ -54,12 +53,12 @@ function ProductsPage() {
 
                         <button
                             onClick={() => setShowCart(true)}
-                            className="relative flex items-center justify-center p-3 bg-white border border-slate-200 rounded-lg shadow-sm hover:bg-slate-100 transition-colors"
+                            className="relative flex items-center justify-center p-3 transition-colors bg-white border rounded-lg shadow-sm border-slate-200 hover:bg-slate-100"
                             aria-label={`Ver carrinho com ${totalItemsInCart} itens`}
                         >
                             <FiShoppingCart size={24} className="text-sky-700" />
                             {totalItemsInCart > 0 && (
-                                <span className="absolute -top-2 -right-2 bg-rose-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center">
+                                <span className="absolute flex items-center justify-center w-6 h-6 text-xs font-bold text-white rounded-full -top-2 -right-2 bg-rose-500">
                                     {totalItemsInCart}
                                 </span>
                             )}
@@ -68,14 +67,14 @@ function ProductsPage() {
                 </div>
 
                 {/* Mensagem Informativa */}
-                <div className='mb-8 flex items-center justify-center gap-3 bg-sky-100 text-sky-800 p-3 rounded-lg'>
+                <div className='flex items-center justify-center gap-3 p-3 mb-8 rounded-lg bg-sky-100 text-sky-800'>
                     <FiInfo size={20} />
-                    <h4 className='font-medium text-center text-sm'>A quantidade de cada produto é ajustada na tela de finalização.</h4>
+                    <h4 className='text-sm font-medium text-center'>A quantidade de cada produto é ajustada na tela de finalização.</h4>
                 </div>
 
                 {/* Notificação de Adicionar ao Carrinho */}
                 {notification.visible && (
-                    <div className="fixed top-24 right-4 bg-teal-500 text-white px-5 py-3 rounded-lg shadow-lg flex items-center gap-3 z-50">
+                    <div className="fixed z-50 flex items-center gap-3 px-5 py-3 text-white bg-teal-500 rounded-lg shadow-lg right-24 top-48 animate-slide-in">
                         <FiCheckCircle size={22} />
                         <span>{notification.message}</span>
                     </div>
@@ -91,21 +90,28 @@ function ProductsPage() {
                 )}
 
                 {/* Grade de Produtos */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {products.map(product => {
-                        const cartItem = cartItems.find(item => item.id === product.id);
-                        const quantityInCart = cartItem ? cartItem.quantity : 0;
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    {products == null || products.length === 0 ? (
+                        <div className="p-6 text-center bg-white border rounded-lg shadow-sm col-span-full border-slate-200">
+                            <FiAlertTriangle size={48} className="mx-auto text-black-400" />
+                            <p className="mt-2 text-sm text-slate-500">Todos os produtos estão indisponíveis no momento.</p>
+                        </div>
+                    ) : (
+                        products.map(product => {
+                            const cartItem = cartItems.find(item => item.id === product.id);
+                            const quantityInCart = cartItem ? cartItem.quantity : 0;
 
-                        return (
-                            <ProductCard
-                                key={product.id}
-                                product={product}
-                                onAddToCart={(product, quantity) => addToCart(product, quantity)}
-                                isInCart={isInCart(product.id!)}
-                                quantityInCart={quantityInCart}
-                            />
-                        );
-                    })}
+                            return (
+                                <ProductCard
+                                    key={product.id}
+                                    product={product}
+                                    onAddToCart={(product, quantity) => addToCart(product, quantity)}
+                                    isInCart={isInCart(product.id!)}
+                                    quantityInCart={quantityInCart}
+                                />
+                            );
+                        })
+                    )}
                 </div>
             </div>
         </>
