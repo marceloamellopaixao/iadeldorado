@@ -6,7 +6,11 @@ import LoadingSpinner from "../../common/LoadingSpinner";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProductsAdmin } from "@/hooks/useProductsAdmin";
 import { db } from "@/lib/firebase";
-import { deleteProductFromSupabaseTable, deleteProductImage } from "@/lib/supabaseProducts";
+import {
+    deleteProductFromSupabaseTable,
+    deleteProductImage,
+    deleteProductStorageFolder,
+} from "@/lib/supabaseProducts";
 import { Product } from "@/types/product";
 import { getTierBadgeText } from "@/utils/pricing";
 
@@ -25,9 +29,14 @@ export default function ProductTable({ onEdit, status }: ProductTableProps) {
         if (!confirm("Tem certeza que deseja excluir este produto?")) return;
         try {
             try {
-                await deleteProductImage(product.imagePath);
+                await deleteProductImage(product.imagePath, product.imageUrl);
             } catch (storageError) {
                 console.warn("Falha ao remover imagem no Supabase Storage:", storageError);
+            }
+            try {
+                await deleteProductStorageFolder(product.id);
+            } catch (folderError) {
+                console.warn("Falha ao remover pasta de arquivos do produto no Supabase Storage:", folderError);
             }
             try {
                 await deleteProductFromSupabaseTable(product.id);
