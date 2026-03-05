@@ -39,3 +39,32 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
 # iadeldorado-cantina
+
+## Variaveis de ambiente (Supabase)
+
+Para habilitar upload de fotos dos produtos (admin/vendedor), configure:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+NEXT_PUBLIC_SUPABASE_PRODUCTS_BUCKET=cardapio
+NEXT_PUBLIC_SUPABASE_PRODUCTS_TABLE=cardapio
+```
+
+Crie no Supabase Storage um bucket com o mesmo nome (`cardapio`, ou o nome definido na variavel acima) e libere politica de upload/leitura para os usuarios autenticados conforme sua regra de seguranca.
+
+Exemplo de estrutura minima da tabela `cardapio` no Supabase:
+
+```sql
+create table if not exists public.cardapio (
+  id text primary key,
+  name text not null,
+  description text,
+  price numeric not null default 0,
+  category text not null,
+  stock integer not null default 0,
+  status boolean not null default true,
+  image_url text,
+  updated_at timestamptz default now()
+);
+```

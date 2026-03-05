@@ -59,7 +59,7 @@ export default function UserDetailsForm({ initialData }: UserDetailsFormProps) {
                 <input id="email" type="email" value={formData.email} className={`${inputBaseStyle} bg-slate-200 cursor-not-allowed`} disabled />
             </div>
             <div className="pt-2">
-                <button type="submit" disabled={loading} className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-sky-600 text-white font-bold rounded-lg hover:bg-sky-700 transition-colors disabled:bg-slate-400">
+                <button type="submit" disabled={loading} className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-sky-600 text-white font-bold rounded-lg hover:bg-sky-500 transition-colors disabled:bg-slate-400">
                     {loading ? (
                         <>
                             <FiLoader className="animate-spin" />

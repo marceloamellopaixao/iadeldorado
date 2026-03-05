@@ -61,7 +61,7 @@ export default function UserForm({ user, onSuccess, onClose }: UserFormProps) {
     const labelBaseStyle = "block text-sm font-medium text-slate-700";
 
     return (
-        <div className="bg-white rounded-xl shadow-lg p-6 relative">
+        <div className="relative rounded-2xl border border-[#e7d8be] bg-[#fffdf7] p-6 shadow-sm">
             <button onClick={onClose} className="lg:hidden absolute top-4 right-4 text-slate-500 hover:text-rose-600 transition-colors z-10" aria-label="Fechar formulário">
                 <FiX size={24} />
             </button>
@@ -93,7 +93,7 @@ export default function UserForm({ user, onSuccess, onClose }: UserFormProps) {
                     <button type="button" onClick={onClose} className="flex items-center gap-2 px-4 py-2 border border-slate-300 rounded-lg text-sm font-bold text-slate-700 hover:bg-slate-50 transition-colors">
                         <span>Cancelar</span>
                     </button>
-                    <button type="submit" disabled={loading} className="flex items-center gap-2 px-5 py-2 bg-teal-500 text-white font-bold rounded-lg hover:bg-teal-600 transition-colors disabled:bg-slate-400">
+                    <button type="submit" disabled={loading} className="flex items-center gap-2 px-5 py-2 bg-sky-600 text-white font-bold rounded-lg hover:bg-sky-500 transition-colors disabled:bg-slate-400">
                         <FiSave />
                         <span>{loading ? 'Salvando...' : (user ? 'Atualizar' : 'Cadastrar')}</span>
                     </button>

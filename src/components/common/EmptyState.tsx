@@ -1,11 +1,10 @@
-export default function EmptyState({ message }: { message: string }) {
-    return (
-        <div className="container mx-auto p-4">
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-                {message}
-                <button onClick={() => { }} className="float-right font-bold">X</button>
-            </div>
-        </div>
-    );
-}
+import { FiInbox } from "react-icons/fi";
 
+export default function EmptyState({ message }: { message: string }) {
+  return (
+    <div className="rounded-2xl border border-[#e7d8be] bg-[#fffdf7] p-8 text-center shadow-sm">
+      <FiInbox className="mx-auto mb-3 text-3xl text-[#8b5e34]" />
+      <p className="text-sm font-medium text-[#5f3711]">{message}</p>
+    </div>
+  );
+}

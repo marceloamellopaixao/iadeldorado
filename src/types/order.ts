@@ -1,54 +1,62 @@
+﻿import { PricingTier } from "./product";
+
 export interface CartItem {
-    id: string;
-    name: string;
-    price: number;
-    quantity: number;
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  pricingTiers?: PricingTier[];
+  lineTotal?: number;
 }
 
-export type PixType =
-    | 'cpf'
-    | 'cnpj'
-    | 'email'
-    | 'celular'
-    | 'aleatorio';
+export type PixType = "cpf" | "cnpj" | "email" | "celular" | "aleatorio";
 
 export interface PixDetails {
-
-    name: string; // "Cantina das Crianças"
-    keyType: PixType; // Tipo da chave Pix
-    key: string; // Chave Pix
-    owner: string; // Nome do proprietário da chave
+  name: string;
+  keyType: PixType;
+  key: string;
+  owner: string;
 }
 
 export type OrderStatus =
-    | 'pendente'
-    | 'preparando'
-    | 'concluido'
-    | 'entregue'
-    | 'cancelado'
-    | 'pagamento pendente'
-    | 'pago'
-    | 'não pago';
+  | "pendente"
+  | "preparando"
+  | "concluido"
+  | "entregue"
+  | "cancelado"
+  | "pagamento pendente"
+  | "pago"
+  | "nao pago"
+  | "não pago"
+  | "nÃ£o pago"
+  | "nÃƒÂ£o pago";
 
 export type PaymentType =
-    | 'dinheiro'
-    | 'pix'
-    | 'cartão de crédito'
-    | 'cartão de débito';
+  | "dinheiro"
+  | "pix"
+  | "credito"
+  | "debito"
+  | "cartao de credito"
+  | "cartao de debito"
+  | "cartão de crédito"
+  | "cartão de débito"
+  | "cartÃ£o de crÃ©dito"
+  | "cartÃ£o de dÃ©bito";
 
 export interface Order {
-    id: string; // ID do pedido (opcional, pois pode ser gerado automaticamente pelo Firestore)
-    clientName: string; // Nome do cliente
-    clientWhatsApp: string; // Número do WhatsApp do cliente formatado: 21912345678
-    items: CartItem[]; // Itens do pedido
-    total: number; // Valor total do pedido
-    paymentMethod: PaymentType; // Método de pagamento
-    selectedPix?: PixDetails; // Detalhes do pagamento via Pix (opcional)
-    status: OrderStatus; // Status do pedido
-    userId: string | null; // ID do usuário que fez o pedido (opcional, se o usuário estiver logado)
-    createdAt: Date; // Data de criação do pedido
-    updatedAt?: Date; // Data de atualização do pedido
-    lastOrderId?: string; // ID do último pedido (opcional, se o usuário estiver deslogado)
-    lastOrderPhone?: string; // Número do último pedido (opcional, se o usuário estiver deslogado)
-    cantinaId: string; // ID da cantina ativa no momento da compra
+  id: string;
+  clientName: string;
+  clientWhatsApp: string;
+  items: CartItem[];
+  total: number;
+  paymentMethod: PaymentType;
+  selectedPix?: PixDetails;
+  status: OrderStatus;
+  userId: string | null;
+  createdAt: Date;
+  updatedAt?: Date;
+  lastOrderId?: string;
+  lastOrderPhone?: string;
+  cantinaId: string;
 }
+

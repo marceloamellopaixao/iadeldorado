@@ -1,119 +1,117 @@
 import { deleteDoc, doc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
-import { Product } from "@/types/product";
+import Image from "next/image";
+import { FiEdit, FiTrash2 } from "react-icons/fi";
+import { toast } from "react-toastify";
 import LoadingSpinner from "../../common/LoadingSpinner";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProductsAdmin } from "@/hooks/useProductsAdmin";
-import { toast } from "react-toastify";
-import { FiEdit, FiTrash2 } from "react-icons/fi";
+import { db } from "@/lib/firebase";
+import { deleteProductFromSupabaseTable, deleteProductImage } from "@/lib/supabaseProducts";
+import { Product } from "@/types/product";
+import { getTierBadgeText } from "@/utils/pricing";
 
-type StatusFilterType = 'ativos' | 'inativos' | 'todos';
+type StatusFilterType = "ativos" | "inativos" | "todos";
 
 interface ProductTableProps {
     onEdit: (product: Product) => void;
     status: StatusFilterType;
 }
 
-
 export default function ProductTable({ onEdit, status }: ProductTableProps) {
     const { userData } = useAuth();
     const { products, loading } = useProductsAdmin();
 
-    const handleDelete = async (id: string) => {
-        if (!confirm("Tem certeza que deseja excluir este produto? A ação é irreversível.")) return;
+    const handleDelete = async (product: Product) => {
+        if (!confirm("Tem certeza que deseja excluir este produto?")) return;
         try {
-            await deleteDoc(doc(db, "products", id));
-            toast.success("Produto excluído com sucesso!");
-        } catch (error) {
-            console.error("Erro ao excluir produto:", error);
-            toast.error("Não foi possível excluir o produto.");
+            try {
+                await deleteProductImage(product.imagePath);
+            } catch (storageError) {
+                console.warn("Falha ao remover imagem no Supabase Storage:", storageError);
+            }
+            try {
+                await deleteProductFromSupabaseTable(product.id);
+            } catch (tableError) {
+                console.warn("Falha ao remover produto na tabela do Supabase:", tableError);
+            }
+            await deleteDoc(doc(db, "products", product.id));
+            toast.success("Produto excluido com sucesso!");
+        } catch {
+            toast.error("Nao foi possivel excluir o produto.");
         }
     };
 
-    const filteredProducts = products.filter(product => {
-        if (status === 'todos') return true;
-        if (status === 'ativos') return product.status === true;
-        if (status === 'inativos') return product.status === false;
+    const filteredProducts = products.filter((product) => {
+        if (status === "todos") return true;
+        if (status === "ativos") return product.status === true;
+        if (status === "inativos") return product.status === false;
         return true;
-    })
+    });
 
     if (loading) {
         return <LoadingSpinner message="Carregando produtos..." />;
     }
 
-    // Mensagem para quando não há produtos após filtrar
     if (products.length > 0 && filteredProducts.length === 0) {
-        return (
-            <div className="p-8 text-center bg-white shadow-md rounded-xl text-slate-500">
-                <p>Nenhum produto encontrado com o filtro selecionado.</p>
-            </div>
-        );
+        return <div className="cantina-panel p-8 text-center text-slate-500">Nenhum produto encontrado com o filtro selecionado.</div>;
     }
 
     if (filteredProducts.length === 0) {
         return (
-            <div className="p-8 text-center bg-white shadow-md rounded-xl text-slate-500">
+            <div className="cantina-panel p-8 text-center text-slate-500">
                 <p>Nenhum produto cadastrado ainda.</p>
-                <p className="mt-2 text-sm">Use o formulário ao lado para adicionar o primeiro produto.</p>
+                <p className="mt-2 text-sm">Use o formulario ao lado para adicionar o primeiro produto.</p>
             </div>
         );
     }
 
     return (
-        // Grade responsiva, otimizada para o layout de 2 colunas do admin
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             {filteredProducts.map((product) => (
-                <div
-                    key={product.id}
-                    className="flex flex-col justify-between h-full p-5 transition-shadow bg-white border shadow-md border-slate-200 rounded-xl hover:shadow-lg"
-                >
-                    {/* Corpo do Card */}
+                <article key={product.id} className="flex h-full flex-col justify-between rounded-2xl border border-[#e7d8be] bg-[#fffdf7] p-5 shadow-sm">
                     <div className="flex-grow">
-                        <div className="flex items-start justify-between gap-3 mb-2">
+                        <div className="relative mb-4 h-28 overflow-hidden rounded-xl border border-[#e7d8be] bg-[#f8f2e6]">
+                            {product.imageUrl ? (
+                                <Image src={product.imageUrl} alt={product.name} fill className="object-cover" unoptimized />
+                            ) : (
+                                <div className="flex h-full items-center justify-center text-xs font-bold tracking-[0.12em] text-[#8b5e34]">SEM FOTO</div>
+                            )}
+                        </div>
+
+                        <div className="mb-2 flex items-start justify-between gap-3">
                             <h3 className="text-lg font-bold text-slate-900">{product.name}</h3>
-                            <span className={`px-2.5 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${product.status ? 'bg-green-100 text-green-800' : 'bg-slate-200 text-slate-800'}`}>
-                                {product.status ? 'Ativo' : 'Inativo'}
+                            <span className={`whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold ${product.status ? "bg-green-100 text-green-800" : "bg-slate-200 text-slate-800"}`}>
+                                {product.status ? "Ativo" : "Inativo"}
                             </span>
                         </div>
-                        <p className="text-slate-600 text-sm mb-4 min-h-[40px]">
-                            {product.description || "Sem descrição."}
-                        </p>
+                        <p className="mb-4 min-h-[40px] text-sm text-slate-600">{product.description || "Sem descricao."}</p>
+                        {(product.pricingTiers || []).length > 0 && (
+                            <p className="mb-3 text-xs font-bold text-[#8b5e34]">
+                                Oferta: {(product.pricingTiers || []).map(getTierBadgeText).join(" | ")}
+                            </p>
+                        )}
                     </div>
 
-                    {/* Rodapé do Card */}
                     <div>
-                        <div className="flex items-baseline justify-between mb-5">
-                            <p className="text-xl font-black text-slate-900">
-                                R$ {product.price.toFixed(2).replace('.', ',')}
-                            </p>
-                            <p className={`text-sm font-semibold ${product.stock <= 0 ? 'text-rose-500' : 'text-slate-600'}`}>
-                                Estoque: {product.stock}
-                            </p>
+                        <div className="mb-5 flex items-baseline justify-between">
+                            <p className="text-xl font-black text-slate-900">R$ {product.price.toFixed(2).replace(".", ",")}</p>
+                            <p className={`text-sm font-semibold ${product.stock <= 0 ? "text-rose-500" : "text-slate-600"}`}>Estoque: {product.stock}</p>
                         </div>
 
-                        {/* Botões de Ação com alto contraste */}
-                        <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
-                            <button
-                                onClick={() => onEdit(product)}
-                                className="flex items-center justify-center flex-1 gap-2 px-4 py-2 font-bold text-white transition-colors rounded-lg bg-sky-600 hover:bg-sky-700"
-                                title="Editar Produto"
-                            >
+                        <div className="mt-4 flex justify-end gap-3 border-t border-slate-200 pt-4">
+                            <button onClick={() => onEdit(product)} className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-sky-600 px-4 py-2 font-bold text-white hover:bg-sky-500" title="Editar Produto">
                                 <FiEdit size={16} />
                                 <span>Editar</span>
                             </button>
                             {userData?.role === "admin" && (
-                                <button
-                                    onClick={() => handleDelete(product.id)}
-                                    className="flex items-center justify-center flex-1 gap-2 px-4 py-2 font-bold text-white transition-colors rounded-lg bg-rose-600 hover:bg-rose-700"
-                                    title="Excluir Produto"
-                                >
+                                <button onClick={() => handleDelete(product)} className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-rose-600 px-4 py-2 font-bold text-white hover:bg-rose-500" title="Excluir Produto">
                                     <FiTrash2 size={16} />
                                     <span>Excluir</span>
                                 </button>
                             )}
                         </div>
                     </div>
-                </div>
+                </article>
             ))}
         </div>
     );

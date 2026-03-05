@@ -1,115 +1,115 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import Image from "next/image";
 import { Product } from "@/types/product";
-import { FiShoppingCart, FiSlash, FiMinus, FiPlus } from 'react-icons/fi';
+import { FiMinus, FiPlus, FiShoppingCart, FiSlash } from "react-icons/fi";
+import { calculateLineTotal, formatCurrencyBRL, getSavingsAmount, getTierBadgeText } from "@/utils/pricing";
 
 interface ProductCardProps {
-    product: Product;
-    onAddToCart: (product: Product, quantity: number) => void; 
-    isInCart: boolean;
-    // NOVA PROPRIEDADE: informa quantos deste item já estão no carrinho.
-    quantityInCart: number; 
+  product: Product;
+  onAddToCart: (product: Product, quantity: number) => void;
+  isInCart: boolean;
+  quantityInCart: number;
 }
 
 export function ProductCard({ product, onAddToCart, isInCart, quantityInCart }: ProductCardProps) {
-    const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState(1);
+  const availableStock = product.stock - quantityInCart;
+  const canAddToCart = availableStock > 0;
 
-    // Lógica de estoque corrigida.
-    const availableStock = product.stock - quantityInCart;
-    const canAddToCart = availableStock > 0;
+  useEffect(() => {
+    if (quantity > availableStock) {
+      setQuantity(Math.max(1, availableStock));
+    }
+    if (availableStock <= 0) {
+      setQuantity(1);
+    }
+  }, [availableStock, quantity]);
 
-    // Efeito para resetar ou ajustar a quantidade local se o estoque disponível mudar.
-    useEffect(() => {
-        // Garante que a quantidade selecionada nunca seja maior que o estoque disponível.
-        if (quantity > availableStock) {
-            setQuantity(Math.max(1, availableStock));
-        }
-        // Se, por alguma razão, o card iniciar com 0 disponível, seta a quantidade para 1 (mas o botão estará desabilitado).
-        if (availableStock <= 0) {
-            setQuantity(1);
-        }
-    }, [availableStock, quantity]);
+  const handleDecrement = () => setQuantity((prev) => Math.max(1, prev - 1));
+  const handleIncrement = () => setQuantity((prev) => Math.min(prev + 1, availableStock));
+  const lineTotal = calculateLineTotal(product.price, quantity, product.pricingTiers);
+  const savingsAmount = getSavingsAmount(product.price, quantity, product.pricingTiers);
 
+  const buttonStyle = !canAddToCart
+    ? "bg-slate-300 text-slate-500 cursor-not-allowed"
+    : "bg-sky-600 hover:bg-sky-500 text-white";
 
-    const handleDecrement = () => {
-        setQuantity((prev) => Math.max(1, prev - 1));
-    };
-
-    const handleIncrement = () => {
-        // Limita o incremento ao estoque REALMENTE disponível.
-        setQuantity((prev) => Math.min(prev + 1, availableStock));
-    };
-
-    const buttonBaseStyle = "w-full mt-4 py-2.5 font-bold rounded-lg transition-all duration-300 flex items-center justify-center gap-2 text-white transform hover:scale-105";
-
-    const buttonStyles = !canAddToCart
-        ? "bg-slate-300 text-slate-500 cursor-not-allowed"
-        : "bg-sky-600 hover:bg-sky-500";
-
-    return (
-        <div className="flex flex-col bg-white border border-slate-200 rounded-xl shadow-md p-4 justify-between transition-shadow duration-300 hover:shadow-xl">
-            <div className="flex-grow">
-                <h3 className="text-slate-800 text-lg font-bold mb-2">{product.name}</h3>
-                <div className="h-14 mb-4">
-                    <p className="text-slate-500 text-sm">{product.description || "Este produto não possui descrição."}</p>
-                </div>
+  return (
+    <article className="group flex h-full flex-col justify-between rounded-2xl border border-[#e7d8be] bg-[#fffdf7] p-5 shadow-[0_10px_25px_rgba(95,55,17,0.10)] transition hover:-translate-y-1 hover:shadow-[0_20px_35px_rgba(95,55,17,0.14)]">
+      <div>
+        <div className="relative mb-4 h-36 overflow-hidden rounded-xl border border-[#e7d8be] bg-[#f8f2e6]">
+          {product.imageUrl ? (
+            <Image src={product.imageUrl} alt={product.name} fill className="object-cover" unoptimized />
+          ) : (
+            <div className="flex h-full items-center justify-center text-xs font-bold tracking-[0.12em] text-[#8b5e34]">
+              FOTO PRODUTO
             </div>
-
-            <div className="mb-4">
-                <p className="text-slate-800 font-black text-xl mb-1">
-                    R$ {product.price.toFixed(2).replace('.', ',')}
-                </p>
-                {/* A mensagem de estoque agora considera o que já está no carrinho */}
-                <p className={`text-sm font-semibold ${!canAddToCart ? 'text-rose-500' : 'text-green-600'}`}>
-                    {product.stock <= 0 ? 'Produto esgotado' :
-                     !canAddToCart ? 'Você já adicionou todo o estoque' :
-                     `Disponível: ${availableStock}`}
-                </p>
-            </div>
-
-            {/* Seletor de Quantidade */}
-            <div className="flex items-center justify-center gap-4 mb-2">
-                <button 
-                    onClick={handleDecrement} 
-                    disabled={!canAddToCart || quantity <= 1}
-                    className="p-2 bg-slate-200 rounded-full text-slate-700 hover:bg-slate-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                    <FiMinus size={16} />
-                </button>
-                <span className="flex justify-center items-center text-xl font-bold text-slate-800 w-8 text-center">
-                    {canAddToCart ? quantity : <FiSlash />}
-                </span>
-                <button 
-                    onClick={handleIncrement} 
-                    disabled={!canAddToCart || quantity >= availableStock}
-                    className="p-2 bg-slate-200 rounded-full text-slate-700 hover:bg-slate-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                    <FiPlus size={16} />
-                </button>
-            </div>
-
-            {/* Botão de Ação Principal */}
-            <button
-                onClick={() => onAddToCart(product, quantity)}
-                disabled={!canAddToCart}
-                className={`${buttonBaseStyle} ${buttonStyles}`}
-            >
-                {!canAddToCart ? (
-                    <>
-                        <FiSlash size={20} />
-                        <span>Indisponível</span>
-                    </>
-                ) : isInCart ? (
-                    <>
-                        <FiPlus size={20} />
-                        <span>Adicionar mais {quantity}</span>
-                    </>
-                ) : (
-                    <>
-                        <FiShoppingCart size={20} />
-                        <span>Adicionar ao Carrinho</span>
-                    </>
-                )}
-            </button>
+          )}
         </div>
-    );
+        <h3 className="mb-2 text-lg font-bold text-slate-800">{product.name}</h3>
+        <p className="min-h-[40px] text-sm text-slate-600">{product.description || "Sem descricao."}</p>
+        {(product.pricingTiers || []).length > 0 && (
+          <p className="mt-2 text-xs font-bold text-[#8b5e34]">
+            Oferta: {(product.pricingTiers || []).map(getTierBadgeText).join(" | ")}
+          </p>
+        )}
+      </div>
+
+      <div className="mt-4">
+        <p className="text-sm font-semibold text-slate-600">Unitario: {formatCurrencyBRL(product.price)}</p>
+        <p className="text-xl font-black text-slate-800">Total atual: {formatCurrencyBRL(lineTotal)}</p>
+        {savingsAmount > 0 && <p className="text-xs font-bold text-[#8b5e34]">Voce economiza {formatCurrencyBRL(savingsAmount)}</p>}
+        <p className={`mt-1 text-sm font-semibold ${!canAddToCart ? "text-rose-500" : "text-slate-600"}`}>
+          {product.stock <= 0
+            ? "Produto esgotado"
+            : !canAddToCart
+              ? "Voce ja adicionou todo o estoque"
+              : `Disponivel: ${availableStock}`}
+        </p>
+
+        <div className="my-3 flex items-center justify-center gap-4">
+          <button
+            onClick={handleDecrement}
+            disabled={!canAddToCart || quantity <= 1}
+            className="rounded-full bg-slate-200 p-2 text-slate-700 transition-colors hover:bg-slate-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <FiMinus size={16} />
+          </button>
+          <span className="flex w-8 items-center justify-center text-xl font-bold text-slate-800">
+            {canAddToCart ? quantity : <FiSlash />}
+          </span>
+          <button
+            onClick={handleIncrement}
+            disabled={!canAddToCart || quantity >= availableStock}
+            className="rounded-full bg-slate-200 p-2 text-slate-700 transition-colors hover:bg-slate-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <FiPlus size={16} />
+          </button>
+        </div>
+
+        <button
+          onClick={() => onAddToCart(product, quantity)}
+          disabled={!canAddToCart}
+          className={`mt-2 flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 font-bold transition ${buttonStyle}`}
+        >
+          {!canAddToCart ? (
+            <>
+              <FiSlash size={18} />
+              <span>Indisponivel</span>
+            </>
+          ) : isInCart ? (
+            <>
+              <FiPlus size={18} />
+              <span>Adicionar mais {quantity}</span>
+            </>
+          ) : (
+            <>
+              <FiShoppingCart size={18} />
+              <span>Adicionar ao Carrinho</span>
+            </>
+          )}
+        </button>
+      </div>
+    </article>
+  );
 }

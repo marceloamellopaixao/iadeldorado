@@ -62,7 +62,7 @@ export default function PixConfigForm({ cantina }: PixConfigFormProps) {
     const labelBaseStyle = "block text-sm font-medium text-slate-700";
 
     return (
-        <div className="bg-white rounded-xl shadow-md p-6">
+        <div className="rounded-2xl border border-[#e7d8be] bg-[#fffdf7] p-6 shadow-sm">
             <h3 className="text-xl font-bold text-slate-800 mb-6">
                 Editar Chave PIX da Cantina Selecionada
             </h3>
@@ -92,7 +92,7 @@ export default function PixConfigForm({ cantina }: PixConfigFormProps) {
                 </div>
 
                 <div className="pt-4">
-                    <button type="submit" disabled={isLoading} className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-teal-500 text-white font-bold rounded-lg hover:bg-teal-600 transition-colors disabled:bg-slate-400">
+                    <button type="submit" disabled={isLoading} className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-sky-600 text-white font-bold rounded-lg hover:bg-sky-500 transition-colors disabled:bg-slate-400">
                         <FiSave />
                         <span>{isLoading ? "Salvando..." : "Salvar Configurações"}</span>
                     </button>

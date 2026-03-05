@@ -2,26 +2,230 @@
 
 
 :root {
-  --background: #053155;
-  --foreground: #ffffff;
+  --cream-100: #f7f6e4;
+  --cream-200: #f6f6e2;
+  --beige-300: #e2d5c1;
+  --beige-400: #d4c098;
+  --brown-900: #5f3711;
+  --background: var(--cream-100);
+  --foreground: var(--brown-900);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: "Inter", "Segoe UI", sans-serif;
   --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #053155;
-    --foreground: #c0c0c0;
+    --background: var(--cream-100);
+    --foreground: var(--brown-900);
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Inter", "Segoe UI", sans-serif;
+}
+
+* {
+  font-family: inherit;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.cantina-title {
+  font-family: "Playfair Display", Georgia, serif;
+  letter-spacing: -0.01em;
+}
+
+input,
+textarea,
+select,
+button {
+  font-family: inherit;
+}
+
+button,
+[role="button"],
+a.inline-flex,
+a[class*="rounded"],
+a[class*="px-"] {
+  cursor: pointer;
+}
+
+button:disabled,
+[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+.cantina-surface-bg {
+  background:
+    radial-gradient(circle at 0% 0%, rgba(212, 192, 152, 0.28), transparent 30%),
+    radial-gradient(circle at 100% 10%, rgba(226, 213, 193, 0.32), transparent 26%),
+    linear-gradient(160deg, #f7f6e4 0%, #f6f6e2 55%, #efe3cf 100%);
+}
+
+.cantina-page-wrap {
+  position: relative;
+}
+
+.cantina-page-wrap::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.2;
+  background-image:
+    linear-gradient(rgba(95, 55, 17, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(95, 55, 17, 0.05) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.cantina-page-wrap > * {
+  position: relative;
+  z-index: 1;
+}
+
+.cantina-page-wrap .container {
+  max-width: 84rem;
+}
+
+.cantina-panel {
+  border: 1px solid rgba(95, 55, 17, 0.14);
+  border-radius: 1rem;
+  background: #fffdf7;
+  box-shadow: 0 10px 24px rgba(95, 55, 17, 0.08);
+}
+
+.cantina-title {
+  color: #0f172a;
+  letter-spacing: -0.015em;
+}
+
+.cantina-subtitle {
+  color: #6b7280;
+}
+
+.bg-white {
+  background-color: #fffdf7 !important;
+}
+
+.bg-slate-50,
+.bg-slate-100 {
+  background-color: var(--cream-100) !important;
+}
+
+.bg-slate-900,
+.bg-slate-950\/95,
+.hover\:bg-slate-800:hover {
+  background-color: var(--brown-900) !important;
+}
+
+.bg-slate-200 {
+  background-color: var(--beige-300) !important;
+}
+
+.bg-slate-300 {
+  background-color: var(--beige-400) !important;
+}
+
+.text-slate-400,
+.text-slate-500,
+.text-slate-600,
+.text-slate-700,
+.text-slate-800,
+.text-slate-900 {
+  color: var(--brown-900) !important;
+}
+
+.border-slate-100,
+.border-slate-200,
+.border-slate-300 {
+  border-color: var(--beige-300) !important;
+}
+
+.border-sky-200,
+.border-amber-300\/80 {
+  border-color: var(--beige-400) !important;
+}
+
+.bg-sky-50,
+.bg-sky-100,
+.hover\:bg-sky-100:hover {
+  background-color: var(--beige-300) !important;
+}
+
+.bg-sky-500,
+.bg-sky-600,
+.bg-sky-700,
+.hover\:bg-sky-500:hover,
+.hover\:bg-sky-600:hover,
+.hover\:bg-sky-700:hover {
+  background-color: var(--brown-900) !important;
+}
+
+.text-sky-600,
+.text-sky-700,
+.text-sky-800,
+.text-sky-900,
+.hover\:text-sky-600:hover,
+.hover\:text-sky-800:hover {
+  color: var(--brown-900) !important;
+}
+
+.focus\:ring-sky-500:focus,
+.focus\:border-sky-500:focus {
+  --tw-ring-color: var(--brown-900) !important;
+  border-color: var(--brown-900) !important;
+}
+
+.bg-teal-50 {
+  background-color: var(--cream-200) !important;
+}
+
+.bg-teal-500,
+.bg-teal-600,
+.hover\:bg-teal-600:hover {
+  background-color: var(--brown-900) !important;
+}
+
+.text-teal-500,
+.text-teal-800,
+.text-teal-900 {
+  color: var(--brown-900) !important;
+}
+
+.border-teal-200,
+.border-teal-500 {
+  border-color: var(--beige-400) !important;
+}
+
+.bg-rose-500,
+.bg-rose-600,
+.bg-rose-700,
+.hover\:bg-rose-500:hover,
+.hover\:bg-rose-600:hover,
+.hover\:bg-rose-700:hover,
+.hover\:bg-red-800:hover,
+.bg-red-600 {
+  background-color: var(--brown-900) !important;
+}
+
+.text-rose-500,
+.text-rose-600,
+.text-red-600 {
+  color: var(--brown-900) !important;
+}
+
+.border-rose-500,
+.border-rose-600 {
+  border-color: var(--beige-400) !important;
 }

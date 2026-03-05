@@ -9,17 +9,17 @@ module.exports = {
       extend: {
         colors: {
           'church-primary': {
-            DEFAULT: '#0284c7', // sky-600
-            light: '#38bdf8',   // sky-400
-            dark: '#0369a1',    // sky-800
+            DEFAULT: '#5f3711',
+            light: '#d4c098',
+            dark: '#5f3711',
           },
           'church-accent': {
-            DEFAULT: '#14b8a6', // teal-500
-            light: '#2dd4bf',   // teal-400
+            DEFAULT: '#e2d5c1',
+            light: '#f6f6e2',
           },
           'church-danger': {
-            DEFAULT: '#e11d48', // rose-600
-            light: '#f43f5e',   // rose-500
+            DEFAULT: '#5f3711',
+            light: '#d4c098',
           }
         }
       },

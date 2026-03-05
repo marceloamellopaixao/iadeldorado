@@ -4,6 +4,7 @@ import { Product } from '@/types/product';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
 import { useAuth } from '@/contexts/AuthContext';
+import { calculateLineTotal } from '@/utils/pricing';
 
 export const useCart = () => {
     const { user } = useAuth();
@@ -85,12 +86,15 @@ export const useCart = () => {
 
         if (existingIndex > -1) {
             newCart[existingIndex].quantity += quantityToAdd;
+            newCart[existingIndex].price = product.price;
+            newCart[existingIndex].pricingTiers = product.pricingTiers || [];
         } else {
             newCart.push({
                 id: product.id,
                 name: product.name,
                 price: product.price,
                 quantity: quantityToAdd,
+                pricingTiers: product.pricingTiers || [],
             });
         }
         
@@ -121,7 +125,7 @@ export const useCart = () => {
     };
 
     const total = useMemo(() =>
-        cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
+        cartItems.reduce((sum, item) => sum + calculateLineTotal(item.price, item.quantity, item.pricingTiers), 0),
         [cartItems]
     );
 

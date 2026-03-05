@@ -1,18 +1,18 @@
 import { useEffect, useState } from "react";
-import { withAuth } from "@/hooks/withAuth";
-import PixConfigForm from "@/components/admin/pix-config/PixConfigForm";
-import ActiveCantinaSelector from "@/components/admin/pix-config/ActiveCantinaSelector";
-import { doc, getDoc, setDoc } from "firebase/firestore";
-import { db } from '@/lib/firebase';
 import Head from "next/head";
-import { toast } from "react-toastify";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { FiCheckCircle } from "react-icons/fi";
+import { toast } from "react-toastify";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
+import ActiveCantinaSelector from "@/components/admin/pix-config/ActiveCantinaSelector";
+import PixConfigForm from "@/components/admin/pix-config/PixConfigForm";
+import { withAuth } from "@/hooks/withAuth";
+import { db } from "@/lib/firebase";
 
-type CantinaId = 'criancas' | 'jovens' | 'irmas' | 'missoes';
+type CantinaId = "criancas" | "jovens" | "irmas" | "missoes";
 
 function AdminPixConfigPage() {
-    const [selectedCantina, setSelectedCantina] = useState<CantinaId>('criancas');
+    const [selectedCantina, setSelectedCantina] = useState<CantinaId>("criancas");
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -44,34 +44,29 @@ function AdminPixConfigPage() {
     };
 
     if (loading) {
-        return <LoadingSpinner message="Carregando configurações..." />;
+        return <LoadingSpinner message="Carregando configuracoes..." />;
     }
 
     return (
         <>
             <Head>
-                <title>Configuração de PIX | IAD Eldorado</title>
+                <title>Configuracao de PIX | IAD Eldorado</title>
                 <meta name="description" content="Configure as chaves PIX e a cantina ativa." />
             </Head>
             <div className="container mx-auto p-4 md:p-8">
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-slate-800">Configuração de Pagamento PIX</h1>
-                    <p className="text-slate-500 mt-1">Gerencie qual cantina está ativa e edite as informações da chave PIX de cada uma.</p>
+                <div className="cantina-panel mb-8 p-5">
+                    <h1 className="cantina-title text-3xl font-bold">Configuracao de Pagamento PIX</h1>
+                    <p className="cantina-subtitle mt-1 text-sm">Gerencie qual cantina esta ativa e edite as informacoes da chave PIX.</p>
                 </div>
 
-                {/* Banner de status */}
-                <div className="mb-8 p-3 rounded-lg bg-teal-500 text-white flex items-center justify-center gap-2 font-bold text-center">
+                <div className="mb-8 flex items-center justify-center gap-2 rounded-lg bg-sky-600 p-3 text-center font-bold text-white">
                     <FiCheckCircle />
-                    <span>A cantina <span className="underline capitalize">{selectedCantina}</span> está ativa no momento.</span>
+                    <span>A cantina <span className="capitalize underline">{selectedCantina}</span> esta ativa no momento.</span>
                 </div>
-                
-                {/* Grid para organizar os componentes */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+
+                <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-2">
                     <div className="space-y-8">
-                        <ActiveCantinaSelector
-                            current={selectedCantina}
-                            onChange={handleChangeCantina}
-                        />
+                        <ActiveCantinaSelector current={selectedCantina} onChange={handleChangeCantina} />
                     </div>
                     <div>
                         <PixConfigForm cantina={selectedCantina} />
@@ -82,4 +77,4 @@ function AdminPixConfigPage() {
     );
 }
 
-export default withAuth(['admin'])(AdminPixConfigPage);
+export default withAuth(["admin"])(AdminPixConfigPage);

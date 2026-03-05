@@ -1,10 +1,10 @@
 import { useState } from "react";
-import withAuth from "@/hooks/withAuth";
 import Head from "next/head";
-import { User } from "@/types/user";
-import UserTable from "@/components/admin/users/UserTable";
-import UserForm from "@/components/admin/users/UserForm";
 import { FiPlus } from "react-icons/fi";
+import UserForm from "@/components/admin/users/UserForm";
+import UserTable from "@/components/admin/users/UserTable";
+import withAuth from "@/hooks/withAuth";
+import { User } from "@/types/user";
 
 function Users() {
     const [editingUser, setEditingUser] = useState<User | null>(null);
@@ -28,44 +28,34 @@ function Users() {
     return (
         <>
             <Head>
-                <title>Gerenciar Usuários | IAD Eldorado</title>
-                <meta name="description" content="Adicione, edite e gerencie os usuários do sistema." />
+                <title>Gerenciar Usuarios | IAD Eldorado</title>
+                <meta name="description" content="Adicione, edite e gerencie os usuarios do sistema." />
             </Head>
             <div className="container mx-auto p-4 md:p-8">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+                <div className="cantina-panel mb-8 flex flex-col items-start justify-between gap-4 p-5 sm:flex-row sm:items-center">
                     <div>
-                        <h1 className="text-3xl font-bold text-slate-800">Gerenciar Usuários</h1>
-                        <p className="text-slate-500 mt-1">Adicione, edite e visualize os usuários do sistema.</p>
+                        <h1 className="cantina-title text-3xl font-bold">Gerenciar Usuarios</h1>
+                        <p className="cantina-subtitle mt-1 text-sm">Adicione, edite e visualize os usuarios do sistema.</p>
                     </div>
-                    <button onClick={handleAddNew} className="flex items-center gap-2 px-4 py-2 bg-sky-600 text-white font-bold rounded-lg hover:bg-sky-700 transition-colors">
-                        <FiPlus/>
+                    <button onClick={handleAddNew} className="flex items-center gap-2 rounded-lg bg-sky-600 px-4 py-2 font-bold text-white transition-colors hover:bg-sky-500">
+                        <FiPlus />
                         <span>Adicionar Novo</span>
                     </button>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-3">
                     <div className="lg:col-span-2">
                         <UserTable onEdit={handleEdit} />
                     </div>
 
-                    {/* MODO DESKTOP: Formulário fixo */}
-                    <div className="hidden lg:block lg:sticky lg:top-24">
-                        <UserForm
-                            user={editingUser}
-                            onClose={() => setEditingUser(null)}
-                            onSuccess={() => setEditingUser(null)}
-                        />
+                    <div className="hidden lg:sticky lg:top-24 lg:block">
+                        <UserForm user={editingUser} onClose={() => setEditingUser(null)} onSuccess={() => setEditingUser(null)} />
                     </div>
 
-                    {/* MODO MOBILE/TABLET: Formulário como modal */}
                     {isFormVisible && (
-                        <div className="lg:hidden fixed inset-0 bg-black/60 z-40 flex items-start justify-center overflow-y-auto p-4 pt-12 sm:pt-20" onClick={handleCloseForm}>
+                        <div className="fixed inset-0 z-40 flex items-start justify-center overflow-y-auto bg-black/60 p-4 pt-12 sm:pt-20 lg:hidden" onClick={handleCloseForm}>
                             <div className="w-full max-w-md" onClick={(e) => e.stopPropagation()}>
-                                <UserForm
-                                    user={editingUser}
-                                    onClose={handleCloseForm}
-                                    onSuccess={handleCloseForm}
-                                />
+                                <UserForm user={editingUser} onClose={handleCloseForm} onSuccess={handleCloseForm} />
                             </div>
                         </div>
                     )}
@@ -75,4 +65,4 @@ function Users() {
     );
 }
 
-export default withAuth(['admin'])(Users);
+export default withAuth(["admin"])(Users);
