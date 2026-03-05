@@ -257,7 +257,7 @@ export default function Header() {
   };
 
   const homeNavLinks: HomeNavItem[] = [
-    { label: "Inicio", href: "/#inicio" },
+    { label: "Início", href: "/#inicio" },
     { label: "Sobre", href: "/#sobre" },
     { label: "Agenda", href: "/#agenda" },
     { label: "Cantina", href: "/#cantina" },
@@ -266,7 +266,7 @@ export default function Header() {
 
   const allNavLinks: NavItem[] = [
     {
-      label: "Inicio Igreja",
+      label: "Início Igreja",
       href: "/",
       icon: <FiGlobe size={20} />,
       allowedRoles: ["admin", "seller", "customer", "guest"],
@@ -310,7 +310,7 @@ export default function Header() {
           allowedRoles: ["admin", "seller"],
         },
         {
-          label: "Relatorio de Vendas",
+          label: "Relatório de Vendas",
           href: "/seller/report",
           icon: <FiFileText size={20} />,
           allowedRoles: ["admin", "seller"],
@@ -330,7 +330,7 @@ export default function Header() {
           allowedRoles: ["admin", "seller", "customer"],
         },
         {
-          label: "Historico de Pedidos",
+          label: "Histórico de Pedidos",
           href: "/customer/orders",
           icon: <FiList size={20} />,
           allowedRoles: ["admin", "seller", "customer"],
@@ -338,25 +338,25 @@ export default function Header() {
       ],
     },
     {
-      label: "Historico de Pedidos",
+      label: "Histórico de Pedidos",
       href: "/customer/orders",
       icon: <FiList size={20} />,
       allowedRoles: ["guest"],
     },
     {
-      label: "Administracao",
+      label: "Administração",
       isDropdown: true,
       icon: <FiSettings size={20} />,
       allowedRoles: ["admin"],
       children: [
         {
-          label: "Gerenciar Usuarios",
+          label: "Gerenciar Usuários",
           href: "/admin/users",
           icon: <FiUser size={20} />,
           allowedRoles: ["admin"],
         },
         {
-          label: "Configuracoes PIX",
+          label: "Configurações PIX",
           href: "/admin/pix-config",
           icon: <FiDollarSign size={20} />,
           allowedRoles: ["admin"],
@@ -385,7 +385,7 @@ export default function Header() {
       <header className="fixed top-0 z-50 w-full border-b border-white/40 bg-white/70 backdrop-blur-xl">
         <nav className="container px-4 mx-auto">
           <div className="flex items-center justify-between py-3">
-            <Link href="/#inicio" className="flex items-center gap-3" title="Pagina inicial">
+            <Link href="/#inicio" className="flex items-center gap-3" title="Página inicial">
               <Image
                 src={Logo}
                 alt="Logo IAD Eldorado"
@@ -440,7 +440,7 @@ export default function Header() {
     <header className="fixed top-0 z-50 w-full border-b border-white/40 bg-white/70 backdrop-blur-xl">
       <nav className="container px-4 mx-auto">
         <div className="flex items-center justify-between py-3">
-          <Link href="/" className="flex items-center gap-3" title="Pagina inicial">
+          <Link href="/" className="flex items-center gap-3" title="Página inicial">
             <Image
               src={Logo}
               alt="Logo IAD Eldorado Cantina"
