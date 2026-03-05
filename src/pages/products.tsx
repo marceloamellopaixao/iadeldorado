@@ -24,7 +24,7 @@ function ProductsPage() {
     <>
       <Head>
         <title>IAD Eldorado - Produtos</title>
-        <meta name="description" content="Lista de produtos disponiveis na cantina da IAD Eldorado." />
+        <meta name="description" content="Lista de produtos disponíveis na cantina da IAD Eldorado." />
       </Head>
 
       <div className="container mx-auto p-4 md:p-8">
@@ -71,7 +71,7 @@ function ProductsPage() {
 
         <div className="mb-8 flex items-center justify-center gap-3 rounded-xl border border-[#e7d8be] bg-[#f8f2e6] p-4 text-[#5f3711]">
           <FiInfo size={20} />
-          <h4 className="text-center text-sm font-medium">A quantidade de cada produto e ajustada na tela de finalizacao.</h4>
+          <h4 className="text-center text-sm font-medium">A quantidade de cada produto é ajustada na tela de finalização.</h4>
         </div>
 
         {notification.visible && (
@@ -87,7 +87,7 @@ function ProductsPage() {
           {products == null || products.length === 0 ? (
             <div className="col-span-full rounded-xl border border-[#e7d8be] bg-[#fffdf7] p-6 text-center shadow-sm">
               <FiAlertTriangle size={48} className="mx-auto text-black-400" />
-              <p className="mt-2 text-sm text-slate-500">Todos os produtos estao indisponiveis no momento.</p>
+              <p className="mt-2 text-sm text-slate-500">Todos os produtos estão indisponíveis no momento.</p>
             </div>
           ) : (
             products.map((product) => {
