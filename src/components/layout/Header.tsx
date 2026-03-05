@@ -449,7 +449,7 @@ export default function Header() {
               className="border-2 rounded-full border-[#d8c19e]"
             />
             <span className="hidden whitespace-nowrap text-sm font-extrabold uppercase tracking-wide text-[#0f172a] sm:block">
-              IAD Eldorado - Cantina
+              IAD Eldorado
             </span>
           </Link>
 
