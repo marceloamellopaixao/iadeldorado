@@ -11,7 +11,7 @@ const nextConfig: NextConfig = {
   allowedDevOrigins: process.env.NODE_ENV === 'development' ? undefined : [
     "http://localhost:3000",
     "http://26.219.51.63:3000",
-    "http://192.168.15.2:3000"
+    `http://${process.env.HOSTNAME}:3000`
   ]
 };
 
