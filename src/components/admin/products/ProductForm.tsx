@@ -35,6 +35,8 @@ export default function ProductForm({ product, onSuccess, onClose }: ProductForm
   const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>("");
   const [removeCurrentImage, setRemoveCurrentImage] = useState(false);
+  const [existingImagePath, setExistingImagePath] = useState("");
+  const [existingImageUrl, setExistingImageUrl] = useState("");
 
   useEffect(() => {
     if (product) {
@@ -50,6 +52,8 @@ export default function ProductForm({ product, onSuccess, onClose }: ProductForm
         pricingTiers: product.pricingTiers || [],
       });
       setPreviewUrl(product.imageUrl || "");
+      setExistingImagePath(product.imagePath || "");
+      setExistingImageUrl(product.imageUrl || "");
       setSelectedImageFile(null);
       setRemoveCurrentImage(false);
       return;
@@ -57,6 +61,8 @@ export default function ProductForm({ product, onSuccess, onClose }: ProductForm
 
     setFormData(initialState);
     setPreviewUrl("");
+    setExistingImagePath("");
+    setExistingImageUrl("");
     setSelectedImageFile(null);
     setRemoveCurrentImage(false);
   }, [product]);
@@ -125,9 +131,11 @@ export default function ProductForm({ product, onSuccess, onClose }: ProductForm
       const productRef = product?.id ? doc(db, "products", product.id) : doc(collection(db, "products"));
       let imageUrl = formData.imageUrl || "";
       let imagePath = formData.imagePath || "";
+      const oldImagePath = existingImagePath;
+      const oldImageUrl = existingImageUrl;
 
-      if (removeCurrentImage && formData.imagePath) {
-        await deleteProductImage(formData.imagePath);
+      if (removeCurrentImage && (oldImagePath || oldImageUrl)) {
+        await deleteProductImage(oldImagePath, oldImageUrl);
         imageUrl = "";
         imagePath = "";
       }
@@ -137,7 +145,7 @@ export default function ProductForm({ product, onSuccess, onClose }: ProductForm
           throw new Error("Supabase nao configurado. Defina NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_ANON_KEY.");
         }
 
-        const uploadResult = await uploadProductImage(selectedImageFile, productRef.id, formData.imagePath);
+        const uploadResult = await uploadProductImage(selectedImageFile, productRef.id, oldImagePath);
         imageUrl = uploadResult.imageUrl;
         imagePath = uploadResult.imagePath;
       }
@@ -157,6 +165,11 @@ export default function ProductForm({ product, onSuccess, onClose }: ProductForm
         await setDoc(productRef, { ...productData, createdAt: serverTimestamp() });
         toast.success("Produto cadastrado com sucesso!");
       }
+
+      setExistingImagePath(imagePath);
+      setExistingImageUrl(imageUrl);
+      setRemoveCurrentImage(false);
+      setSelectedImageFile(null);
 
       try {
         await syncProductToSupabaseTable({
@@ -213,7 +226,7 @@ export default function ProductForm({ product, onSuccess, onClose }: ProductForm
     <div className="relative rounded-2xl border border-[#e7d8be] bg-[#fffdf7] p-6 shadow-sm">
       <button
         onClick={onClose}
-        className="absolute right-4 top-4 z-10 text-slate-500 transition-colors hover:text-rose-600 lg:hidden"
+        className="absolute z-10 transition-colors right-4 top-4 text-slate-500 hover:text-rose-600 lg:hidden"
         aria-label="Fechar formulario"
         type="button"
       >
@@ -303,7 +316,7 @@ export default function ProductForm({ product, onSuccess, onClose }: ProductForm
         </div>
 
         <div className="rounded-xl border border-[#e7d8be] bg-[#f8f2e6] p-4">
-          <div className="mb-3 flex items-center justify-between gap-3">
+          <div className="flex items-center justify-between gap-3 mb-3">
             <div>
               <p className={labelBaseStyle}>Promocoes por quantidade</p>
               <p className="text-xs text-slate-600">Exemplo: 3 por R$ 5,00.</p>
@@ -311,7 +324,7 @@ export default function ProductForm({ product, onSuccess, onClose }: ProductForm
             <button
               type="button"
               onClick={addPricingTier}
-              className="inline-flex items-center gap-2 rounded-lg bg-sky-600 px-3 py-2 text-xs font-bold text-white hover:bg-sky-500"
+              className="inline-flex items-center gap-2 px-3 py-2 text-xs font-bold text-white rounded-lg bg-sky-600 hover:bg-sky-500"
             >
               <FiPlus />
               Adicionar promocao
@@ -326,7 +339,7 @@ export default function ProductForm({ product, onSuccess, onClose }: ProductForm
                 <div key={`${tier.quantity}-${index}`} className="rounded-lg border border-[#e7d8be] bg-white p-3">
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
                     <div>
-                      <label className="mb-1 block text-xs font-semibold text-slate-600">Quantidade</label>
+                      <label className="block mb-1 text-xs font-semibold text-slate-600">Quantidade</label>
                       <input
                         type="number"
                         min="2"
@@ -337,7 +350,7 @@ export default function ProductForm({ product, onSuccess, onClose }: ProductForm
                       />
                     </div>
                     <div>
-                      <label className="mb-1 block text-xs font-semibold text-slate-600">Preco total (R$)</label>
+                      <label className="block mb-1 text-xs font-semibold text-slate-600">Preco total (R$)</label>
                       <input
                         type="number"
                         min="0"
@@ -350,7 +363,7 @@ export default function ProductForm({ product, onSuccess, onClose }: ProductForm
                     <button
                       type="button"
                       onClick={() => removePricingTier(index)}
-                      className="inline-flex items-center justify-center gap-2 rounded-lg border border-rose-300 bg-white px-3 py-3 text-sm font-bold text-rose-600 hover:bg-rose-50"
+                      className="inline-flex items-center justify-center gap-2 px-3 py-3 text-sm font-bold bg-white border rounded-lg border-rose-300 text-rose-600 hover:bg-rose-50"
                     >
                       <FiTrash2 />
                       Remover
@@ -369,7 +382,7 @@ export default function ProductForm({ product, onSuccess, onClose }: ProductForm
         <div className="rounded-xl border border-[#e7d8be] bg-[#f8f2e6] p-4">
           <label htmlFor="image" className={labelBaseStyle}>Foto do produto</label>
 
-          <div className="mt-3 flex items-center gap-4">
+          <div className="flex items-center gap-4 mt-3">
             <div className="relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-xl border border-dashed border-[#d4c098] bg-[#fffdf7]">
               {previewUrl ? (
                 <Image src={previewUrl} alt="Preview do produto" fill className="object-cover" unoptimized />
@@ -381,7 +394,7 @@ export default function ProductForm({ product, onSuccess, onClose }: ProductForm
             <div className="flex flex-wrap items-center gap-2">
               <label
                 htmlFor="image"
-                className="inline-flex items-center gap-2 rounded-lg bg-sky-600 px-3 py-2 text-sm font-bold text-white hover:bg-sky-500"
+                className="inline-flex items-center gap-2 px-3 py-2 text-sm font-bold text-white rounded-lg bg-sky-600 hover:bg-sky-500 hover:cursor-pointer"
               >
                 <FiUpload />
                 Escolher imagem
@@ -392,7 +405,7 @@ export default function ProductForm({ product, onSuccess, onClose }: ProductForm
                 <button
                   type="button"
                   onClick={handleRemoveImage}
-                  className="inline-flex items-center gap-2 rounded-lg border border-rose-300 bg-white px-3 py-2 text-sm font-bold text-rose-600 hover:bg-rose-50"
+                  className="inline-flex items-center gap-2 px-3 py-2 text-sm font-bold bg-white border rounded-lg border-rose-300 text-rose-600 hover:bg-rose-50"
                 >
                   <FiTrash2 />
                   Remover
@@ -408,18 +421,18 @@ export default function ProductForm({ product, onSuccess, onClose }: ProductForm
           )}
         </div>
 
-        <div className="flex justify-end space-x-3 pt-4">
+        <div className="flex justify-end pt-4 space-x-3">
           <button
             type="button"
             onClick={onClose}
-            className="flex items-center gap-2 rounded-lg border border-slate-300 px-4 py-2 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-50"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-bold transition-colors border rounded-lg border-slate-300 text-slate-700 hover:bg-slate-50"
           >
             <span>Cancelar</span>
           </button>
           <button
             type="submit"
             disabled={loading}
-            className="flex items-center gap-2 rounded-lg bg-sky-600 px-5 py-2 font-bold text-white transition-colors hover:bg-sky-500 disabled:bg-slate-400"
+            className="flex items-center gap-2 px-5 py-2 font-bold text-white transition-colors rounded-lg bg-sky-600 hover:bg-sky-500 disabled:bg-slate-400"
           >
             <FiSave />
             <span>{loading ? "Salvando..." : product ? "Atualizar" : "Cadastrar"}</span>
@@ -429,4 +442,3 @@ export default function ProductForm({ product, onSuccess, onClose }: ProductForm
     </div>
   );
 }
-
