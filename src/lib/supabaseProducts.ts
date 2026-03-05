@@ -8,6 +8,15 @@ const buildFilePath = (productId: string, fileName: string) => {
   return `products/${productId}/${Date.now()}-${safeName}`;
 };
 
+const extractPathFromPublicUrl = (imageUrl?: string) => {
+  if (!imageUrl) return "";
+  const marker = `/object/public/${productsBucket}/`;
+  const markerIndex = imageUrl.indexOf(marker);
+  if (markerIndex === -1) return "";
+  const rawPath = imageUrl.slice(markerIndex + marker.length);
+  return decodeURIComponent(rawPath.split("?")[0] || "");
+};
+
 export const uploadProductImage = async (
   file: File,
   productId: string,
@@ -40,11 +49,15 @@ export const uploadProductImage = async (
   return { imageUrl: data.publicUrl, imagePath: filePath };
 };
 
-export const deleteProductImage = async (imagePath?: string) => {
-  if (!supabase || !imagePath) {
+export const deleteProductImage = async (imagePath?: string, imageUrl?: string) => {
+  if (!supabase) {
     return;
   }
-  await supabase.storage.from(productsBucket).remove([imagePath]);
+  const targetPath = imagePath || extractPathFromPublicUrl(imageUrl);
+  if (!targetPath) {
+    return;
+  }
+  await supabase.storage.from(productsBucket).remove([targetPath]);
 };
 
 interface SyncProductPayload {
@@ -91,5 +104,36 @@ export const deleteProductFromSupabaseTable = async (productId: string) => {
   const { error } = await supabase.from(productsTable).delete().eq("id", productId);
   if (error) {
     throw error;
+  }
+};
+
+export const deleteProductStorageFolder = async (productId: string) => {
+  if (!supabase || !productId) {
+    return;
+  }
+
+  const prefix = `products/${productId}`;
+  const { data, error } = await supabase.storage.from(productsBucket).list(prefix, {
+    limit: 1000,
+    offset: 0,
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  if (!data || data.length === 0) {
+    return;
+  }
+
+  const files = data
+    .filter((item) => item.name && item.name !== ".emptyFolderPlaceholder")
+    .map((item) => `${prefix}/${item.name}`);
+
+  if (files.length > 0) {
+    const { error: removeError } = await supabase.storage.from(productsBucket).remove(files);
+    if (removeError) {
+      throw removeError;
+    }
   }
 };
