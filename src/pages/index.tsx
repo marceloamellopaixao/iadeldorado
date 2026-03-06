@@ -2,8 +2,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect, useMemo, useState } from "react";
-import { FiCalendar, FiClock, FiInstagram, FiRadio, FiSend, FiYoutube } from "react-icons/fi";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { FiCalendar, FiClock, FiInstagram, FiPause, FiPlay, FiRadio, FiSend, FiVolume2, FiYoutube } from "react-icons/fi";
 import { useCart } from "@/hooks/useCart";
 import { useProducts } from "@/hooks/useProducts";
 import { getTierBadgeText } from "@/utils/pricing";
@@ -67,6 +67,10 @@ export default function Home() {
   const router = useRouter();
   const [activeCategory, setActiveCategory] = useState("todas");
   const zenoEmbedUrl = process.env.NEXT_PUBLIC_ZENOFM_EMBED_URL || "";
+  const radioBannerUrl = process.env.NEXT_PUBLIC_RADIO_BANNER_URL || "/igreja.jpg";
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [volume, setVolume] = useState(80);
 
   const categories = useMemo(() => {
     const uniqueCategories = Array.from(new Set(products.map((item) => normalizeCategory(item.category))));
@@ -78,6 +82,11 @@ export default function Home() {
       setActiveCategory("todas");
     }
   }, [categories, activeCategory]);
+
+  useEffect(() => {
+    if (!audioRef.current) return;
+    audioRef.current.volume = volume / 100;
+  }, [volume]);
 
   const filteredCantinaItems = useMemo(
     () =>
@@ -91,6 +100,30 @@ export default function Home() {
     if (item.stock <= 0) return;
     await addToCart(item, 1);
     router.push("/checkout");
+  };
+
+  const handleToggleRadio = async () => {
+    if (!audioRef.current) return;
+
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+      return;
+    }
+
+    try {
+      await audioRef.current.play();
+      setIsPlaying(true);
+    } catch {
+      setIsPlaying(false);
+    }
+  };
+
+  const handleVolumeChange = (value: number) => {
+    const clampedValue = Math.max(0, Math.min(100, value));
+    setVolume(clampedValue);
+    if (!audioRef.current) return;
+    audioRef.current.volume = clampedValue / 100;
   };
 
   return (
@@ -107,7 +140,7 @@ export default function Home() {
       <main className="bg-[#fcfbf7] text-[#1f2937]">
         <section
           id="inicio"
-          className="relative isolate overflow-hidden px-4 pb-24 pt-28 sm:px-6 lg:px-8"
+          className="relative px-4 pb-24 overflow-hidden isolate pt-28 sm:px-6 lg:px-8"
           style={{
             backgroundImage:
               "linear-gradient(to bottom, rgba(15,23,42,.78), rgba(15,23,42,.72)), url('/igreja.jpg')",
@@ -115,22 +148,22 @@ export default function Home() {
             backgroundPosition: "center",
           }}
         >
-          <div className="mx-auto max-w-6xl">
+          <div className="max-w-6xl mx-auto">
             <div className="max-w-3xl">
               <p className="mb-4 inline-flex rounded-full border border-white/25 bg-white/10 px-4 py-1 text-sm font-semibold text-[#f8edd3] backdrop-blur">
                 Uma igreja para toda a família
               </p>
               <h1
-                className="text-balance text-4xl font-extrabold leading-tight text-white sm:text-5xl lg:text-6xl"
+                className="text-4xl font-extrabold leading-tight text-white text-balance sm:text-5xl lg:text-6xl"
                 style={{ fontFamily: "'Playfair Display', serif" }}
               >
                 Bem-vindo à IAD Eldorado
               </h1>
-              <p className="mt-6 max-w-2xl text-lg text-slate-100">
+              <p className="max-w-2xl mt-6 text-lg text-slate-100">
                 Um ambiente acolhedor, de fé viva e comunhão real para você e sua família.
                 Venha viver esse novo tempo conosco.
               </p>
-              <div className="mt-8 flex flex-wrap gap-3">
+              <div className="flex flex-wrap gap-3 mt-8">
                 <Link
                   href="#agenda"
                   className="rounded-full bg-[#f2c46d] px-6 py-3 text-sm font-bold text-[#1e293b] shadow-lg shadow-[#f2c46d]/30 transition hover:-translate-y-0.5 hover:brightness-105"
@@ -139,7 +172,7 @@ export default function Home() {
                 </Link>
                 <Link
                   href="/products"
-                  className="rounded-full border border-white/60 bg-white/5 px-6 py-3 text-sm font-bold text-white backdrop-blur transition hover:bg-white/15"
+                  className="px-6 py-3 text-sm font-bold text-white transition border rounded-full border-white/60 bg-white/5 backdrop-blur hover:bg-white/15"
                 >
                   Abrir Cantina
                 </Link>
@@ -149,7 +182,7 @@ export default function Home() {
         </section>
 
         <section id="midia" className="px-4 py-16 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-6xl">
+          <div className="max-w-6xl mx-auto">
             <div className="mb-8 text-center">
               <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#8b5e34]">Web Rádio</p>
               <h2 className="mt-2 text-3xl font-bold text-[#0f172a] sm:text-4xl" style={{ fontFamily: "'Playfair Display', serif" }}>
@@ -164,20 +197,74 @@ export default function Home() {
 
               {zenoEmbedUrl ? (
                 <div className="overflow-hidden rounded-2xl border border-[#eadfca] bg-[#fffcf6]">
-                  <iframe
+                  <div
+                    className="relative h-56 w-full bg-cover bg-center sm:h-64"
+                    style={{
+                      backgroundImage: `linear-gradient(to top, rgba(15,23,42,.78), rgba(15,23,42,.35)), url('${radioBannerUrl}')`,
+                    }}
+                  >
+                    <div className="absolute inset-0 flex flex-col items-center justify-end gap-4 p-5 sm:p-6">
+                      <p className="text-sm font-semibold uppercase tracking-[0.15em] text-[#f8edd3]">Rádio IAD Eldorado</p>
+
+                      <div className="flex w-full max-w-xl items-center gap-4 rounded-2xl border border-white/20 bg-black/35 p-4 backdrop-blur">
+                        <button
+                          type="button"
+                          onClick={handleToggleRadio}
+                          className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#f2c46d] text-[#1f2937] transition hover:brightness-105"
+                          aria-label={isPlaying ? "Pausar rádio" : "Tocar rádio"}
+                        >
+                          {isPlaying ? <FiPause className="text-lg" /> : <FiPlay className="ml-0.5 text-lg" />}
+                        </button>
+
+                        <div className="flex flex-1 items-center gap-2 text-white">
+                          <FiVolume2 className="shrink-0" />
+                          <button
+                            type="button"
+                            onClick={() => handleVolumeChange(volume - 10)}
+                            className="rounded-md border border-white/35 px-2 py-1 text-xs font-bold text-white transition hover:bg-white/10"
+                            aria-label="Diminuir volume"
+                          >
+                            -
+                          </button>
+                          <input
+                            type="range"
+                            min={0}
+                            max={100}
+                            step={1}
+                            value={volume}
+                            onChange={(event) => handleVolumeChange(Number(event.target.value))}
+                            className="h-2 w-full cursor-pointer rounded-lg bg-white/40 accent-[#f2c46d]"
+                            aria-label="Volume da rádio"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleVolumeChange(volume + 10)}
+                            className="rounded-md border border-white/35 px-2 py-1 text-xs font-bold text-white transition hover:bg-white/10"
+                            aria-label="Aumentar volume"
+                          >
+                            +
+                          </button>
+                        </div>
+
+                        <span className="min-w-[58px] text-right text-xs font-semibold text-[#f8edd3]">
+                          {isPlaying ? "Ao vivo" : "Parado"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <audio
+                    ref={audioRef}
                     src={zenoEmbedUrl}
-                    width="100%"
-                    height="160"
-                    frameBorder="0"
-                    allow="autoplay"
-                    loading="lazy"
-                    title="Player Web Rádio ZenoFM"
+                    preload="none"
+                    onPlay={() => setIsPlaying(true)}
+                    onPause={() => setIsPlaying(false)}
                   />
                 </div>
               ) : (
                 <div className="rounded-2xl border border-dashed border-[#d8c19e] bg-[#fffcf6] p-4 text-sm text-slate-600">
-                  Configure em <span className="font-bold">NEXT_PUBLIC_ZENOFM_EMBED_URL</span>.
-                  Exemplo: <code>https://zeno.fm/embed/SEU-CODIGO</code>
+                  Configure em <span className="font-bold">NEXT_PUBLIC_ZENOFM_EMBED_URL</span> com a URL do stream.
+                  Exemplo: <code>https://stream.zeno.fm/SEU-CODIGO</code>
                 </div>
               )}
 
@@ -204,13 +291,13 @@ export default function Home() {
             </article>
 
             <div className="overflow-hidden rounded-3xl border border-[#eadfca] bg-white shadow-xl">
-              <div className="relative h-96 w-full bg-gray-200">
+              <div className="relative w-full bg-gray-200 h-96">
                 <Image src="/Pastorado.jpeg" alt="Pastores" fill className="object-contain" />
               </div>
               <div className="p-6">
                 <h3 className="text-lg font-extrabold text-[#0f172a]">Pr. Edison Xavier & Ev. Eliane Xavier</h3>
                 <p className="mt-1 text-sm text-slate-600">Pastor e Evangelista</p>
-                <div className="mt-4 flex gap-2">
+                <div className="flex gap-2 mt-4">
                   <Link
                     href="https://www.instagram.com/iad_eldorado_/"
                     target="_blank"
@@ -232,7 +319,7 @@ export default function Home() {
         </section>
 
         <section id="agenda" className="px-4 py-16 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-6xl">
+          <div className="max-w-6xl mx-auto">
             <div className="mb-8">
               <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#8b5e34]">Agenda e Eventos</p>
               <h2 className="mt-2 text-3xl font-bold text-[#0f172a] sm:text-4xl" style={{ fontFamily: "'Playfair Display', serif" }}>
@@ -258,13 +345,13 @@ export default function Home() {
         </section>
 
         <section id="cantina" className="bg-[#f8f2e6] px-4 py-16 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-6xl">
+          <div className="max-w-6xl mx-auto">
             <div className="mb-8">
               <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#8b5e34]">Destaque Especial</p>
               <h2 className="mt-2 text-3xl font-bold text-[#0f172a] sm:text-4xl" style={{ fontFamily: "'Playfair Display', serif" }}>
                 IAD Eldorado - Cantina
               </h2>
-              <p className="mt-4 max-w-3xl text-slate-700">
+              <p className="max-w-3xl mt-4 text-slate-700">
                 Toda arrecadação da cantina é revertida para projetos da igreja, missão e apoio
                 à obra de Deus. Consuma com alegria e participe desse propósito.
               </p>
@@ -274,7 +361,7 @@ export default function Home() {
             </div>
 
             <div className="rounded-3xl border border-[#e7d8be] bg-white p-6 shadow-xl">
-              <div className="mb-6 flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 mb-6">
                 {categories.map((tab) => {
                   const isActive = activeCategory === tab;
                   return (
@@ -365,7 +452,7 @@ export default function Home() {
               <h2 className="mt-2 text-3xl font-bold text-[#0f172a] sm:text-4xl" style={{ fontFamily: "'Playfair Display', serif" }}>
                 Pedido de Oração
               </h2>
-              <p className="mt-4 max-w-xl text-slate-700">
+              <p className="max-w-xl mt-4 text-slate-700">
                 Envie seu pedido. Nossa equipe pastoral vai orar por você e por sua família com carinho e sigilo.
               </p>
             </div>
@@ -387,7 +474,7 @@ export default function Home() {
       </main>
 
       <footer id="contato" className="bg-[#111827] px-4 py-12 text-white sm:px-6 lg:px-8">
-        <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-2">
+        <div className="grid max-w-6xl gap-8 mx-auto md:grid-cols-2">
           <div>
             <h3 className="text-xl font-bold">IAD Eldorado</h3>
             <p className="mt-3 text-slate-300">Rua Baiacu, 300 - Eldorado - Diadema/SP - CEP 09972-010</p>
@@ -398,7 +485,7 @@ export default function Home() {
             </Link>
           </div>
 
-          <div className="overflow-hidden rounded-2xl border border-white/20">
+          <div className="overflow-hidden border rounded-2xl border-white/20">
             <iframe
               className="h-full min-h-[220px] w-full"
               src="https://www.google.com/maps/embed?pb=!1m23!1m12!1m3!1d6143.023468415731!2d-46.62867425775863!3d-23.723703952954!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!4m8!3e3!4m0!4m5!1s0x94ce4431057996ff%3A0xc054b204a96989ca!2sAssembl%C3%A9ia%20de%20Deus%20-%20Jardim%20Eldorado%20-%20Diadema%20-%20SP%20-%20(Setor%203%20-%20Campo%20do%20Jabaquara)%20-%20R.%20Baiacu%2C%20300%20-%20Eldorado%2C%20Diadema%20-%20SP%2C%2009950-000!3m2!1d-23.723198099999998!2d-46.6252785!5e0!3m2!1spt-BR!2sbr!4v1694715620748!5m2!1spt-BR!2sbr"
@@ -409,7 +496,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="mx-auto mt-10 max-w-6xl border-t border-white/15 pt-6 text-center text-sm text-slate-400">
+        <div className="max-w-6xl pt-6 mx-auto mt-10 text-sm text-center border-t border-white/15 text-slate-400">
           © {new Date().getFullYear()} IAD Eldorado. Todos os direitos reservados.
         </div>
       </footer>
