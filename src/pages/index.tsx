@@ -204,9 +204,11 @@ export default function Home() {
             </article>
 
             <div className="overflow-hidden rounded-3xl border border-[#eadfca] bg-white shadow-xl">
-              <div className="h-64 w-full bg-cover bg-center" style={{ backgroundImage: "url('/pastor_pastora.jpg')" }} />
+              <div className="relative h-96 w-full bg-gray-200">
+                <Image src="/Pastorado.jpeg" alt="Pastores" fill className="object-contain" />
+              </div>
               <div className="p-6">
-                <h3 className="text-lg font-extrabold text-[#0f172a]">Pr. Edison Xavier & Ev. Eliane Ferreira</h3>
+                <h3 className="text-lg font-extrabold text-[#0f172a]">Pr. Edison Xavier & Ev. Eliane Xavier</h3>
                 <p className="mt-1 text-sm text-slate-600">Pastor e Evangelista</p>
                 <div className="mt-4 flex gap-2">
                   <Link
