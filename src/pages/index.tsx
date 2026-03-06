@@ -148,6 +148,44 @@ export default function Home() {
           </div>
         </section>
 
+        <section id="midia" className="px-4 py-16 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-6xl">
+            <div className="mb-8 text-center">
+              <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#8b5e34]">Web Rádio</p>
+              <h2 className="mt-2 text-3xl font-bold text-[#0f172a] sm:text-4xl" style={{ fontFamily: "'Playfair Display', serif" }}>
+                Ouça nossa rádio em tempo real
+              </h2>
+            </div>
+
+            <div className="overflow-hidden rounded-3xl border border-[#eadfca] bg-white p-6 shadow-xl sm:p-8">
+              <div className="mb-4 inline-flex items-center rounded-full bg-[#f8f2e6] px-3 py-1 text-xs font-bold uppercase tracking-wide text-[#8b5e34]">
+                <FiRadio className="mr-2" /> Ao vivo
+              </div>
+
+              {zenoEmbedUrl ? (
+                <div className="overflow-hidden rounded-2xl border border-[#eadfca] bg-[#fffcf6]">
+                  <iframe
+                    src={zenoEmbedUrl}
+                    width="100%"
+                    height="160"
+                    frameBorder="0"
+                    allow="autoplay"
+                    loading="lazy"
+                    title="Player Web Rádio ZenoFM"
+                  />
+                </div>
+              ) : (
+                <div className="rounded-2xl border border-dashed border-[#d8c19e] bg-[#fffcf6] p-4 text-sm text-slate-600">
+                  Configure em <span className="font-bold">NEXT_PUBLIC_ZENOFM_EMBED_URL</span>.
+                  Exemplo: <code>https://zeno.fm/embed/SEU-CODIGO</code>
+                </div>
+              )}
+
+              <p className="mt-4 text-sm text-slate-600">Louvores, palavra e avisos da igreja durante a semana.</p>
+            </div>
+          </div>
+        </section>
+
         <section id="sobre" className="px-4 py-16 sm:px-6 lg:px-8">
           <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
             <article>
@@ -166,9 +204,11 @@ export default function Home() {
             </article>
 
             <div className="overflow-hidden rounded-3xl border border-[#eadfca] bg-white shadow-xl">
-              <div className="h-64 w-full bg-cover bg-center" style={{ backgroundImage: "url('/pastor_pastora.jpg')" }} />
+              <div className="relative h-96 w-full bg-gray-200">
+                <Image src="/Pastorado.jpeg" alt="Pastores" fill className="object-contain" />
+              </div>
               <div className="p-6">
-                <h3 className="text-lg font-extrabold text-[#0f172a]">Pr. Edison Xavier & Ev. Eliane Ferreira</h3>
+                <h3 className="text-lg font-extrabold text-[#0f172a]">Pr. Edison Xavier & Ev. Eliane Xavier</h3>
                 <p className="mt-1 text-sm text-slate-600">Pastor e Evangelista</p>
                 <div className="mt-4 flex gap-2">
                   <Link
@@ -314,44 +354,6 @@ export default function Home() {
                 <p className="font-bold">Horário de funcionamento</p>
                 <p>Aberta antes e depois dos cultos.</p>
               </div>
-            </div>
-          </div>
-        </section>
-
-        <section id="midia" className="px-4 py-16 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-6xl">
-            <div className="mb-8 text-center">
-              <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#8b5e34]">Web Rádio</p>
-              <h2 className="mt-2 text-3xl font-bold text-[#0f172a] sm:text-4xl" style={{ fontFamily: "'Playfair Display', serif" }}>
-                Ouça nossa rádio em tempo real
-              </h2>
-            </div>
-
-            <div className="overflow-hidden rounded-3xl border border-[#eadfca] bg-white p-6 shadow-xl sm:p-8">
-              <div className="mb-4 inline-flex items-center rounded-full bg-[#f8f2e6] px-3 py-1 text-xs font-bold uppercase tracking-wide text-[#8b5e34]">
-                <FiRadio className="mr-2" /> Ao vivo
-              </div>
-
-              {zenoEmbedUrl ? (
-                <div className="overflow-hidden rounded-2xl border border-[#eadfca] bg-[#fffcf6]">
-                  <iframe
-                    src={zenoEmbedUrl}
-                    width="100%"
-                    height="160"
-                    frameBorder="0"
-                    allow="autoplay"
-                    loading="lazy"
-                    title="Player Web Rádio ZenoFM"
-                  />
-                </div>
-              ) : (
-                <div className="rounded-2xl border border-dashed border-[#d8c19e] bg-[#fffcf6] p-4 text-sm text-slate-600">
-                  Configure em <span className="font-bold">NEXT_PUBLIC_ZENOFM_EMBED_URL</span>.
-                  Exemplo: <code>https://zeno.fm/embed/SEU-CODIGO</code>
-                </div>
-              )}
-
-              <p className="mt-4 text-sm text-slate-600">Louvores, palavra e avisos da igreja durante a semana.</p>
             </div>
           </div>
         </section>
