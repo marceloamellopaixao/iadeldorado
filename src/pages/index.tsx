@@ -1,12 +1,8 @@
 ﻿import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FiCalendar, FiClock, FiInstagram, FiPause, FiPlay, FiRadio, FiSend, FiVolume2, FiYoutube } from "react-icons/fi";
-import { useCart } from "@/hooks/useCart";
-import { useProducts } from "@/hooks/useProducts";
-import { getTierBadgeText } from "@/utils/pricing";
 
 const agendaItems = [
   {
@@ -47,60 +43,18 @@ const agendaItems = [
   },
 ];
 
-const normalizeCategory = (category?: string) =>
-  (category || "geral")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .trim();
-
-const categoryLabel = (category: string) =>
-  category
-    .split(" ")
-    .filter(Boolean)
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-
 export default function Home() {
-  const { products, loading: cantinaLoading } = useProducts();
-  const { addToCart } = useCart();
-  const router = useRouter();
-  const [activeCategory, setActiveCategory] = useState("todas");
   const zenoEmbedUrl = process.env.NEXT_PUBLIC_ZENOFM_EMBED_URL || "";
   const radioBannerUrl = process.env.NEXT_PUBLIC_RADIO_BANNER_URL || "/igreja.jpg";
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(80);
 
-  const categories = useMemo(() => {
-    const uniqueCategories = Array.from(new Set(products.map((item) => normalizeCategory(item.category))));
-    return ["todas", ...uniqueCategories];
-  }, [products]);
-
-  useEffect(() => {
-    if (!categories.includes(activeCategory)) {
-      setActiveCategory("todas");
-    }
-  }, [categories, activeCategory]);
 
   useEffect(() => {
     if (!audioRef.current) return;
     audioRef.current.volume = volume / 100;
   }, [volume]);
-
-  const filteredCantinaItems = useMemo(
-    () =>
-      products.filter((item) =>
-        activeCategory === "todas" ? true : normalizeCategory(item.category) === activeCategory,
-      ),
-    [products, activeCategory],
-  );
-
-  const handleBuyFromHome = async (item: (typeof products)[number]) => {
-    if (item.stock <= 0) return;
-    await addToCart(item, 1);
-    router.push("/checkout");
-  };
 
   const handleToggleRadio = async () => {
     if (!audioRef.current) return;
@@ -198,7 +152,7 @@ export default function Home() {
               {zenoEmbedUrl ? (
                 <div className="overflow-hidden rounded-2xl border border-[#eadfca] bg-[#fffcf6]">
                   <div
-                    className="relative h-56 w-full bg-cover bg-center sm:h-64"
+                    className="relative w-full h-56 bg-center bg-cover sm:h-64"
                     style={{
                       backgroundImage: `linear-gradient(to top, rgba(15,23,42,.78), rgba(15,23,42,.35)), url('${radioBannerUrl}')`,
                     }}
@@ -206,7 +160,7 @@ export default function Home() {
                     <div className="absolute inset-0 flex flex-col items-center justify-end gap-4 p-5 sm:p-6">
                       <p className="text-sm font-semibold uppercase tracking-[0.15em] text-[#f8edd3]">Rádio IAD Eldorado</p>
 
-                      <div className="flex w-full max-w-xl items-center gap-4 rounded-2xl border border-white/20 bg-black/35 p-4 backdrop-blur">
+                      <div className="flex items-center w-full max-w-xl gap-4 p-4 border rounded-2xl border-white/20 bg-black/35 backdrop-blur">
                         <button
                           type="button"
                           onClick={handleToggleRadio}
@@ -216,12 +170,12 @@ export default function Home() {
                           {isPlaying ? <FiPause className="text-lg" /> : <FiPlay className="ml-0.5 text-lg" />}
                         </button>
 
-                        <div className="flex flex-1 items-center gap-2 text-white">
+                        <div className="flex items-center flex-1 gap-2 text-white">
                           <FiVolume2 className="shrink-0" />
                           <button
                             type="button"
                             onClick={() => handleVolumeChange(volume - 10)}
-                            className="rounded-md border border-white/35 px-2 py-1 text-xs font-bold text-white transition hover:bg-white/10"
+                            className="px-2 py-1 text-xs font-bold text-white transition border rounded-md border-white/35 hover:bg-white/10"
                             aria-label="Diminuir volume"
                           >
                             -
@@ -233,14 +187,14 @@ export default function Home() {
                             step={1}
                             value={volume}
                             onChange={(event) => handleVolumeChange(Number(event.target.value))}
-                            className="radio-volume-slider h-2 w-full cursor-pointer"
+                            className="w-full h-2 cursor-pointer radio-volume-slider"
                             style={{ "--volume": `${volume}%` } as React.CSSProperties}
                             aria-label="Volume da rádio"
                           />
                           <button
                             type="button"
                             onClick={() => handleVolumeChange(volume + 10)}
-                            className="rounded-md border border-white/35 px-2 py-1 text-xs font-bold text-white transition hover:bg-white/10"
+                            className="px-2 py-1 text-xs font-bold text-white transition border rounded-md border-white/35 hover:bg-white/10"
                             aria-label="Aumentar volume"
                           >
                             +
@@ -345,106 +299,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="cantina" className="bg-[#f8f2e6] px-4 py-16 sm:px-6 lg:px-8">
-          <div className="max-w-6xl mx-auto">
-            <div className="mb-8">
-              <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#8b5e34]">Destaque Especial</p>
-              <h2 className="mt-2 text-3xl font-bold text-[#0f172a] sm:text-4xl" style={{ fontFamily: "'Playfair Display', serif" }}>
-                IAD Eldorado - Cantina
-              </h2>
-              <p className="max-w-3xl mt-4 text-slate-700">
-                Toda arrecadação da cantina é revertida para projetos da igreja, missão e apoio
-                à obra de Deus. Consuma com alegria e participe desse propósito.
-              </p>
-              <Link href="/products" className="mt-5 inline-flex rounded-full bg-[#5f3711] px-6 py-3 text-sm font-bold text-white transition hover:bg-[#4a2b0d]">
-                Ir para a página da cantina
-              </Link>
-            </div>
-
-            <div className="rounded-3xl border border-[#e7d8be] bg-white p-6 shadow-xl">
-              <div className="flex flex-wrap gap-2 mb-6">
-                {categories.map((tab) => {
-                  const isActive = activeCategory === tab;
-                  return (
-                    <button
-                      key={tab}
-                      type="button"
-                      onClick={() => setActiveCategory(tab)}
-                      className={`rounded-full px-4 py-2 text-sm font-bold transition ${isActive ? "bg-[#5f3711] text-white shadow-md" : "border border-[#eadfca] bg-[#fcfbf7] text-[#5f3711] hover:bg-[#f7f1e5]"}`}
-                    >
-                      {tab === "todas" ? "Todas" : categoryLabel(tab)}
-                    </button>
-                  );
-                })}
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {cantinaLoading && (
-                  <div className="col-span-full rounded-2xl border border-[#eadfca] bg-[#fffcf6] p-4 text-sm text-slate-600">
-                    Carregando itens da cantina...
-                  </div>
-                )}
-
-                {!cantinaLoading && filteredCantinaItems.length === 0 && (
-                  <div className="col-span-full rounded-2xl border border-[#eadfca] bg-[#fffcf6] p-4 text-sm text-slate-600">
-                    Nenhum produto disponível nesta categoria no momento.
-                  </div>
-                )}
-
-                {!cantinaLoading &&
-                  filteredCantinaItems.map((item) => (
-                    <article
-                      key={item.id}
-                      className="flex h-full min-h-[230px] flex-col rounded-2xl border border-[#eadfca] bg-[#fffcf6] p-4 transition hover:shadow-md"
-                    >
-                      <div className="mb-3 flex min-h-[56px] items-center gap-3">
-                        <div className="relative h-12 w-12 overflow-hidden rounded-full border border-[#e7d8be] bg-[#e8d3af]">
-                          {item.imageUrl ? (
-                            <Image src={item.imageUrl} alt={item.name} fill className="object-cover" unoptimized />
-                          ) : (
-                            <div className="flex h-full items-center justify-center text-[10px] font-extrabold text-[#5f3711]">FOTO</div>
-                          )}
-                        </div>
-                        <div>
-                          <h3 className="font-bold text-[#0f172a]">{item.name}</h3>
-                          <span className="mt-1 inline-block rounded-full bg-[#f2c46d]/30 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#8b5e34]">
-                            Estoque: {item.stock}
-                          </span>
-                        </div>
-                      </div>
-                      <p className="min-h-[44px] text-sm text-slate-600">{item.description || "Sem descrição."}</p>
-                      {(item.pricingTiers || []).length > 0 && (
-                        <p className="mt-2 min-h-[18px] text-xs font-bold text-[#8b5e34]">
-                          Oferta: {(item.pricingTiers || []).map(getTierBadgeText).join(" | ")}
-                        </p>
-                      )}
-                      {(item.pricingTiers || []).length === 0 && <div className="mt-2 min-h-[18px]" />}
-                      <p className="mt-2 min-h-[24px] text-sm font-extrabold text-[#5f3711]">
-                        {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(item.price)}
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => handleBuyFromHome(item)}
-                        disabled={item.stock <= 0}
-                        className={`mt-auto w-full rounded-full px-4 py-2 text-sm font-bold transition ${
-                          item.stock <= 0
-                            ? "cursor-not-allowed bg-[#d4c098] text-[#5f3711]/70"
-                            : "bg-[#5f3711] text-white hover:bg-[#4a2b0d]"
-                        }`}
-                      >
-                        {item.stock <= 0 ? "Indisponível" : "Comprar"}
-                      </button>
-                    </article>
-                  ))}
-              </div>
-
-              <div className="mt-6 rounded-2xl border border-[#eadfca] bg-[#f8f2e6] p-4 text-sm text-[#5f3711]">
-                <p className="font-bold">Horário de funcionamento</p>
-                <p>Aberta antes e depois dos cultos.</p>
-              </div>
-            </div>
-          </div>
-        </section>
+        
 
         <section id="pedido-oracao" className="bg-[#f8f2e6] px-4 py-16 sm:px-6 lg:px-8">
           <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[1fr_1.1fr] lg:items-start">
