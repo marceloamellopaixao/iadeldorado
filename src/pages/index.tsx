@@ -233,7 +233,8 @@ export default function Home() {
                             step={1}
                             value={volume}
                             onChange={(event) => handleVolumeChange(Number(event.target.value))}
-                            className="h-2 w-full cursor-pointer rounded-lg bg-white/40 accent-[#f2c46d]"
+                            className="radio-volume-slider h-2 w-full cursor-pointer"
+                            style={{ "--volume": `${volume}%` } as React.CSSProperties}
                             aria-label="Volume da rádio"
                           />
                           <button
